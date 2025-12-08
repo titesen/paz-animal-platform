@@ -671,7 +671,51 @@ CREATE TABLE public.payment_methods (
     CONSTRAINT fk_pm_user FOREIGN KEY (user_id) REFERENCES auth.users(user_id) ON DELETE CASCADE
 );
 
---- 8. AUDIT & OPS
+--- 9. UI CONTENT MANAGEMENT (Lightweight CMS): Added for dynamic management of text and images.
+-- 1. We define the types of components and fixed sections.
+CREATE TYPE public.ui_component_type AS ENUM (
+    'TEXT',           -- Plain text (Titles, Labels)
+    'RICH_TEXT',      -- HTML/Markdown (Long paragraphs)
+    'IMAGE_URL',      -- Link to a photo in R2
+    'CAROUSEL_LIST',  -- Array of objects {url, alt, link}
+    'CONFIG',         -- Boolean or numeric configurations (e.g. show_banner: true)
+    'LINK'            -- Buttons or external links
+);
+
+CREATE TYPE public.ui_section AS ENUM (
+    'GLOBAL',         -- Things that appear everywhere (e.g. Phone in header)
+    'HOME',           -- Home Page
+    'FOOTER',         -- Footer
+    'NAVBAR',         -- Navbar
+    'ADOPTIONS',      -- Adoptions Page
+    'VOLUNTEERS',     -- Volunteers Page
+    'DONATIONS',      -- Donations Page
+    'CONTACT',        -- Contact Page
+    'ABOUT_US'        -- About Us Page
+);
+
+-- 2. The fragment table
+CREATE TABLE public.ui_fragments (
+    fragment_key VARCHAR(100) NOT NULL, -- Logical unique ID (e.g. 'home_hero_title')
+    language public.language_code NOT NULL DEFAULT 'es',
+
+    description VARCHAR(255), -- Help for admin: "Large title of the main banner"
+    type public.ui_component_type NOT NULL,
+    section public.ui_section NOT NULL, -- Your correction: Now it's ENUM
+
+    content JSONB NOT NULL, -- The actual value (flexible)
+
+    last_updated_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_by UUID, -- Who last modified it
+
+    CONSTRAINT pk_ui_fragments PRIMARY KEY (fragment_key, language),
+    CONSTRAINT fk_ui_fragments_updater FOREIGN KEY (updated_by) REFERENCES auth.users(user_id) ON DELETE SET NULL
+);
+
+-- Index for fast search by section (what the Frontend will do)
+CREATE INDEX idx_ui_fragments_section ON public.ui_fragments(section);
+
+--- 10. AUDIT & OPS
 CREATE TABLE public.notifications (
     notification_id UUID DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
