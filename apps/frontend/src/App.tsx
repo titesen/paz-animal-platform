@@ -24,18 +24,26 @@ function App() {
         <div className="min-h-screen">
           <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           <Routes>
-            <Route path="/" element={
-              <main>
-                <Hero />
-                <Services />
-                <FeaturedPets />
-                <DonationModule />
-                <LostPetsSection />
-                <Events />
-                <Sponsors />
-                <AboutUsSection />
-              </main>
-            } />
+            <Route
+              path="/"
+              element={
+                <main>
+                  <Hero />
+                  <Services />
+                  <FeaturedPets />
+                  <DonationModule />
+                  <LostPetsSection />
+                  <Events />
+                  <Sponsors />
+                  <AboutUsSection />
+                </main>
+              }
+            />
+            {/* Rutas adicionales listas para implementar */}
+            {/* <Route path="/adoptar" element={<AdoptPage />} /> */}
+            {/* <Route path="/donar" element={<DonatePage />} /> */}
+            {/* <Route path="/eventos" element={<EventsPage />} /> */}
+            {/* <Route path="/nosotros" element={<AboutPage />} /> */}
           </Routes>
           <Footer />
         </div>
