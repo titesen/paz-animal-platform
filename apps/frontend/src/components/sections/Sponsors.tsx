@@ -10,7 +10,7 @@ const Sponsors: React.FC = () => {
           {/* Placeholder Logos using Text or generic shapes for Demo */}
           {['Royal Canin', 'Mercado Pago', 'Municipalidad', 'PetShop'].map((name, i) => (
             <div key={i} className="group cursor-pointer transition-all duration-300">
-              <span className="text-xl md:text-2xl font-display font-bold text-slate-400 grayscale group-hover:grayscale-0 group-hover:text-primary transition-all duration-500">
+              <span className="text-xl md:text-2xl font-heading font-bold text-slate-400 grayscale group-hover:grayscale-0 group-hover:text-primary transition-all duration-500">
                 {name}
               </span>
             </div>

@@ -40,7 +40,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
             <div className="bg-white text-primary p-2 rounded-xl group-hover:scale-110 transition-transform">
               <PawPrint size={24} fill="currentColor" />
             </div>
-            <span className="text-2xl font-display font-bold tracking-tight">Paz Animal</span>
+            <span className="text-2xl font-heading font-bold tracking-tight">Paz Animal</span>
           </a>
 
           {/* Desktop Nav */}
@@ -87,7 +87,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-primary border-t border-primary-hover shadow-xl p-4 flex flex-col gap-4">
+        <div className="md:hidden absolute top-full left-0 w-full bg-primary border-t border-primary-hover shadow-xl p-4 flex flex-col gap-4 animate-in slide-in-from-top-5">
           {navLinks.map((link) => (
             <a
               key={link.name}

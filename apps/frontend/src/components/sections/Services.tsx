@@ -30,7 +30,7 @@ const Services: React.FC = () => {
     <section id="services" className="py-20 bg-white dark:bg-slate-900">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 dark:text-white mb-4">
+          <h2 className="text-3xl md:text-5xl font-heading font-bold text-slate-900 dark:text-white mb-4">
             Cómo puedes <span className="text-primary">ayudar hoy</span>
           </h2>
           <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
@@ -50,7 +50,7 @@ const Services: React.FC = () => {
                 <service.icon size={32} />
               </div>
 
-              <h3 className="text-2xl font-display font-bold text-slate-900 dark:text-white mb-4 relative z-10">
+              <h3 className="text-2xl font-heading font-bold text-slate-900 dark:text-white mb-4 relative z-10">
                 {service.title}
               </h3>
 

@@ -26,7 +26,7 @@ const Events: React.FC = () => {
     <section id="events" className="py-20 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between mb-10">
-          <h2 className="text-3xl font-display font-bold text-slate-900 dark:text-white">
+          <h2 className="text-3xl font-heading font-bold text-slate-900 dark:text-white">
             Próximos <span className="text-primary">Eventos</span>
           </h2>
           <div className="flex gap-2">
@@ -43,7 +43,7 @@ const Events: React.FC = () => {
           {events.map((event) => (
             <div key={event.id} className="group bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 flex flex-col sm:flex-row gap-6 items-start">
 
-              <div className="flex-shrink-0 w-20 h-20 bg-secondary dark:bg-slate-700 rounded-xl flex flex-col items-center justify-center text-primary font-display font-bold leading-none">
+              <div className="flex-shrink-0 w-20 h-20 bg-secondary dark:bg-slate-700 rounded-xl flex flex-col items-center justify-center text-primary font-heading font-bold leading-none">
                 <span className="text-2xl">{event.date.split(' ')[0]}</span>
                 <span className="text-sm uppercase">{event.date.split(' ')[1]}</span>
               </div>

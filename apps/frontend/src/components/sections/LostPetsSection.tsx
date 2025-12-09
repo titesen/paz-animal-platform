@@ -70,7 +70,7 @@ const LostPetsSection: React.FC = () => {
             ALERTA COMUNITARIA
           </div>
 
-          <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 dark:text-white mb-4">
+          <h2 className="text-3xl md:text-5xl font-heading font-bold text-slate-900 dark:text-white mb-4">
             ¿Viste a alguno de <span className="text-rose-600 dark:text-rose-500 decoration-wavy underline decoration-rose-300 underline-offset-4">ellos?</span>
           </h2>
           <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg">
@@ -108,7 +108,7 @@ const LostPetsSection: React.FC = () => {
                 <div className="p-5 relative">
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <h3 className="text-2xl font-display font-bold text-slate-900 dark:text-white leading-none mb-1">
+                      <h3 className="text-2xl font-heading font-bold text-slate-900 dark:text-white leading-none mb-1">
                         {pet.name}
                       </h3>
                       <p className="text-sm text-slate-500">{pet.type} • {pet.age}</p>
@@ -124,7 +124,7 @@ const LostPetsSection: React.FC = () => {
                   </div>
 
                   {/* Custom 'Danger/Alert' Button Style specifically for this section */}
-                  <button className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-display font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-600/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2">
+                  <button className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-heading font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-600/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2">
                     <Phone size={18} /> Reportar Avistamiento
                   </button>
                 </div>
@@ -136,7 +136,7 @@ const LostPetsSection: React.FC = () => {
             <div className="w-24 h-24 bg-green-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 text-green-600 dark:text-green-500">
               <AlertCircle size={40} />
             </div>
-            <p className="text-xl font-display font-bold text-slate-600 dark:text-slate-300">
+            <p className="text-xl font-heading font-bold text-slate-600 dark:text-slate-300">
               ¡Buenas noticias! No hay mascotas reportadas como perdidas.
             </p>
           </div>

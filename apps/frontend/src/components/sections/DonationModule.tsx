@@ -15,7 +15,7 @@ const DonationModule: React.FC = () => {
 
           {/* Left Side: Info */}
           <div className="md:w-2/5 bg-secondary/50 dark:bg-slate-700/50 p-8 md:p-12 flex flex-col justify-center">
-            <h3 className="text-3xl font-display font-bold text-slate-900 dark:text-white mb-4">
+            <h3 className="text-3xl font-heading font-bold text-slate-900 dark:text-white mb-4">
               Tu ayuda salva vidas
             </h3>
             <p className="text-slate-600 dark:text-slate-300 mb-8">

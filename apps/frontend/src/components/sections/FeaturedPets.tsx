@@ -46,7 +46,7 @@ const FeaturedPets: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
           <div>
-            <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 dark:text-white mb-2">
+            <h2 className="text-3xl md:text-5xl font-heading font-bold text-slate-900 dark:text-white mb-2">
               Esperando un <span className="text-primary">hogar</span>
             </h2>
             <p className="text-slate-600 dark:text-slate-400">
@@ -84,7 +84,7 @@ const FeaturedPets: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90 transition-opacity"></div>
 
               <div className="absolute bottom-0 left-0 w-full p-6 text-white transform translate-y-2 group-hover:translate-y-0 transition-transform">
-                <h3 className="text-2xl font-display font-bold mb-1">{pet.name}</h3>
+                <h3 className="text-2xl font-heading font-bold mb-1">{pet.name}</h3>
                 <p className="text-gray-200 text-sm mb-2">{pet.type} • {pet.age}</p>
                 <div className="h-0 group-hover:h-auto overflow-hidden transition-all opacity-0 group-hover:opacity-100">
                   <p className="text-sm text-gray-300">{pet.description}</p>

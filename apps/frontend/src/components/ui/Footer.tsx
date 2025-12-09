@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center gap-2 mb-6">
               <PawPrint className="text-primary" size={24} fill="currentColor" />
-              <span className="text-2xl font-display font-bold">Paz Animal</span>
+              <span className="text-2xl font-heading font-bold">Paz Animal</span>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed mb-6">
               Dedicados a rescatar, rehabilitar y reubicar animales en situación de calle. Tu apoyo hace posible nuestra misión.
@@ -37,7 +37,7 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="font-display font-bold text-lg mb-6">Enlaces Rápidos</h4>
+            <h4 className="font-heading font-bold text-lg mb-6">Enlaces Rápidos</h4>
             <ul className="space-y-3 text-sm text-slate-400">
               <li>
                 <a href="#" className="hover:text-primary transition-colors">
@@ -63,7 +63,7 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="font-display font-bold text-lg mb-6">Legal</h4>
+            <h4 className="font-heading font-bold text-lg mb-6">Legal</h4>
             <ul className="space-y-3 text-sm text-slate-400">
               <li>
                 <a href="#" className="hover:text-primary transition-colors">
@@ -84,7 +84,7 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="font-display font-bold text-lg mb-6">Contacto</h4>
+            <h4 className="font-heading font-bold text-lg mb-6">Contacto</h4>
             <ul className="space-y-3 text-sm text-slate-400">
               <li>contacto@pazanimal.org</li>
               <li>+54 11 1234 5678</li>

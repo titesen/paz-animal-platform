@@ -8,7 +8,10 @@ export function useDarkMode() {
       if (savedMode) {
         return savedMode === "dark";
       }
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const systemPrefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      return systemPrefersDark;
     }
     return false;
   });
