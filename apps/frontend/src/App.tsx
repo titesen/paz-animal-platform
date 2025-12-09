@@ -1,41 +1,51 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
+import {
+  AboutUsSection,
+  DonationModule,
+  Events,
+  FeaturedPets,
+  Hero,
+  LostPetsSection,
+  Services,
+  Sponsors
+} from './components/sections'
+import { Footer, Header } from './components/ui'
+import { useDarkMode } from './hooks/useDarkMode'
 
 const queryClient = new QueryClient()
 
 function App() {
+  const { darkMode, toggleDarkMode } = useDarkMode()
+
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
+          <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           <Routes>
-            <Route path="/" element={
-              <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                  <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                    Plataforma Paz Animal
-                  </h1>
-                  <p className="text-gray-600 mb-8">
-                    Sistema de gestión en desarrollo
-                  </p>
-                  <div className="space-y-2">
-                    <div className="text-sm text-gray-500">
-                      ✅ Monorepo configurado
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      ✅ Backend API listo
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      ✅ Frontend React + Vite
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      ✅ PostgreSQL + pgAdmin
-                    </div>
-                  </div>
-                </div>
-              </div>
-            } />
+            <Route
+              path="/"
+              element={
+                <main>
+                  <Hero />
+                  <Services />
+                  <FeaturedPets />
+                  <DonationModule />
+                  <LostPetsSection />
+                  <Events />
+                  <Sponsors />
+                  <AboutUsSection />
+                </main>
+              }
+            />
+            {/* Rutas adicionales listas para implementar */}
+            {/* <Route path="/adoptar" element={<AdoptPage />} /> */}
+            {/* <Route path="/donar" element={<DonatePage />} /> */}
+            {/* <Route path="/eventos" element={<EventsPage />} /> */}
+            {/* <Route path="/nosotros" element={<AboutPage />} /> */}
           </Routes>
+          <Footer />
         </div>
       </Router>
     </QueryClientProvider>
