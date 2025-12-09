@@ -8,7 +8,7 @@ const pets: Pet[] = [
     age: "2 años",
     type: "Perro",
     badge: "Urgente",
-    imageUrl: "https://picsum.photos/seed/dog1/500/500",
+    imageUrl: "https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=500&h=500&fit=crop",
     description: "Lleno de energía y amor para dar."
   },
   {
@@ -17,7 +17,7 @@ const pets: Pet[] = [
     age: "4 meses",
     type: "Gato",
     badge: "Cachorro",
-    imageUrl: "https://picsum.photos/seed/cat1/500/600",
+    imageUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=500&h=600&fit=crop",
     description: "Juguetona y muy cariñosa."
   },
   {
@@ -26,7 +26,7 @@ const pets: Pet[] = [
     age: "5 años",
     type: "Perro",
     badge: "Especial",
-    imageUrl: "https://picsum.photos/seed/dog2/500/400",
+    imageUrl: "https://images.unsplash.com/photo-1600369671738-ffcc846f5be0?w=500&h=400&fit=crop",
     description: "Ideal para compañía tranquila."
   },
   {
@@ -35,7 +35,7 @@ const pets: Pet[] = [
     age: "1 año",
     type: "Perro",
     badge: "Adoptable",
-    imageUrl: "https://picsum.photos/seed/dog3/500/500",
+    imageUrl: "https://images.unsplash.com/photo-1615789591457-74a63395c990?w=500&h=500&fit=crop",
     description: "Le encantan los paseos largos."
   },
 ];

@@ -12,7 +12,7 @@ const lostPets: Pet[] = [
     badge: "Perdido hace 2h",
     status: 'LOST',
     lastSeenZone: "Parque Mitre",
-    imageUrl: "https://picsum.photos/seed/lost1/500/500",
+    imageUrl: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500&h=500&fit=crop",
     description: "Tiene un collar rojo."
   },
   {
@@ -23,7 +23,7 @@ const lostPets: Pet[] = [
     badge: "Perdido ayer",
     status: 'LOST',
     lastSeenZone: "Barrio Centro",
-    imageUrl: "https://picsum.photos/seed/lost2/500/500",
+    imageUrl: "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=500&h=500&fit=crop",
     description: "Es muy asustadizo."
   },
   {
@@ -34,7 +34,7 @@ const lostPets: Pet[] = [
     badge: "Urgente",
     status: 'LOST',
     lastSeenZone: "Costanera Sur",
-    imageUrl: "https://picsum.photos/seed/lost3/500/500",
+    imageUrl: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=500&h=500&fit=crop",
     description: "Responde a su nombre."
   },
   {
@@ -45,7 +45,7 @@ const lostPets: Pet[] = [
     badge: "Perdido hoy",
     status: 'LOST',
     lastSeenZone: "Plaza Vera",
-    imageUrl: "https://picsum.photos/seed/lost4/500/500",
+    imageUrl: "https://images.unsplash.com/photo-1552053831-71594a27632d?w=500&h=500&fit=crop",
     description: "Collar azul con chapita."
   }
 ];
@@ -54,7 +54,7 @@ const LostPetsSection: React.FC = () => {
   const hasLostPets = lostPets.length > 0;
 
   return (
-    <section className="py-20 bg-rose-50/50 dark:bg-slate-900/50 border-t-4 border-rose-500 relative overflow-hidden">
+    <section className="py-20 bg-rose-50/50 dark:bg-slate-950 border-t-4 border-rose-500 relative overflow-hidden">
       {/* Background Pattern: Subtle Hazard Stripes */}
       <div className="absolute top-0 left-0 w-full h-2 bg-[linear-gradient(45deg,rgba(255,255,255,.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.15)_50%,rgba(255,255,255,.15)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] opacity-50"></div>
 

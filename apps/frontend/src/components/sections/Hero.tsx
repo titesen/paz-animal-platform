@@ -39,11 +39,11 @@ const Hero: React.FC = () => {
 
           {/* Image Content */}
           <div className="order-1 md:order-2 relative animate-in slide-in-from-right-10 duration-1000 fade-in">
-            <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 border-8 border-white dark:border-slate-800 rotate-2 hover:rotate-0 transition-transform duration-500">
-              <img
-                src="https://picsum.photos/id/237/800/800"
-                alt="Perro feliz adoptado"
-                className="w-full h-auto object-cover aspect-[4/4]"
+              <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 border-8 border-white dark:border-slate-800 rotate-2 hover:rotate-0 transition-transform duration-500">
+                <img
+                  src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&h=800&fit=crop"
+                  alt="Perro feliz adoptado"
+                  className="w-full h-auto object-cover aspect-[4/4]"
               />
             </div>
             {/* Background Accent Card */}
