@@ -3,7 +3,7 @@ import React from 'react';
 
 const AboutUsSection: React.FC = () => {
   return (
-    <section className="py-24 bg-secondary-50 dark:bg-slate-800 transition-colors duration-300">
+    <section className="py-24 bg-secondary dark:bg-slate-800 transition-colors duration-300">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 dark:text-white">
@@ -16,7 +16,7 @@ const AboutUsSection: React.FC = () => {
 
           {/* Vision */}
           <div className="flex flex-col items-center">
-            <div className="w-16 h-16 bg-white dark:bg-slate-700 rounded-2xl flex items-center justify-center text-primary-600 shadow-sm mb-6 rotate-3 hover:rotate-0 transition-transform">
+            <div className="w-16 h-16 bg-white dark:bg-slate-700 rounded-2xl flex items-center justify-center text-primary shadow-sm mb-6 rotate-3 hover:rotate-0 transition-transform">
               <Eye size={32} />
             </div>
             <h3 className="text-2xl font-display font-bold text-slate-900 dark:text-white mb-4">

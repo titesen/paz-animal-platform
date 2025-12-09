@@ -4,10 +4,10 @@ import { Button } from '../ui';
 
 const Hero: React.FC = () => {
   return (
-    <section id="hero" className="pt-32 pb-20 md:pt-40 md:pb-32 bg-gradient-to-b from-white to-secondary-50 dark:from-slate-900 dark:to-slate-800 overflow-hidden relative">
+    <section id="hero" className="pt-32 pb-20 md:pt-40 md:pb-32 bg-gradient-to-b from-white to-secondary dark:from-slate-900 dark:to-slate-800 overflow-hidden relative">
       {/* Decorative Circles */}
-      <div className="absolute top-20 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl -z-10"></div>
+      <div className="absolute top-20 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl -z-10"></div>
 
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -39,7 +39,7 @@ const Hero: React.FC = () => {
 
           {/* Image Content */}
           <div className="order-1 md:order-2 relative">
-            <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl shadow-primary-600/20 border-8 border-white dark:border-slate-800 rotate-2 hover:rotate-0 transition-transform duration-500">
+            <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 border-8 border-white dark:border-slate-800 rotate-2 hover:rotate-0 transition-transform duration-500">
               <img
                 src="https://picsum.photos/id/237/800/800"
                 alt="Perro feliz adoptado"

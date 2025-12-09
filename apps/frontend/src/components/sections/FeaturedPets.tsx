@@ -42,7 +42,7 @@ const pets: Pet[] = [
 
 const FeaturedPets: React.FC = () => {
   return (
-    <section className="py-20 bg-secondary-50/30 dark:bg-slate-850">
+    <section className="py-20 bg-secondary/30 dark:bg-slate-850">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
           <div>

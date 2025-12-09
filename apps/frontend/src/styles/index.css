@@ -1,5 +1,50 @@
 @import "tailwindcss";
 
+@layer base {
+  :root {
+    --color-primary: 2 149 1;
+    --color-primary-hover: 2 122 1;
+    --color-primary-light: 3 176 2;
+    --color-secondary: 230 244 230;
+    --color-accent: 255 159 28;
+    --color-accent-hover: 224 139 21;
+    --color-slate-850: 21 31 50;
+  }
+}
+
+@layer utilities {
+  .bg-primary { background-color: rgb(var(--color-primary)); }
+  .text-primary { color: rgb(var(--color-primary)); }
+  .border-primary { border-color: rgb(var(--color-primary)); }
+  .hover\:bg-primary:hover { background-color: rgb(var(--color-primary)); }
+  .hover\:text-primary:hover { color: rgb(var(--color-primary)); }
+
+  .bg-primary-hover { background-color: rgb(var(--color-primary-hover)); }
+  .hover\:bg-primary-hover:hover { background-color: rgb(var(--color-primary-hover)); }
+  .border-primary-hover { border-color: rgb(var(--color-primary-hover)); }
+
+  .text-primary-light { color: rgb(var(--color-primary-light)); }
+  .dark .dark\:text-primary-light { color: rgb(var(--color-primary-light)); }
+
+  .bg-secondary { background-color: rgb(var(--color-secondary)); }
+  .hover\:text-secondary:hover { color: rgb(var(--color-secondary)); }
+  .hover\:bg-secondary:hover { background-color: rgb(var(--color-secondary)); }
+
+  .bg-accent { background-color: rgb(var(--color-accent)); }
+  .text-accent { color: rgb(var(--color-accent)); }
+  .hover\:bg-accent:hover { background-color: rgb(var(--color-accent)); }
+
+  .bg-accent-hover { background-color: rgb(var(--color-accent-hover)); }
+  .hover\:bg-accent-hover:hover { background-color: rgb(var(--color-accent-hover)); }
+
+  .bg-slate-850 { background-color: rgb(var(--color-slate-850)); }
+  .dark .dark\:bg-slate-850 { background-color: rgb(var(--color-slate-850)); }
+
+  .shadow-primary\/20 { box-shadow: 0 25px 50px -12px rgba(var(--color-primary), 0.2); }
+  .shadow-primary\/30 { box-shadow: 0 20px 25px -5px rgba(var(--color-primary), 0.3); }
+  .shadow-accent\/30 { box-shadow: 0 20px 25px -5px rgba(var(--color-accent), 0.3); }
+}
+
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-feature-settings: "rlig" 1, "calt" 1;

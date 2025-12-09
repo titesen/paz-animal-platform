@@ -49,7 +49,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
               <a
                 key={link.name}
                 href={link.href}
-                className="font-medium hover:text-secondary-200 transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-white after:transition-all hover:after:w-full"
+                className="font-medium hover:text-secondary transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-white after:transition-all hover:after:w-full"
               >
                 {link.name}
               </a>
@@ -66,7 +66,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
 
-            <button className="flex items-center gap-1 font-medium hover:text-secondary-200">
+            <button className="flex items-center gap-1 font-medium hover:text-secondary">
               <Globe size={18} /> ES
             </button>
 
@@ -87,12 +87,12 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-primary-600 border-t border-primary-700 shadow-xl p-4 flex flex-col gap-4">
+        <div className="md:hidden absolute top-full left-0 w-full bg-primary border-t border-primary-hover shadow-xl p-4 flex flex-col gap-4">
           {navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="text-lg font-medium py-2 border-b border-primary-700/30"
+              className="text-lg font-medium py-2 border-b border-primary-hover/30"
               onClick={() => setMobileMenuOpen(false)}
             >
               {link.name}

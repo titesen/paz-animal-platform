@@ -14,7 +14,7 @@ const DonationModule: React.FC = () => {
         <div className="max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row">
 
           {/* Left Side: Info */}
-          <div className="md:w-2/5 bg-secondary-50/50 dark:bg-slate-700/50 p-8 md:p-12 flex flex-col justify-center">
+          <div className="md:w-2/5 bg-secondary/50 dark:bg-slate-700/50 p-8 md:p-12 flex flex-col justify-center">
             <h3 className="text-3xl font-display font-bold text-slate-900 dark:text-white mb-4">
               Tu ayuda salva vidas
             </h3>
@@ -43,8 +43,8 @@ const DonationModule: React.FC = () => {
                 onClick={() => setActiveTab('money')}
                 className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${
                   activeTab === 'money'
-                    ? 'bg-white dark:bg-slate-700 text-primary-600 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                    ? 'bg-white dark:bg-slate-700 text-primary shadow-sm'
+                    : 'text-white/80 hover:text-white'
                 }`}
               >
                 <CreditCard size={18} /> Dinero
@@ -53,8 +53,8 @@ const DonationModule: React.FC = () => {
                 onClick={() => setActiveTab('supplies')}
                 className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${
                   activeTab === 'supplies'
-                    ? 'bg-white dark:bg-slate-700 text-primary-600 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                    ? 'bg-white dark:bg-slate-700 text-primary shadow-sm'
+                    : 'text-white/80 hover:text-white'
                 }`}
               >
                 <Package size={18} /> Insumos
@@ -92,7 +92,7 @@ const DonationModule: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                <div className="bg-secondary-50/30 dark:bg-slate-700/30 p-4 rounded-xl">
+                <div className="bg-secondary/30 dark:bg-slate-700/30 p-4 rounded-xl">
                   <h4 className="font-bold text-slate-800 dark:text-white mb-2">Lo que más necesitamos:</h4>
                   <ul className="list-disc list-inside text-slate-600 dark:text-slate-300 space-y-1 text-sm">
                     <li>Alimento balanceado (Cachorro/Adulto)</li>
