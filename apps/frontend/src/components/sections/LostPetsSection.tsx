@@ -55,9 +55,6 @@ const LostPetsSection: React.FC = () => {
 
   return (
     <section className="py-20 bg-rose-50/50 dark:bg-slate-900 border-t-4 border-rose-500 relative overflow-hidden">
-      {/* Background Pattern: Subtle Hazard Stripes */}
-      <div className="absolute top-0 left-0 w-full h-2 bg-[linear-gradient(45deg,rgba(255,255,255,.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.15)_50%,rgba(255,255,255,.15)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] opacity-50"></div>
-
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="flex flex-col items-center text-center mb-12">
 

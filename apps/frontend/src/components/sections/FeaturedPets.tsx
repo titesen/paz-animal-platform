@@ -26,7 +26,7 @@ const pets: Pet[] = [
     age: "5 años",
     type: "Perro",
     badge: "Especial",
-    imageUrl: "https://images.unsplash.com/photo-1600369671738-ffcc846f5be0?w=500&h=400&fit=crop",
+    imageUrl: "https://images.unsplash.com/photo-1588943211346-0908a1fb0b01?q=80&w=435&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     description: "Ideal para compañía tranquila."
   },
   {
@@ -35,7 +35,7 @@ const pets: Pet[] = [
     age: "1 año",
     type: "Perro",
     badge: "Adoptable",
-    imageUrl: "https://images.unsplash.com/photo-1615789591457-74a63395c990?w=500&h=500&fit=crop",
+    imageUrl: "https://images.unsplash.com/photo-1544568100-847a948585b9?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     description: "Le encantan los paseos largos."
   },
 ];
