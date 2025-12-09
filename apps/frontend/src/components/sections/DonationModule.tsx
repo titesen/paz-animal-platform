@@ -44,7 +44,7 @@ const DonationModule: React.FC = () => {
                 className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${
                   activeTab === 'money'
                     ? 'bg-white dark:bg-slate-700 text-primary shadow-sm'
-                    : 'text-white/80 hover:text-white'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
               >
                 <CreditCard size={18} /> Dinero
@@ -54,7 +54,7 @@ const DonationModule: React.FC = () => {
                 className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${
                   activeTab === 'supplies'
                     ? 'bg-white dark:bg-slate-700 text-primary shadow-sm'
-                    : 'text-white/80 hover:text-white'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
               >
                 <Package size={18} /> Insumos
@@ -62,7 +62,7 @@ const DonationModule: React.FC = () => {
             </div>
 
             {activeTab === 'money' ? (
-              <div className="space-y-6">
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="grid grid-cols-3 gap-3">
                   {['$1.000', '$2.500', '$5.000'].map((amount) => (
                     <button key={amount} className="border-2 border-slate-200 dark:border-slate-700 hover:border-primary dark:hover:border-primary text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl transition-colors">
@@ -73,7 +73,7 @@ const DonationModule: React.FC = () => {
 
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500">$</span>
+                    <span className="text-gray-500 dark:text-gray-400">$</span>
                   </div>
                   <input
                     type="number"
@@ -91,7 +91,7 @@ const DonationModule: React.FC = () => {
                 </p>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="bg-secondary/30 dark:bg-slate-700/30 p-4 rounded-xl">
                   <h4 className="font-bold text-slate-800 dark:text-white mb-2">Lo que más necesitamos:</h4>
                   <ul className="list-disc list-inside text-slate-600 dark:text-slate-300 space-y-1 text-sm">
