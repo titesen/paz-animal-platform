@@ -31,13 +31,13 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? 'py-2 shadow-xl' : 'py-4'
-      } bg-primary-600 text-white`}
+      } bg-primary text-white`}
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 group">
-            <div className="bg-white text-primary-600 p-2 rounded-xl group-hover:scale-110 transition-transform">
+            <div className="bg-white text-primary p-2 rounded-xl group-hover:scale-110 transition-transform">
               <PawPrint size={24} fill="currentColor" />
             </div>
             <span className="text-2xl font-display font-bold tracking-tight">Paz Animal</span>
@@ -60,7 +60,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
           <div className="hidden md:flex items-center gap-4">
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-full hover:bg-primary-700 transition-colors"
+              className="p-2 rounded-full hover:bg-primary-hover transition-colors"
               aria-label="Toggle Theme"
             >
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}

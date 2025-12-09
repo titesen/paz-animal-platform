@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center gap-2 mb-6">
-              <PawPrint className="text-primary-500" size={24} fill="currentColor" />
+              <PawPrint className="text-primary" size={24} fill="currentColor" />
               <span className="text-2xl font-display font-bold">Paz Animal</span>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed mb-6">
@@ -17,19 +17,19 @@ const Footer: React.FC = () => {
             <div className="flex gap-4">
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary-600 transition-colors"
+                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition-colors"
               >
                 <Facebook size={18} />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary-600 transition-colors"
+                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition-colors"
               >
                 <Instagram size={18} />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary-600 transition-colors"
+                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition-colors"
               >
                 <Twitter size={18} />
               </a>
@@ -40,22 +40,22 @@ const Footer: React.FC = () => {
             <h4 className="font-display font-bold text-lg mb-6">Enlaces Rápidos</h4>
             <ul className="space-y-3 text-sm text-slate-400">
               <li>
-                <a href="#" className="hover:text-primary-500 transition-colors">
+                <a href="#" className="hover:text-primary transition-colors">
                   Inicio
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-500 transition-colors">
+                <a href="#" className="hover:text-primary transition-colors">
                   Adopciones
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-500 transition-colors">
+                <a href="#" className="hover:text-primary transition-colors">
                   Voluntariado
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-500 transition-colors">
+                <a href="#" className="hover:text-primary transition-colors">
                   Eventos
                 </a>
               </li>
@@ -66,17 +66,17 @@ const Footer: React.FC = () => {
             <h4 className="font-display font-bold text-lg mb-6">Legal</h4>
             <ul className="space-y-3 text-sm text-slate-400">
               <li>
-                <a href="#" className="hover:text-primary-500 transition-colors">
+                <a href="#" className="hover:text-primary transition-colors">
                   Política de Privacidad
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-500 transition-colors">
+                <a href="#" className="hover:text-primary transition-colors">
                   Términos y Condiciones
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-500 transition-colors">
+                <a href="#" className="hover:text-primary transition-colors">
                   Transparencia Financiera
                 </a>
               </li>

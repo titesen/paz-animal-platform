@@ -31,7 +31,7 @@ const Services: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 dark:text-white mb-4">
-            Cómo puedes <span className="text-primary-600">ayudar hoy</span>
+            Cómo puedes <span className="text-primary">ayudar hoy</span>
           </h2>
           <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             Existen muchas formas de ser parte de nuestra misión. Cada pequeña acción cuenta para transformar vidas.
@@ -42,11 +42,11 @@ const Services: React.FC = () => {
           {services.map((service) => (
             <div
               key={service.id}
-              className="group bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border-t-8 border-primary-600 relative overflow-hidden"
+              className="group bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border-t-8 border-primary relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-secondary-100/50 dark:bg-slate-700/50 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-secondary-50/50 dark:bg-slate-700/50 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
 
-              <div className="bg-secondary-100 dark:bg-slate-700 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-colors relative z-10">
+              <div className="bg-secondary dark:bg-slate-700 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 text-primary group-hover:bg-primary group-hover:text-white transition-colors relative z-10">
                 <service.icon size={32} />
               </div>
 
@@ -58,7 +58,7 @@ const Services: React.FC = () => {
                 {service.description}
               </p>
 
-              <a href="#" className="inline-flex items-center gap-2 font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 transition-colors relative z-10">
+              <a href="#" className="inline-flex items-center gap-2 font-bold text-primary hover:text-primary-hover dark:text-primary-light transition-colors relative z-10">
                 {service.action} <ArrowRight size={18} />
               </a>
             </div>

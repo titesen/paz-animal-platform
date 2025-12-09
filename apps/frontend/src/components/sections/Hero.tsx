@@ -4,7 +4,7 @@ import { Button } from '../ui';
 
 const Hero: React.FC = () => {
   return (
-    <section id="hero" className="pt-32 pb-20 md:pt-40 md:pb-32 bg-gradient-to-b from-white to-secondary-100 dark:from-slate-900 dark:to-slate-850 overflow-hidden relative">
+    <section id="hero" className="pt-32 pb-20 md:pt-40 md:pb-32 bg-gradient-to-b from-white to-secondary-50 dark:from-slate-900 dark:to-slate-800 overflow-hidden relative">
       {/* Decorative Circles */}
       <div className="absolute top-20 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl -z-10"></div>
@@ -14,13 +14,13 @@ const Hero: React.FC = () => {
 
           {/* Text Content */}
           <div className="order-2 md:order-1 space-y-8">
-            <div className="inline-flex items-center gap-2 bg-secondary-100/50 dark:bg-slate-800/50 px-4 py-2 rounded-full text-primary-700 dark:text-primary-400 font-bold text-sm">
+            <div className="inline-flex items-center gap-2 bg-secondary/50 dark:bg-slate-800/50 px-4 py-2 rounded-full text-primary dark:text-primary-light font-bold text-sm">
               <Heart size={16} fill="currentColor" />
               <span>Más de 500 animales rescatados este año</span>
             </div>
 
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-extrabold text-slate-900 dark:text-white leading-[1.1]">
-              Cambia una vida, <span className="text-primary-600 block mt-2">adopta amor.</span>
+              Cambia una vida, <span className="text-primary block mt-2">adopta amor.</span>
             </h1>
 
             <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-lg leading-relaxed">
@@ -47,7 +47,7 @@ const Hero: React.FC = () => {
               />
             </div>
             {/* Background Accent Card */}
-            <div className="absolute top-4 -right-4 w-full h-full bg-primary-600 rounded-3xl -z-10 -rotate-2"></div>
+            <div className="absolute top-4 -right-4 w-full h-full bg-primary rounded-3xl -z-10 -rotate-2"></div>
           </div>
 
         </div>

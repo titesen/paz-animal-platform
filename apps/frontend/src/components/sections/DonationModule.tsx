@@ -6,7 +6,7 @@ const DonationModule: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'money' | 'supplies'>('money');
 
   return (
-    <section id="donate" className="py-24 bg-primary-600 relative overflow-hidden">
+    <section id="donate" className="py-24 bg-primary relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
 
@@ -14,7 +14,7 @@ const DonationModule: React.FC = () => {
         <div className="max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row">
 
           {/* Left Side: Info */}
-          <div className="md:w-2/5 bg-secondary-100/50 dark:bg-slate-700/50 p-8 md:p-12 flex flex-col justify-center">
+          <div className="md:w-2/5 bg-secondary-50/50 dark:bg-slate-700/50 p-8 md:p-12 flex flex-col justify-center">
             <h3 className="text-3xl font-display font-bold text-slate-900 dark:text-white mb-4">
               Tu ayuda salva vidas
             </h3>
@@ -27,7 +27,7 @@ const DonationModule: React.FC = () => {
                 Transparencia garantizada
               </div>
               <div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-primary-600 w-3/4"></div>
+                <div className="h-full bg-primary w-3/4"></div>
               </div>
               <div className="flex justify-between text-xs text-slate-500 mt-1">
                 <span>Meta mensual</span>
@@ -65,7 +65,7 @@ const DonationModule: React.FC = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-3 gap-3">
                   {['$1.000', '$2.500', '$5.000'].map((amount) => (
-                    <button key={amount} className="border-2 border-slate-200 dark:border-slate-700 hover:border-primary-600 dark:hover:border-primary-600 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl transition-colors">
+                    <button key={amount} className="border-2 border-slate-200 dark:border-slate-700 hover:border-primary dark:hover:border-primary text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl transition-colors">
                       {amount}
                     </button>
                   ))}
@@ -78,7 +78,7 @@ const DonationModule: React.FC = () => {
                   <input
                     type="number"
                     placeholder="Otro monto"
-                    className="w-full pl-8 pr-4 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-900 focus:border-primary-600 focus:ring-0 outline-none transition-all dark:text-white"
+                    className="w-full pl-8 pr-4 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-900 focus:border-primary focus:ring-0 outline-none transition-all dark:text-white"
                   />
                 </div>
 
@@ -92,7 +92,7 @@ const DonationModule: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                <div className="bg-secondary-100/30 dark:bg-slate-700/30 p-4 rounded-xl">
+                <div className="bg-secondary-50/30 dark:bg-slate-700/30 p-4 rounded-xl">
                   <h4 className="font-bold text-slate-800 dark:text-white mb-2">Lo que más necesitamos:</h4>
                   <ul className="list-disc list-inside text-slate-600 dark:text-slate-300 space-y-1 text-sm">
                     <li>Alimento balanceado (Cachorro/Adulto)</li>
@@ -105,7 +105,7 @@ const DonationModule: React.FC = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-700 rounded-lg">
                     <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Punto de Acopio</span>
-                    <button className="text-primary-600 hover:text-primary-700 p-1" title="Copy Address">
+                    <button className="text-primary hover:text-primary-hover p-1" title="Copy Address">
                       <Copy size={16} />
                     </button>
                   </div>

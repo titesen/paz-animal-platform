@@ -42,18 +42,18 @@ const pets: Pet[] = [
 
 const FeaturedPets: React.FC = () => {
   return (
-    <section className="py-20 bg-secondary-100/30 dark:bg-slate-850">
+    <section className="py-20 bg-secondary-50/30 dark:bg-slate-850">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
           <div>
             <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 dark:text-white mb-2">
-              Esperando un <span className="text-primary-600">hogar</span>
+              Esperando un <span className="text-primary">hogar</span>
             </h2>
             <p className="text-slate-600 dark:text-slate-400">
               Estos pequeños están listos para conocerte.
             </p>
           </div>
-          <button className="text-primary-600 font-bold hover:underline underline-offset-4">
+          <button className="text-primary font-bold hover:underline underline-offset-4">
             Ver todas las mascotas &rarr;
           </button>
         </div>
@@ -75,7 +75,7 @@ const FeaturedPets: React.FC = () => {
               <div className="absolute top-4 left-4 z-20">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white shadow-sm ${
                   pet.badge === 'Urgente' ? 'bg-red-500' :
-                  pet.badge === 'Cachorro' ? 'bg-blue-500' : 'bg-primary-600'
+                  pet.badge === 'Cachorro' ? 'bg-blue-500' : 'bg-primary'
                 }`}>
                   {pet.badge}
                 </span>
