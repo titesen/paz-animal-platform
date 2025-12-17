@@ -20,11 +20,11 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
   }, []);
 
   const navLinks = [
-    { name: 'Inicio', href: '/' },
-    { name: 'Adopciones', href: '/#services' },
-    { name: 'Donar', href: '/#donate' },
-    { name: 'Eventos', href: '/#events' },
-    { name: 'Nosotros', href: '/nosotros' },
+    { name: 'Inicio', href: '#hero' },
+    { name: 'Adopciones', href: '#services' },
+    { name: 'Donar', href: '#donate' },
+    { name: 'Eventos', href: '#events' },
+    { name: 'Nosotros', href: '#footer' },
   ];
 
   return (
