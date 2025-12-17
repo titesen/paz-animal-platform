@@ -1,17 +1,18 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import {
-  AboutUsSection,
-  DonationModule,
-  Events,
-  FeaturedPets,
-  Hero,
-  LostPetsSection,
-  Services,
-  Sponsors
+    AboutUsSection,
+    DonationModule,
+    Events,
+    FeaturedPets,
+    Hero,
+    LostPetsSection,
+    Services,
+    Sponsors
 } from './components/sections'
 import { Footer, Header } from './components/ui'
 import { useDarkMode } from './hooks/useDarkMode'
+import { AboutPage } from './pages'
 
 const queryClient = new QueryClient()
 
@@ -39,11 +40,11 @@ function App() {
                 </main>
               }
             />
+            <Route path="/nosotros" element={<AboutPage />} />
             {/* Rutas adicionales listas para implementar */}
             {/* <Route path="/adoptar" element={<AdoptPage />} /> */}
             {/* <Route path="/donar" element={<DonatePage />} /> */}
             {/* <Route path="/eventos" element={<EventsPage />} /> */}
-            {/* <Route path="/nosotros" element={<AboutPage />} /> */}
           </Routes>
           <Footer />
         </div>
