@@ -1,14 +1,5 @@
 # Diccionario de Datos: Plataforma de Paz Animal
 
-| Campo                 | Descripción                                                   |
-| :-------------------- | :------------------------------------------------------------ |
-| Título del Documento  | Diccionario de Datos \- Plataforma Web Interactiva Paz Animal |
-| Versión               | 1.0 (Basado en Definición de BD V23)                          |
-| Fecha de Creación     | 04/12/2025                                                    |
-| Autor(es)             | Facundo Nicolás González                                      |
-| Base de Datos         | paz_animal_db (PostgreSQL 15+)                                |
-| Tipo de Base de Datos | Transaccional / OLTP (Online Transaction Processing)          |
-
 ## 1. Introducción y objetivo
 
 El presente documento constituye el Diccionario de Datos para la base de datos transaccional del sistema Plataforma de Paz Animal.
