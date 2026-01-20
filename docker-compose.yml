@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Servicio de Base de Datos PostgreSQL
@@ -13,7 +13,7 @@ services:
       POSTGRES_DB: paz_animal_local
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql  # Commented: Using Drizzle migrations instead
     networks:
       - paz_animal_network
 

@@ -1,0 +1,1 @@
+ALTER TABLE "lost_pet_alerts" DROP CONSTRAINT "uq_lost_alerts_active";

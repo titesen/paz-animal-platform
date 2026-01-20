@@ -269,9 +269,11 @@ CREATE TABLE public.lost_pet_alerts (
     resolved_at TIMESTAMPTZ,
 
     CONSTRAINT pk_lost_alerts PRIMARY KEY (alert_id),
-    CONSTRAINT fk_lost_alerts_pet FOREIGN KEY (pet_id) REFERENCES public.pets(pet_id) ON DELETE CASCADE,
-    CONSTRAINT uq_lost_alerts_active UNIQUE (pet_id) INCLUDE (is_active) WHERE (is_active = true)
+    CONSTRAINT fk_lost_alerts_pet FOREIGN KEY (pet_id) REFERENCES public.pets(pet_id) ON DELETE CASCADE
 );
+
+-- Unique partial index: solo puede haber una alerta activa por mascota
+CREATE UNIQUE INDEX uq_lost_alerts_active ON public.lost_pet_alerts(pet_id) WHERE (is_active = true);
 
 CREATE TABLE public.vaccines_catalog (
     vaccine_id SERIAL,
