@@ -60,18 +60,18 @@ Usaremos la librería **pino** en el Backend para generar logs en formato JSON. 
 
 **Formato Ejemplo:**
 
-JSON
-
+```json
 {
-"level": "info",
-"time": 1696773210,
-"pid": 123,
-"hostname": "railway-container-x",
-"module": "payments",
-"action": "create_preference",
-"data": { "userId": "uuid...", "amount": 1500 },
-"msg": "Preferencia de pago creada"
+  "level": "info",
+  "time": 1696773210,
+  "pid": 123,
+  "hostname": "railway-container-x",
+  "module": "payments",
+  "action": "create_preference",
+  "data": { "userId": "uuid...", "amount": 1500 },
+  "msg": "Preferencia de pago creada"
 }
+```
 
 Niveles de Log
 

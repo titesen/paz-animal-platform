@@ -82,22 +82,22 @@ Todas las respuestas siguen este formato JSON estricto:
 
 **Éxito:**
 
-JSON
-
+```json
 {
   "status": "success",
   "data": { "pet": { "id": 1, "name": "Firulais" } }
 }
+```
 
 **Error:**
 
-JSON
-
+```json
 {
   "status": "error",
   "message": "La mascota ya ha sido adoptada.",
-  "code": "PET\_ALREADY\_ADOPTED"
+  "code": "PET_ALREADY_ADOPTED"
 }
+```
 
 Lógica de Negocio: Flujo de Donación
 

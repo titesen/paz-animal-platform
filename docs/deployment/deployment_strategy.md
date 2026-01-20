@@ -67,9 +67,9 @@ Comando de Producción:
 
 El comando de inicio del contenedor Backend debe ser:
 
-Bash
-
+```bash
 npm run db:migrate && node dist/server.js
+```
 
 - Esto asegura que **antes** de que la API empiece a recibir tráfico, la base de datos ya tenga las nuevas tablas/columnas.
 - Usamos drizzle-kit migrate para este proceso seguro.
@@ -109,11 +109,13 @@ Si un despliegue rompe la producción:
 
 Comandos útiles definidos en package.json:
 
-JSON
-
-"scripts": {
-"build": "turbo run build",
-"start": "node apps/backend/dist/main.js",
-"db:migrate": "drizzle-kit migrate",
-"docker:build": "docker build \-t paz-animal-monorepo ."
+```json
+{
+  "scripts": {
+    "build": "turbo run build",
+    "start": "node apps/backend/dist/main.js",
+    "db:migrate": "drizzle-kit migrate",
+    "docker:build": "docker build -t paz-animal-monorepo ."
+  }
 }
+```

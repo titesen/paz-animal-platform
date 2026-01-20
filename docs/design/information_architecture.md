@@ -24,50 +24,51 @@ Diseñado para la gestión eficiente de recursos y datos.
 
 ### **🌍 Vista Pública**
 
-Plaintext
-
+```
 Home (Landing)
 ├── Adoptar (Catálogo)
-│ ├── Filtros (Perro/Gato, Edad, Tamaño)
-│ └── Ficha de Mascota (Detalle)
-│ └── Solicitar Adopción (Formulario)
+│   ├── Filtros (Perro/Gato, Edad, Tamaño)
+│   └── Ficha de Mascota (Detalle)
+│       └── Solicitar Adopción (Formulario)
 ├── Donar (Hub Financiero)
-│ ├── Donación Única (Mercado Pago)
-│ ├── Suscripción Mensual
-│ └── Donar Insumos (Logística)
+│   ├── Donación Única (Mercado Pago)
+│   ├── Suscripción Mensual
+│   └── Donar Insumos (Logística)
 ├── Voluntariado
-│ ├── Información y Requisitos
-│ └── Formulario de Postulación
+│   ├── Información y Requisitos
+│   └── Formulario de Postulación
 ├── Blog / Novedades
-│ └── Artículo (Detalle)
+│   └── Artículo (Detalle)
 ├── Eventos
 ├── Nosotros (Institucional)
 └── Mi Perfil (Usuario Logueado)
-├── Mis Adopciones (Seguimiento)
-├── Mis Donaciones (Historial)
-└── Configuración
+    ├── Mis Adopciones (Seguimiento)
+    ├── Mis Donaciones (Historial)
+    └── Configuración
+```
 
 ### **🔐 Vista Admin / Voluntario (Dashboard)**
 
-Plaintext
-
+```
 Dashboard (Resumen de Métricas)
 ├── Gestión de Mascotas
-│ ├── Inventario (Tabla)
-│ ├── Altas y Bajas
-│ └── Historial Médico (Vacunas)
+│   ├── Inventario (Tabla)
+│   ├── Altas y Bajas
+│   └── Historial Médico (Vacunas)
 ├── Gestión de Adopciones
-│ ├── Kanban de Solicitudes (Nuevas \-\> Entrevista \-\> Aprobadas)
-│ └── Seguimientos Post-Adopción
+│   ├── Kanban de Solicitudes (Nuevas -> Entrevista -> Aprobadas)
+│   └── Seguimientos Post-Adopción
 ├── Finanzas
-│ ├── Transacciones (Mercado Pago Logs)
-│ └── Caja Chica (Efectivo Eventos)
+│   ├── Transacciones (Mercado Pago Logs)
+│   └── Caja Chica (Efectivo Eventos)
 ├── Usuarios y Roles
-│ ├── Staff
-│ └── Voluntarios (Turnos y Asignación)
+│   ├── Staff
+│   └── Voluntarios (Turnos y Asignación)
 ├── CMS (Contenidos)
-│ ├── Noticias
-│ └── Eventos
+│   ├── Noticias
+│   └── Eventos
+```
+
 └── Configuración del Sistema
 
 ---

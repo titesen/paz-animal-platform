@@ -92,7 +92,7 @@ El archivo .gitignore en la raíz es la fuente de verdad.
 
 Asegúrate de que tu email de Git coincida con tu cuenta de GitHub para que las contribuciones se atribuyan correctamente.
 
-Bash
-
-git config \--global user.name "Facundo Nicolás González"
-git config \--global user.email "tu@email.com"
+```bash
+git config --global user.name "Facundo Nicolás González"
+git config --global user.email "tu@email.com"
+```

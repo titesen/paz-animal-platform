@@ -10,16 +10,16 @@ Contexto: apps/backend
 
 Descripción: Separamos el código en capas lógicas con responsabilidades únicas.
 
-* **Controller:** Maneja la entrada/salida HTTP (Requests/Responses).  
-* **Service:** Contiene la lógica de negocio pura (Reglas, Validaciones de negocio).  
-* Repository: Abstrae el acceso a datos (SQL/Drizzle).  
+- **Controller:** Maneja la entrada/salida HTTP (Requests/Responses).
+- **Service:** Contiene la lógica de negocio pura (Reglas, Validaciones de negocio).
+- Repository: Abstrae el acceso a datos (SQL/Drizzle).
   Justificación: Permite cambiar la base de datos (ej. de Postgres a Mongo) tocando solo el Repository, sin romper la lógica de negocio.
 
 ---
 
 ## **2\. Patrones Creacionales (Creational)**
 
-*Cómo se crean los objetos.*
+_Cómo se crean los objetos._
 
 ### **🔒 Singleton**
 
@@ -35,7 +35,7 @@ Referencia: export const db \= drizzle(...).
 
 ## **3\. Patrones Estructurales (Structural)**
 
-*Cómo se componen y relacionan las clases.*
+_Cómo se componen y relacionan las clases._
 
 ### **🔌 Adapter (Adaptador)**
 
@@ -71,7 +71,7 @@ Justificación: Reduce el acoplamiento y la complejidad en los controladores.
 
 ## **4\. Patrones de Comportamiento (Behavioral)**
 
-*Cómo se comunican los objetos.*
+_Cómo se comunican los objetos._
 
 ### **⛓️ Chain of Responsibility (Cadena de Responsabilidad)**
 
@@ -105,12 +105,12 @@ Implementación:
 
 Patrón utilizado por Shadcn/UI. En lugar de un componente gigante con 50 props, usamos sub-componentes que trabajan juntos:
 
-TypeScript
-
-\<Dialog\>  
-  \<DialogTrigger\>Abrir\</DialogTrigger\>  
-  \<DialogContent\>Hola Mundo\</DialogContent\>  
-\</Dialog\>
+```tsx
+<Dialog>
+  <DialogTrigger>Abrir</DialogTrigger>
+  <DialogContent>Hola Mundo</DialogContent>
+</Dialog>
+```
 
 **Justificación:** Máxima flexibilidad de composición para el desarrollador.
 
@@ -123,4 +123,3 @@ Implementación:
 Encapsulamos lógica de estado compleja (login, logout, check session) en funciones que empiezan con use.
 
 Justificación: Permite compartir lógica de comportamiento entre componentes visualmente distintos.
-

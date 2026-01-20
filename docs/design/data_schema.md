@@ -104,35 +104,37 @@ Todas las respuestas de la API siguen el formato **JSend**.
 
 ### **✅ Respuesta Exitosa (Success)**
 
-JSON
+```json
 {
-"success": true,
-"statusCode": 200,
-"message": "Mascota recuperada con éxito",
-"data": {
-"id": "550e8400-e29b-41d4-a716-446655440000",
-"name": "Firulais",
-"status": "ADOPTION_AVAILABLE",
-"images": \[
-{
-"url": "https://cdn.pazanimal.org/pets/firulais-1.webp",
-"isMain": true
+  "success": true,
+  "statusCode": 200,
+  "message": "Mascota recuperada con éxito",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Firulais",
+    "status": "ADOPTION_AVAILABLE",
+    "images": [
+      {
+        "url": "https://cdn.pazanimal.org/pets/firulais-1.webp",
+        "isMain": true
+      }
+    ]
+  },
+  "timestamp": "2025-10-08T10:00:00Z"
 }
-\]
-},
-"timestamp": "2025-10-08T10:00:00Z"
-}
+```
 
 ### **❌ Respuesta de Error (Fail/Error)**
 
-JSON
+```json
 {
-"success": false,
-"statusCode": 404,
-"message": "La mascota solicitada no existe o fue eliminada.",
-"error": {
-"code": "PET_NOT_FOUND",
-"details": null
+  "success": false,
+  "statusCode": 404,
+  "message": "La mascota solicitada no existe o fue eliminada.",
+  "error": {
+    "code": "PET_NOT_FOUND",
+    "details": null
+  }
 },
 "data": null,
 "timestamp": "2025-10-08T10:05:00Z"
@@ -148,3 +150,4 @@ Para desarrollo local, el sistema se inicializa con:
 4. **Usuario Admin Default:** admin@pazanimal.org (Password en .env).
 
 **Nota:** Para ver la definición SQL exacta, consultar apps/backend/src/db/schema.ts o database/init.sql.
+```
