@@ -67,9 +67,8 @@ Dashboard (Resumen de Métricas)
 ├── CMS (Contenidos)
 │   ├── Noticias
 │   └── Eventos
-```
-
 └── Configuración del Sistema
+```
 
 ---
 
