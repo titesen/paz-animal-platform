@@ -26,7 +26,7 @@ Utilizamos un modelo simplificado híbrido, optimizado para CI/CD en Railway.
 | hotfix/ | main    | main \+ develop | Error crítico en producción que requiere arreglo inmediato.     |
 | chore/  | develop | develop         | Tareas técnicas (deps, config) sin impacto en código funcional. |
 
-# 3\. Convenciones de Nomenclatura
+## 3. Convenciones de Nomenclatura
 
 Los nombres de las ramas deben ser descriptivos y en **minúsculas**, separados por guiones.
 
@@ -37,8 +37,6 @@ Los nombres de las ramas deben ser descriptivos y en **minúsculas**, separados 
 - ❌ ArregloBug (Usa mayúsculas y español genérico)
 
 ---
-
-# 4\. Convenciones de Commits
 
 Es **OBLIGATORIO** usar [Conventional Commits](https://www.conventionalcommits.org/). Husky abortará el commit si no sigues este formato.
 
@@ -62,7 +60,7 @@ Estructura:
 - fix(auth): corregir expiración de token JWT
 - chore(deps): actualizar drizzle-orm a v0.30
 
-# 5\. Flujo de Trabajo (Pull Requests)
+## 5. Flujo de Trabajo (Pull Requests)
 
 1. **Sincronizar:** Antes de empezar, siempre git pull origin develop.
 2. **Crear Rama:** git checkout \-b feat/mi-feature.
@@ -75,7 +73,7 @@ Estructura:
 7. **Merge:**
    - Preferimos **"Squash and Merge"** para features pequeñas (convierte 10 commits de trabajo en 1 limpio en develop).
 
-# 6\. Buenas Prácticas y Configuraciones
+## 6. Buenas Prácticas y Configuraciones
 
 ### **🧹 Historial Limpio**
 
