@@ -14,12 +14,11 @@ export interface JWTPayload {
  * @returns Signed JWT access token
  */
 export function generateAccessToken(payload: JWTPayload): string {
-  const options: SignOptions = {
+  return jwt.sign(payload, env.JWT_SECRET, {
     expiresIn: env.JWT_ACCESS_EXPIRATION,
     issuer: "paz-animal",
     audience: "paz-animal-client",
-  };
-  return jwt.sign(payload, env.JWT_SECRET, options);
+  } as SignOptions);
 }
 
 /**
@@ -29,12 +28,11 @@ export function generateAccessToken(payload: JWTPayload): string {
  */
 export function generateRefreshToken(payload: JWTPayload): string {
   const secret = env.JWT_REFRESH_SECRET || env.JWT_SECRET;
-  const options: SignOptions = {
+  return jwt.sign(payload, secret, {
     expiresIn: env.JWT_REFRESH_EXPIRATION,
     issuer: "paz-animal",
     audience: "paz-animal-client",
-  };
-  return jwt.sign(payload, secret, options);
+  } as SignOptions);
 }
 
 /**

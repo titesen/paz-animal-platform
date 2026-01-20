@@ -1,5 +1,6 @@
 // Master Data Seeder
 // This script seeds essential reference data required for the system to function
+import { eq } from "drizzle-orm";
 import { logger } from "../../config/logger.js";
 import { db, pool } from "../index.js";
 import * as schema from "../schema/index.js";
@@ -57,7 +58,7 @@ async function seedMasterData() {
         await db
           .select()
           .from(schema.species)
-          .where(schema.species.name.eq("Dog"))
+          .where(eq(schema.species.name, "Dog"))
       )[0];
     const catSpecies =
       speciesResult.find((s) => s.name === "Cat") ||
@@ -65,7 +66,7 @@ async function seedMasterData() {
         await db
           .select()
           .from(schema.species)
-          .where(schema.species.name.eq("Cat"))
+          .where(eq(schema.species.name, "Cat"))
       )[0];
     logger.info("✓ Species seeded");
 
@@ -230,7 +231,7 @@ async function seedMasterData() {
         await db
           .select()
           .from(schema.provinces)
-          .where(schema.provinces.name.eq("Buenos Aires"))
+          .where(eq(schema.provinces.name, "Buenos Aires"))
       )[0];
     const caba =
       provinceResults.find(
@@ -240,7 +241,7 @@ async function seedMasterData() {
         await db
           .select()
           .from(schema.provinces)
-          .where(schema.provinces.name.eq("Ciudad Autónoma de Buenos Aires"))
+          .where(eq(schema.provinces.name, "Ciudad Autónoma de Buenos Aires"))
       )[0];
 
     const cities = [
@@ -270,7 +271,7 @@ async function seedMasterData() {
 
     logger.info("✅ Master data seeding completed successfully!");
   } catch (error) {
-    logger.error("❌ Error seeding master data:", error);
+    logger.error({ error }, "❌ Error seeding master data");
     throw error;
   } finally {
     await pool.end();
@@ -278,11 +279,15 @@ async function seedMasterData() {
 }
 
 // Run seeder if executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url.includes("master-data.seed")) {
   seedMasterData()
-    .then(() => process.exit(0))
-    .catch((error) => {
-      console.error(error);
+    .then(async () => {
+      await pool.end();
+      process.exit(0);
+    })
+    .catch(async (error) => {
+      console.error("Seeder error:", error);
+      await pool.end();
       process.exit(1);
     });
 }
