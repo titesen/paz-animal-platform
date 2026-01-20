@@ -21,19 +21,18 @@ graph TD
     UserPublic[Usuario Público] -->|HTTPS| CDN[Cloudflare / Edge]
     UserAdmin[Administrador/Voluntario] -->|HTTPS| CDN
 
-    subgraph "Paz Animal Cloud (Railway)"
-        CDN -->|Serves Static| Frontend[Frontend SPA (React)]
-        Frontend -->|JSON/REST| Backend[Backend API (Node.js)]
+    subgraph PazAnimal["Paz Animal Cloud (Railway)"]
+        CDN -->|Serves Static| Frontend[Frontend SPA React]
+        Frontend -->|JSON/REST| Backend[Backend API Node.js]
 
         Backend -->|Query/ORM| DB[(PostgreSQL V23)]
-        Backend -->|Read/Write| Storage[Object Storage (R2)]
+        Backend -->|Read/Write| Storage[Object Storage R2]
     end
 
-    subgraph "Integraciones Externas"
+    subgraph Integraciones["Integraciones Externas"]
         Backend -->|OAuth| Google[Google Identity]
         Backend -->|Payments| MP[Mercado Pago]
     end
-
 ```
 
 ---
