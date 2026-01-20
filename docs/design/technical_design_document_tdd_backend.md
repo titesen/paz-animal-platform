@@ -1,95 +1,103 @@
-# **Technical Design Document (TDD) \- Backend**
+# Technical Design Document (TDD) - Backend
 
-## **1\. Introducción**
+## 1. Introducción
 
-Visión General
+### Visión General
 
-El backend de Paz Animal es una **API RESTful Monolítica Modular** construida sobre Node.js. Actúa como la fuente de verdad centralizada para la gestión de adopciones, inventario de mascotas y procesamiento de donaciones. No es un microservicio, pero está estructurado internamente para permitir esa evolución si fuera necesario en el futuro.
+El backend de **Paz Animal** es una API RESTful diseñada como un **Monolito Modular** construido sobre Node.js. Actúa como la fuente de verdad centralizada para la gestión de adopciones, el inventario de mascotas y el procesamiento de donaciones.
 
-Contexto
+> **Nota Arquitectónica:** No es un microservicio, pero su estructura interna de módulos permite esa evolución si fuera necesaria en el futuro.
 
-La fundación necesita digitalizar sus procesos manuales (Excel/Papel). El sistema debe garantizar la integridad de los datos (no perder donaciones, no duplicar adopciones) y exponer una interfaz rápida para el Frontend público.
+### Contexto
 
-Glosario
+La fundación necesita digitalizar sus procesos manuales (actualmente en Excel/Papel). El sistema debe garantizar la **integridad de los datos** (cero pérdida de donaciones, evitar duplicidad en adopciones) y exponer una interfaz de baja latencia para el Frontend público.
 
-- **DTO (Data Transfer Object):** Objeto Zod que define qué datos entran/salen de la API.
+### Glosario Técnico
+
+- **DTO (Data Transfer Object):** Objeto Zod que define estrictamente qué datos entran y salen de la API.
 - **V23:** Versión actual del esquema de base de datos Multi-Tenant.
-- **R2:** Cloudflare R2 (Object Storage compatible con S3).
-- **Polimórfico:** Relación de base de datos donde una tabla (ej. media) puede pertenecer a varias entidades (pets, news).
+- **R2:** Cloudflare R2 (Object Storage compatible con la API de S3).
+- **Polimórfico:** Relación de base de datos donde una tabla (ej. `media`) puede pertenecer a múltiples entidades distintas (como `pets` o `news`).
 
 ---
 
-## **2\. Objetivos y No-Objetivos**
+## 2. Objetivos y No-Objetivos
 
-Objetivos del Diseño
+### Objetivos del Diseño
 
-1. **Integridad de Datos (Prioridad 1):** Uso de **PostgreSQL** con Constraints estrictas y transacciones ACID. Una adopción no puede quedar "a medias".
-2. **Type-Safety Total:** Desde la DB (Drizzle) hasta el Controller (Zod), el flujo de datos debe estar tipado en TypeScript para evitar errores en tiempo de ejecución (undefined is not a function).
-3. **Rendimiento:** Latencia de endpoints de lectura (GET /pets) \< 200ms (P95).
+1. **Integridad de Datos (Prioridad 1):** Uso de PostgreSQL con _constraints_ estrictas y transacciones ACID. Una adopción no puede quedar en un estado intermedio.
+2. **Type-Safety Total:** Desde la base de datos (Drizzle) hasta el Controller (Zod), el flujo de datos debe estar tipado en TypeScript para evitar errores en tiempo de ejecución (`undefined is not a function`).
+3. **Rendimiento:** Latencia de endpoints de lectura (`GET /pets`) < **200ms (P95)**.
 
-No-Objetivos
+### No-Objetivos (Fase Actual)
 
-- **Microservicios:** En esta fase, la complejidad de orquestación supera los beneficios.
-- **WebSockets en tiempo real:** Las notificaciones serán asíncronas (Email) o Polling en esta versión.
+- **Microservicios:** La complejidad de orquestación supera los beneficios actuales.
+- **WebSockets en tiempo real:** Las notificaciones serán asíncronas (Email) o mediante _Polling_ en esta versión.
 
 ---
 
-3\. Arquitectura del Sistema
+## 3. Arquitectura del Sistema
 
-Diagrama de Capas (Container Level)
+### Diagrama de Capas (Container Level)
 
-````mermaid
+```mermaid
 graph TD
-    Client\[Frontend / Postman\] \--\>|JSON/HTTP| API\_Gateway\[Express Router\]
+    Client[Frontend / Postman] -->|JSON/HTTP| API_Gateway[Express Router]
 
     subgraph "Backend Core (Node.js)"
-        API\_Gateway \--\>|Zod Validation| Controller\[Controller Layer\]
-        Controller \--\>|DTO| Service\[Service Layer (Business Logic)\]
-        Service \--\>|Entity| Repo\[Repository Layer (Drizzle)\]
+        API_Gateway -->|Zod Validation| Controller[Controller Layer]
+        Controller -->|DTO| Service[Service Layer (Business Logic)]
+        Service -->|Entity| Repo[Repository Layer (Drizzle)]
     end
 
-    Repo \--\>|SQL| DB\[(PostgreSQL V23)\]
-    Service \--\>|Upload| R2\[Cloudflare R2\]
-    Service \--\>|Queue| Bull\[Redis/BullMQ\]```
-Patrones Arquitectónicos
+    Repo -->|SQL| DB[(PostgreSQL V23)]
+    Service -->|Upload| R2[Cloudflare R2]
+    Service -->|Queue| Bull[Redis/BullMQ]
 
-* **Estilo:** Monolito Modular (Modular Monolith).
-* **Diseño:** Arquitectura de 3 Capas (Controller \- Service \- Repository)11.
-  * *Ventaja:* Desacopla la lógica de negocio del framework web (Express) y de la base de datos.
+```
 
-Tecnologías Clave
+### Patrones Arquitectónicos
 
-* **Runtime:** Node.js 20+ (LTS).
-* **Framework:** Express 4 (Estándar de industria, fácil de migrar).
-* **ORM:** **Drizzle ORM**. Elegido por sobre Prisma por su bajo *overhead* y control SQL directo.
-* **Validación:** **Zod**.
+- **Estilo:** Monolito Modular (_Modular Monolith_).
+- **Diseño:** [Arquitectura de 3 Capas](https://martinfowler.com/eaaCatalog/serviceLayer.html) (Controller - Service - Repository).
+- _Ventaja:_ Desacopla la lógica de negocio del framework web (Express) y de la base de datos.
+
+### Tecnologías Clave
+
+- **Runtime:** Node.js 20+ (LTS).
+- **Framework:** Express 4 (Estándar de industria, fácil de migrar).
+- **ORM:** **Drizzle ORM**. Elegido por sobre Prisma por su bajo _overhead_ y control SQL directo.
+- **Validación:** Zod.
 
 ---
 
-4\. Diseño Detallado
+## 4. Diseño Detallado
 
-Modelo de Datos (Database Design)
+### Modelo de Datos (Database Design)
 
-Utilizamos un esquema **Multi-Schema** en Postgres:
+Utilizamos un esquema **Multi-Schema** en Postgres para organizar lógicamente las tablas:
 
-* auth: users, roles, permissions, sessions.
-* public: pets, adoptions, donations, media.
-* **Migraciones:** Gestionadas vía drizzle-kit migrate. Nunca se modifica la DB a mano.
+- `auth`: `users`, `roles`, `permissions`, `sessions`.
+- `public`: `pets`, `adoptions`, `donations`, `media`.
 
-Diseño de API (Estándar JSend)
+> **Migraciones:** Gestionadas vía `drizzle-kit migrate`. Nunca se modifica la DB manualmente.
 
-Todas las respuestas siguen este formato JSON estricto:
+### Diseño de API (Estándar JSend)
 
-**Éxito:**
+Todas las respuestas siguen un formato JSON estricto para predecibilidad en el cliente:
+
+**Respuesta de Éxito:**
 
 ```json
 {
   "status": "success",
-  "data": { "pet": { "id": 1, "name": "Firulais" } }
+  "data": {
+    "pet": { "id": 1, "name": "Firulais" }
+  }
 }
 ```
 
-**Error:**
+**Respuesta de Error:**
 
 ```json
 {
@@ -99,66 +107,64 @@ Todas las respuestas siguen este formato JSON estricto:
 }
 ```
 
-Lógica de Negocio: Flujo de Donación
+### Lógica de Negocio: Flujo de Donación
 
-1. **Frontend:** Envía intención de donación (amount, email).
-2. **Controller:** Valida input con Zod.
+1. **Frontend:** Envía intención de donación (`amount`, `email`).
+2. **Controller:** Valida el input con Zod.
 3. **Service:**
-   * Llama a API Mercado Pago \-\> createPreference.
-   * Registra transacción en DB estado PENDING.
-4. **Webhook Controller:**
-   * Recibe notificación de MP.
-   * Valida firma de seguridad.
-   * **Service:** Actualiza transacción a APPROVED y dispara email de agradecimiento (vía BullMQ).
 
-Autenticación y Seguridad
+- Llama a API Mercado Pago -> `createPreference`.
+- Registra transacción en DB con estado `PENDING`.
 
-* **AuthN:** JWT (Access Token 15min \+ Refresh Token 7 días).
-* **AuthZ:** Middleware RBAC.
-* TypeScript
+4. **Webhook Controller:** Recibe notificación de MP y valida la firma de seguridad.
+5. **Service:** Actualiza transacción a `APPROVED` y dispara email de agradecimiento (vía BullMQ).
 
-router.post('/pets', requireRole('ADMIN'), createPet);
+### Autenticación y Seguridad
 
-*
-*
+- **AuthN:** JWT (Access Token 15min + Refresh Token 7 días).
+- **AuthZ:** Middleware RBAC (Role-Based Access Control).
 
----
-
-5\. Consideraciones de Implementación
-
-Manejo de Errores
-
-* Uso de una clase AppError personalizada que extiende Error.
-* **Global Exception Filter:** Un middleware al final de app.js captura cualquier error no manejado, lo loguea en JSON y devuelve un 500 genérico al usuario (para no exponer Stack Traces).
-
-Observabilidad
-
-* **Logging:** Librería pino. Formato JSON estructurado.
-  * Niveles: info (producción), debug (desarrollo).
-* **Health Check:** Endpoint /health para monitoreo de uptime (Railway).
-
-Estrategia de Pruebas
-
-* **Unitarias:** Vitest. Foco en Services y utilidades puras.
-* **Integración:** Supertest. Foco en Controllers. Se levanta una DB de prueba en Docker, se ejecuta el endpoint y se verifica que el dato persista.
+```typescript
+// Ejemplo de uso en ruta
+router.post("/pets", requireRole("ADMIN"), createPet);
+```
 
 ---
 
-6\. Riesgos y Mitigación
+## 5. Consideraciones de Implementación
 
-| Riesgo | Impacto | Mitigación |
-| :---- | :---- | :---- |
-| **Cuello de botella en DB** | La DB se satura por muchas lecturas públicas. | Implementar caché en memoria (Redis) para endpoints GET /pets23. |
-| **Fallo en Webhook MP** | Se cobra pero no se registra la donación. | El Webhook debe ser idempotente y responder 200 solo tras guardar en DB. Logs críticos en Sentry. |
-| **Complejidad de Tipos** | Drizzle \+ Zod \+ TS puede ser verborrágico. | Usar drizzle-zod para generar esquemas automáticamente desde la DB. |
+### Manejo de Errores
+
+- Uso de una clase `AppError` personalizada que extiende de `Error`.
+- **Global Exception Filter:** Un middleware al final de `app.js` captura cualquier error no manejado, lo registra en logs JSON y devuelve un `500 Internal Server Error` genérico al usuario (evitando exponer _Stack Traces_).
+
+### Observabilidad
+
+- **Logging:** Librería `pino`. Formato JSON estructurado.
+- Niveles: `info` (producción), `debug` (desarrollo).
+
+- **Health Check:** Endpoint `/health` para monitoreo de uptime (útil para Railway/K8s).
+
+### Estrategia de Pruebas
+
+- **Unitarias:** `Vitest`. Foco en Services y utilidades puras.
+- **Integración:** `Supertest`. Foco en Controllers. Se levanta una DB de prueba en Docker, se ejecuta el endpoint real y se verifica la persistencia del dato.
 
 ---
 
-7\. Plan de Implementación
+## 6. Riesgos y Mitigación
 
-1. **Semana 1:** Setup de Monorepo, Docker, Drizzle y Auth Module.
-2. **Semana 2:** Módulo de Mascotas (CRUD) e integración con R2 (Imágenes).
-3. **Semana 3:** Módulo de Adopciones y Donaciones (Mercado Pago).
-4. **Semana 4:** Testing de integración y despliegue a Staging.
+| Riesgo                      | Impacto                                                               | Mitigación                                                                                                 |
+| --------------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| **Cuello de botella en DB** | La DB se satura por exceso de lecturas públicas.                      | Implementar caché en memoria (**Redis**) para endpoints críticos como `GET /pets`.                         |
+| **Fallo en Webhook MP**     | Se cobra al usuario pero no se registra la donación en el sistema.    | El Webhook debe ser idempotente y responder `200 OK` **solo tras** guardar en DB. Logs críticos en Sentry. |
+| **Complejidad de Tipos**    | Drizzle + Zod + TS puede volverse verborrágico y difícil de mantener. | Usar `drizzle-zod` para generar esquemas de validación automáticamente desde la definición de la DB.       |
 
-````
+---
+
+## 7. Plan de Implementación
+
+- **Semana 1:** Setup de Monorepo, Docker, configuración de Drizzle y Módulo de Auth.
+- **Semana 2:** Módulo de Mascotas (CRUD completo) e integración con R2 (Imágenes).
+- **Semana 3:** Módulo de Adopciones y Módulo de Donaciones (Integración Mercado Pago).
+- **Semana 4:** Testing de integración, QA y despliegue a entorno de Staging.

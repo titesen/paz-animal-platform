@@ -1,111 +1,126 @@
-# **Estrategia de Auditoría y Control de Sistemas**
+# Estrategia de Auditoría y Control de Sistemas
 
-## **1\. Filosofía de Auditoría**
+### 1. Filosofía de Auditoría
 
-El sistema debe ser capaz de reconstruir la historia de cualquier registro crítico. No confiamos ciegamente; verificamos.
+El sistema debe ser capaz de reconstruir la historia de cualquier registro crítico bajo el principio de desconfianza cero: _verificamos, no confiamos ciegamente_.
 
-Principio Rector: "Si no está en el log o en la base de datos, no sucedió."
-
----
-
-## **2\. Registro de Eventos (Logging)**
-
-Definimos qué se registra para permitir el análisis forense sin saturar el almacenamiento2.
-
-### **📝 Qué registrar (Eventos Críticos)**
-
-1. **Seguridad:** Logins exitosos y fallidos, cambios de contraseña, cambios de roles (de Cliente a Admin).  
-2. **Financiero:** Creación de intenciones de pago, webhooks de Mercado Pago recibidos, cambios de estado en transacciones (PENDING \-\> APPROVED).  
-3. **Negocio (Mascotas):** Cambio de estado de una mascota (ej. de DISPONIBLE a ADOPTADO).  
-4. **Errores:** Excepciones no controladas (500 Internal Server Error) con Stack Trace (solo en logs privados, nunca al cliente).
-
-### **🚫 Qué NO registrar (Privacidad & Ruido)**
-
-* **PII (Información Personal Identificable):** Contraseñas en texto plano, tokens de sesión completos, números de tarjeta de crédito (PCI DSS).  
-* **Ruido:** Peticiones GET a recursos estáticos (imágenes, CSS) o Health Checks del balanceador de carga.
-
-### **💾 Formato y Almacenamiento**
-
-* **Formato:** JSON Estructurado (NDJSON).  
-* JSON
-
-{"level":"info","time":"2026-01-20T10:00:00Z","actor":"user\_123","action":"pet\_update","resource\_id":"pet\_555","changes":{"status\_old":"AVAILABLE","status\_new":"ADOPTED"}}
-
-*   
-*   
-* **Retención:** 30 días en caliente (Railway Logs), archivado frío en R2 si es necesario por legal.
+> **Principio Rector:** "Si no está en el log o en la base de datos, no sucedió."
 
 ---
 
-## **3\. Trazabilidad y "Soft Deletes"**
+### 2. Registro de Eventos (Logging)
 
-Para cumplir con el requisito de trazabilidad3, prohibimos la eliminación física de datos.
+Definimos estrictamente qué se registra para permitir el análisis forense sin saturar el almacenamiento ni comprometer la privacidad.
 
-### **Estrategia de Borrado Lógico**
+#### 📝 Qué registrar (Eventos Críticos)
 
-En lugar de DELETE FROM users WHERE id=1, hacemos:
+- **Seguridad:** Logins (exitosos y fallidos), cambios de contraseña, elevación de privilegios (de Cliente a Admin).
+- **Financiero:** Creación de intenciones de pago, recepción de webhooks (Mercado Pago), transiciones de estado (`PENDING` -> `APPROVED`).
+- **Negocio (Mascotas):** Cambios de estado en el inventario de vidas (ej. de `DISPONIBLE` a `ADOPTADO`).
+- **Errores:** Excepciones no controladas (500 Internal Server Error) incluyendo _Stack Trace_ (**solo** en logs internos).
 
-SQL
+#### 🚫 Qué NO registrar (Privacidad & Ruido)
 
-UPDATE users SET deleted\_at \= NOW(), is\_active \= FALSE WHERE id\=1;
+- **PII (Información Personal Identificable):** Contraseñas en texto plano, tokens de sesión completos, números de tarjeta de crédito (PCI DSS).
+- **Ruido:** Peticiones `GET` a recursos estáticos (imágenes, CSS) o _Health Checks_ de infraestructura.
 
-Esto permite:
+#### 💾 Formato y Almacenamiento
 
-1. Recuperar datos borrados por error.  
-2. Mantener la integridad referencial (las donaciones de un usuario borrado siguen existiendo).
+- **Formato:** JSON Estructurado (NDJSON) para facilitar el parseo automático.
+- **Retención:** 30 días en caliente (Railway Logs), archivado en frío (R2) para cumplimiento legal a largo plazo.
 
-### **Columnas de Auditoría (Drizzle Schema)**
+**Ejemplo de Log:**
+
+```json
+{
+  "level": "info",
+  "time": "2026-01-20T10:00:00Z",
+  "actor": "user_123",
+  "action": "pet_update",
+  "resource_id": "pet_555",
+  "changes": {
+    "status_old": "AVAILABLE",
+    "status_new": "ADOPTED"
+  }
+}
+```
+
+---
+
+### 3. Trazabilidad y "Soft Deletes"
+
+Para cumplir con los requisitos de auditoría, **prohibimos la eliminación física** de datos en tablas maestras.
+
+#### Estrategia de Borrado Lógico
+
+En lugar de ejecutar `DELETE`, actualizamos el estado del registro.
+
+```sql
+-- NO hacemos esto: DELETE FROM users WHERE id=1;
+
+-- SÍ hacemos esto:
+UPDATE users
+SET deleted_at = NOW(), is_active = FALSE
+WHERE id=1;
+
+```
+
+**Beneficios:**
+
+1. Permite recuperar datos borrados por error humano.
+2. Mantiene la **integridad referencial** (ej. las donaciones históricas de un usuario "borrado" no quedan huérfanas).
+
+#### Columnas de Auditoría (Schema Standard)
 
 Todas las tablas críticas deben incluir:
 
-* created\_at: Fecha de creación (Inmutable).  
-* updated\_at: Fecha de última modificación (Automático).  
-* deleted\_at: Fecha de baja (Nulo por defecto).  
-* created\_by: ID del usuario que creó el registro (si aplica).
+- `created_at`: Fecha de creación (**Inmutable**).
+- `updated_at`: Fecha de última modificación (Automático).
+- `deleted_at`: Fecha de baja (Nulo por defecto).
+- `created_by`: ID del usuario que originó el registro.
 
 ---
 
-## **4\. Controles de Acceso y Atribución**
+### 4. Controles de Acceso y Atribución
 
-Para auditar, primero debemos autenticar inequívocamente4.
+Para auditar correctamente, la identificación debe ser inequívoca.
 
-* **Identidad Única:** No existen usuarios genéricos como admin o invitado. Cada acción debe estar vinculada a un user\_id específico (ej. "Facundo González").  
-* **Contexto de Ejecución:** En cada request, el sistema registra:  
-  * IP de origen.  
-  * User-Agent (Navegador/Dispositivo).  
-  * Timestamp preciso (UTC).
-
----
-
-## **5\. No Repudio e Integridad de Datos**
-
-Garantizamos que un usuario no pueda negar haber realizado una acción crítica5.
-
-### **Acciones Contractuales (Adopción)**
-
-Cuando un usuario "Firma" digitalmente la adopción:
-
-1. Se guarda el estado exacto del contrato en ese momento (Snapshot).  
-2. Se registra la IP desde donde aceptó los términos.  
-3. Se envía un correo de confirmación inmutable como prueba externa.
-
-### **Integridad Financiera (Ledger Inmutable)**
-
-La tabla transactions es **Solo Escritura (Append-Only)** para los importes.
-
-* Si una donación se registró mal ($100 en vez de $1000), **NO se edita**.  
-* Se anula la anterior (Reembolso/Cancelación) y se crea una nueva transacción correcta. Esto deja un rastro contable perfecto.
+- **Identidad Única:** No existen usuarios genéricos (como `admin` o `invitado`). Cada acción se vincula a un `user_id` nominal (ej. "Facundo González").
+- **Contexto de Ejecución:** En cada _request_, el sistema registra:
+- Dirección IP de origen.
+- `User-Agent` (Dispositivo/Navegador).
+- _Timestamp_ preciso (UTC).
 
 ---
 
-## **6\. Cumplimiento Normativo (Compliance)**
+### 5. No Repudio e Integridad de Datos
 
-Preparación para auditorías legales y Ley 25.3266666.
+Garantizamos que un usuario no pueda negar haber realizado una acción crítica una vez completada.
 
-\+1
+#### Acciones Contractuales (Adopción)
 
-### **Derecho de Acceso y Supresión (Habeas Data)**
+Cuando un usuario "firma" digitalmente la adopción:
 
-* **Exportación:** El sistema debe tener un script/endpoint capaz de generar un ZIP con "Todo lo que Paz Animal sabe de mí" si un usuario lo solicita.  
-* **Anonimización:** Si un usuario exige ser borrado, sus datos personales (Nombre, DNI) se sobrescriben con ANONYMIZED\_USER, pero sus IDs y transacciones se mantienen para cuadrar la caja.
+1. Se guarda un **Snapshot** del estado exacto del contrato en ese milisegundo.
+2. Se registra la IP de aceptación.
+3. Se envía un correo de confirmación que sirve como prueba externa inmutable.
 
+#### Integridad Financiera (Ledger Inmutable)
+
+La tabla `transactions` opera bajo lógica **Append-Only** (Solo Escritura) para los importes.
+
+- **Regla:** Si una donación se registró erróneamente ($100 en vez de $1000), **NUNCA se edita la fila original**.
+- **Corrección:** Se inserta una nueva transacción de anulación/reembolso y luego otra con el valor correcto. Esto deja un rastro contable perfecto y auditable.
+
+---
+
+### 6. Cumplimiento Normativo (Compliance)
+
+Preparación para auditorías legales y Ley de Protección de Datos Personales (Habeas Data).
+
+#### Derecho de Acceso y Supresión
+
+- **Exportación:** Implementación de un mecanismo capaz de generar un archivo (ZIP/JSON) con "Todo lo que la plataforma sabe de mí" ante la solicitud del usuario.
+- **Anonimización:** Si un usuario exige ser borrado ("Derecho al olvido"):
+- Sus datos personales (Nombre, DNI, Email) se sobrescriben con `ANONYMIZED_USER`.
+- Sus IDs internos y el historial de transacciones se mantienen intactos para asegurar que la caja de la fundación cuadre, disociando la identidad del dato financiero.
