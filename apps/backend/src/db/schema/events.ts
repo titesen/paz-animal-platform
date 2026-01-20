@@ -7,6 +7,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -128,9 +129,10 @@ export const attendances = pgTable(
     notes: text("notes"),
   },
   (table) => ({
-    uniqueAttendance: {
-      name: "uq_attendance_unique",
-      columns: [table.userId, table.entityType, table.entityId],
-    },
+    uniqueAttendance: unique("uq_attendance_unique").on(
+      table.userId,
+      table.entityType,
+      table.entityId,
+    ),
   }),
 );

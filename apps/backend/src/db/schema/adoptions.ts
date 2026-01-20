@@ -9,6 +9,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 import { users } from "./auth";
@@ -43,7 +44,12 @@ export const adoptionApplications = pgTable(
     decidedAt: timestamp("decided_at", { withTimezone: true }),
   },
   (table) => ({
-    uniqueActive: unique("uq_adoption_active").on(table.clientId, table.status),
+    // Partial unique index: only one active adoption per client
+    activeAdoptionIdx: uniqueIndex("uq_adoption_active")
+      .on(table.clientId, table.status)
+      .where(
+        sql`${table.status} IN ('REQUESTED', 'UNDER_REVIEW', 'INTERVIEW_SCHEDULED', 'APPROVED', 'PROBATION')`,
+      ),
   }),
 );
 

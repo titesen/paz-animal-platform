@@ -9,6 +9,7 @@ import {
   point,
   serial,
   timestamp,
+  uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -68,20 +69,29 @@ export const pets = pgTable(
   }),
 );
 
-export const lostPetAlerts = pgTable("lost_pet_alerts", {
-  alertId: uuid("alert_id").defaultRandom().primaryKey(),
-  petId: uuid("pet_id")
-    .notNull()
-    .references(() => pets.petId, { onDelete: "cascade" }),
+export const lostPetAlerts = pgTable(
+  "lost_pet_alerts",
+  {
+    alertId: uuid("alert_id").defaultRandom().primaryKey(),
+    petId: uuid("pet_id")
+      .notNull()
+      .references(() => pets.petId, { onDelete: "cascade" }),
 
-  lostAt: timestamp("lost_at", { withTimezone: true }).notNull().defaultNow(),
-  lastSeenZone: varchar("last_seen_zone", { length: 255 }).notNull(),
-  coordinates: point("coordinates"),
-  contactPhone: varchar("contact_phone", { length: 50 }).notNull(),
-  message: varchar("message"),
-  isActive: boolean("is_active").default(true),
-  resolvedAt: timestamp("resolved_at", { withTimezone: true }),
-});
+    lostAt: timestamp("lost_at", { withTimezone: true }).notNull().defaultNow(),
+    lastSeenZone: varchar("last_seen_zone", { length: 255 }).notNull(),
+    coordinates: point("coordinates"),
+    contactPhone: varchar("contact_phone", { length: 50 }).notNull(),
+    message: varchar("message"),
+    isActive: boolean("is_active").default(true),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+  },
+  (table) => ({
+    // Partial unique index: only one active alert per pet
+    activeAlertIdx: uniqueIndex("uq_lost_alerts_active")
+      .on(table.petId)
+      .where(sql`${table.isActive} = true`),
+  }),
+);
 
 export const vaccinesCatalog = pgTable("vaccines_catalog", {
   vaccineId: serial("vaccine_id").primaryKey(),

@@ -1,0 +1,6 @@
+ALTER TABLE "adoption_applications" DROP CONSTRAINT "uq_adoption_active";--> statement-breakpoint
+ALTER TABLE "auth"."users" ADD CONSTRAINT "users_nationality_iso_countries_iso_code_fk" FOREIGN KEY ("nationality_iso") REFERENCES "public"."countries"("iso_code") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "comments" ADD CONSTRAINT "comments_parent_comment_id_comments_comment_id_fk" FOREIGN KEY ("parent_comment_id") REFERENCES "public"."comments"("comment_id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE UNIQUE INDEX "uq_adoption_active" ON "adoption_applications" USING btree ("client_id","status") WHERE "adoption_applications"."status" IN ('REQUESTED', 'UNDER_REVIEW', 'INTERVIEW_SCHEDULED', 'APPROVED', 'PROBATION');--> statement-breakpoint
+CREATE UNIQUE INDEX "uq_lost_alerts_active" ON "lost_pet_alerts" USING btree ("pet_id") WHERE "lost_pet_alerts"."is_active" = true;--> statement-breakpoint
+ALTER TABLE "attendances" ADD CONSTRAINT "uq_attendance_unique" UNIQUE("user_id","entity_type","entity_id");

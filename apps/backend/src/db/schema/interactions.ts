@@ -1,4 +1,5 @@
 // Interactions Tables
+import type { PgTableWithColumns } from "drizzle-orm/pg-core";
 import {
   boolean,
   index,
@@ -16,7 +17,7 @@ import { moderationStatusEnum, reportReasonEnum } from "./enums";
 // INTERACTIONS TABLES
 // ===================
 
-export const comments = pgTable(
+export const comments: PgTableWithColumns<any> = pgTable(
   "comments",
   {
     commentId: uuid("comment_id").defaultRandom().primaryKey(),
@@ -38,7 +39,10 @@ export const comments = pgTable(
     lastUpdatedAt: timestamp("last_updated_at", {
       withTimezone: true,
     }).defaultNow(),
-    parentCommentId: uuid("parent_comment_id"),
+    parentCommentId: uuid("parent_comment_id").references(
+      (): any => comments.commentId,
+      { onDelete: "cascade" },
+    ),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
   },
   (table) => ({

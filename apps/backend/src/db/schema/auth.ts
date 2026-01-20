@@ -14,6 +14,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { authSchema, documentTypeEnum } from "./enums";
+import { countries } from "./master";
 
 // ===================
 // AUTH SCHEMA TABLES
@@ -46,7 +47,8 @@ export const users = authSchema.table(
     docNumber: varchar("doc_number", { length: 50 }).notNull(),
     nationalityIso: char("nationality_iso", { length: 2 })
       .notNull()
-      .default("AR"),
+      .default("AR")
+      .references(() => countries.isoCode),
 
     // Contact
     birthDate: date("birth_date"),
