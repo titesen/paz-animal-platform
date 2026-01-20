@@ -5,7 +5,6 @@
 ### Requisitos
 
 - [SRS - Software Requirements Specification](./design/srs_paz_animal.md)
-- [Casos de Uso e Historias de Usuario](./requirements/use_cases_user_stories.md)
 - [Especificaciones Personalizadas](./requirements/additional_custom_specifications.md)
 - [Reglas y Estándares del Proyecto](./requirements/project_rules_and_standards.md)
 - [Estructura del Proyecto](./requirements/project_structure.md)
@@ -15,7 +14,6 @@
 - [Consideraciones de Seguridad](./requirements/safety_considerations.md)
 - [IA Responsable](./requirements/responsible_AI.md)
 - [Guía de Git y DVCS](./requirements/guide_to_git_and_dvcs.md)
-- [Reglas de Interacción con Usuario](./requirements/rules_of_interaction_user.md)
 - [Convenciones de Nomenclatura](./requirements/structure_organization_and_naming_conventions.md)
 
 ### Diseño
@@ -41,6 +39,11 @@
 
 - [Estrategia de Despliegue](./deployment/deployment_strategy.md)
 - [Monitoreo y Observabilidad](./deployment/monitoring_and_observability_strategy.md)
+
+### Guías de Usuario
+
+- [Casos de Uso e Historias de Usuario](./user-guides/use_cases_user_stories.md)
+- [Reglas de Interacción con Usuario](./user-guides/rules_of_interaction_user.md)
 
 ### Changelog & Contribución
 

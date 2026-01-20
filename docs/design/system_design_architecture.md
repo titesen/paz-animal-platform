@@ -104,31 +104,28 @@ Crítico para el módulo de pagos (Mercado Pago).
 ### 6.1 Diagrama de Contenedores (C4)
 
 ```mermaid
-C4Context
-    title Diagrama de Contenedores - Paz Animal
+graph TB
+    user["Usuario<br/>(Adoptante o Donante)"]
+    admin["Admin/Voluntario<br/>(Gestiona el refugio)"]
 
-    Person(user, "Usuario", "Adoptante o Donante")
-    Person(admin, "Admin/Voluntario", "Gestiona el refugio")
+    subgraph paz_platform["Plataforma Paz Animal"]
+        frontend["Single Page App<br/>React + Vite<br/>(UI en navegador del usuario)"]
+        api["API Backend<br/>Node.js + Express<br/>(Lógica de negocio y validaciones)"]
+        db[("Base de Datos<br/>PostgreSQL<br/>(Almacena datos relacionales)")]
+        storage["Object Storage<br/>Cloudflare R2<br/>(Almacena fotos de mascotas)"]
+        worker["Background Worker<br/>BullMQ<br/>(Envío de emails y tareas pesadas)"]
+    end
 
-    System_Boundary(paz_platform, "Plataforma Paz Animal") {
-        Container(frontend, "Single Page App", "React + Vite", "UI en navegador del usuario")
-        Container(api, "API Backend", "Node.js + Express", "Lógica de negocio y validaciones")
-        ContainerDb(db, "Base de Datos", "PostgreSQL", "Almacena datos relacionales")
-        Container(storage, "Object Storage", "Cloudflare R2", "Almacena fotos de mascotas")
-        Container(worker, "Background Worker", "BullMQ", "Envío de emails y tareas pesadas")
-    }
+    mp["Mercado Pago<br/>(Procesador de Pagos)"]
+    google["Google Auth<br/>(Proveedor de Identidad)"]
 
-    System_Ext(mp, "Mercado Pago", "Procesador de Pagos")
-    System_Ext(google, "Google Auth", "Proveedor de Identidad")
-
-    Rel(user, frontend, "Usa", "HTTPS")
-    Rel(frontend, api, "Llama API", "JSON/REST")
-    Rel(api, db, "Lee/Escribe", "SQL/Drizzle")
-    Rel(api, storage, "Sube fotos", "S3 SDK")
-    Rel(api, worker, "Encola tareas", "Redis Protocol")
-    Rel(api, mp, "Crea Preferencia", "HTTPS")
-    Rel(api, google, "Valida Token", "HTTPS")
-
+    user -->|Usa HTTPS| frontend
+    frontend -->|Llama API JSON/REST| api
+    api -->|Lee/Escribe SQL/Drizzle| db
+    api -->|Sube fotos S3 SDK| storage
+    api -->|Encola tareas Redis Protocol| worker
+    api -->|Crea Preferencia HTTPS| mp
+    api -->|Valida Token HTTPS| google
 ```
 
 ### 6.2 Diagrama de Secuencia: Flujo de Donación
@@ -142,7 +139,7 @@ sequenceDiagram
     participant MP as Mercado Pago
     participant DB as PostgreSQL
 
-    User->>FE: Click "Donar $1000"
+    User->>FE: Click Donar $1000
     FE->>API: POST /donations/preference
     API->>MP: Crear Preferencia de Pago
     MP-->>API: Retorna init_point (URL)
@@ -155,9 +152,8 @@ sequenceDiagram
     API->>API: Validar Firma & Idempotencia
     API->>DB: INSERT transaction (Status: APPROVED)
     deactivate API
-    MP-->>User: "¡Pago Exitoso!"
+    MP-->>User: Pago Exitoso!
     User->>FE: Vuelve al sitio
-
 ```
 
 ---

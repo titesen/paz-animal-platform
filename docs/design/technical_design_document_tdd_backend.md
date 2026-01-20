@@ -44,16 +44,15 @@ La fundación necesita digitalizar sus procesos manuales (actualmente en Excel/P
 graph TD
     Client[Frontend / Postman] -->|JSON/HTTP| API_Gateway[Express Router]
 
-    subgraph "Backend Core (Node.js)"
+    subgraph Backend["Backend Core (Node.js)"]
         API_Gateway -->|Zod Validation| Controller[Controller Layer]
-        Controller -->|DTO| Service[Service Layer (Business Logic)]
-        Service -->|Entity| Repo[Repository Layer (Drizzle)]
+        Controller -->|DTO| Service["Service Layer (Business Logic)"]
+        Service -->|Entity| Repo["Repository Layer (Drizzle)"]
     end
 
     Repo -->|SQL| DB[(PostgreSQL V23)]
     Service -->|Upload| R2[Cloudflare R2]
     Service -->|Queue| Bull[Redis/BullMQ]
-
 ```
 
 ### Patrones Arquitectónicos
