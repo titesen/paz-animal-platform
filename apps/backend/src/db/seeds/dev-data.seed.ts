@@ -181,13 +181,13 @@ async function seedDevData() {
         db
           .select()
           .from(schema.breeds)
-          .where(eq(schema.breeds.name, "Persa"))
+          .where(eq(schema.breeds.name, "Persian"))
           .limit(1)
           .then((r) => r[0]),
         db
           .select()
           .from(schema.breeds)
-          .where(eq(schema.breeds.name, "Siamés"))
+          .where(eq(schema.breeds.name, "Siamese"))
           .limit(1)
           .then((r) => r[0]),
       ]);
