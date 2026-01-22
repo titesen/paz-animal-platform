@@ -29,7 +29,7 @@ export async function createAdoptionApplication(data: NewAdoptionApplication) {
 export async function updateAdoptionStatus(adoptionId: string, status: string) {
   const result = await db
     .update(schema.adoptionApplications)
-    .set({ status: status as any, updatedAt: new Date() })
+    .set({ status: status as any })
     .where(eq(schema.adoptionApplications.applicationId, adoptionId))
     .returning();
 
@@ -40,5 +40,5 @@ export async function findAdoptionsByUser(userId: string) {
   return db
     .select()
     .from(schema.adoptionApplications)
-    .where(eq(schema.adoptionApplications.applicantId, userId));
+    .where(eq(schema.adoptionApplications.clientId, userId));
 }

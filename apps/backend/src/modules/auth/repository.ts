@@ -92,13 +92,12 @@ export async function assignRoleToUser(
  */
 export async function updateUserPassword(
   userId: string,
-  hashedPassword: string,
+  passwordHash: string,
 ): Promise<void> {
   await db
     .update(schema.users)
     .set({
-      hashedPassword,
-      updatedAt: new Date(),
+      passwordHash,
     })
     .where(eq(schema.users.userId, userId));
 }
@@ -114,18 +113,6 @@ export async function findUserByGoogleId(googleId: string) {
     .limit(1);
 
   return result[0] || null;
-}
-
-/**
- * Update user's last login timestamp
- */
-export async function updateLastLogin(userId: string): Promise<void> {
-  await db
-    .update(schema.users)
-    .set({
-      lastLoginAt: new Date(),
-    })
-    .where(eq(schema.users.userId, userId));
 }
 
 /**

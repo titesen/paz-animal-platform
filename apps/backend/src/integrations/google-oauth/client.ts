@@ -13,7 +13,7 @@ import { ServiceUnavailableError } from "../../types/errors";
  * @returns User information from Google
  */
 export async function verifyGoogleIdToken(
-  idToken: string,
+  _idToken: string,
 ): Promise<GoogleUserInfo> {
   // TODO: Implement Google OAuth client verification
   // Using google-auth-library package

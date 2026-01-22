@@ -28,25 +28,29 @@ export async function findPets(filters: {
   page: number;
   limit: number;
   status?: string;
-  speciesId?: number;
   sex?: string;
   sortBy: string;
   sortOrder: "asc" | "desc";
 }) {
-  const { page, limit, status, speciesId, sex, sortBy, sortOrder } = filters;
+  const { page, limit, status, sex, sortBy, sortOrder } = filters;
   const offset = (page - 1) * limit;
 
   // Build where conditions
   const conditions = [];
   if (status) conditions.push(eq(schema.pets.status, status as any));
-  if (speciesId) conditions.push(eq(schema.pets.speciesId, speciesId));
   if (sex) conditions.push(eq(schema.pets.sex, sex as any));
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-  // Build order by
+  // Build order by - use explicit column mapping
+  const validSortColumns = {
+    createdAt: schema.pets.createdAt,
+    name: schema.pets.name,
+  } as const;
+
   const orderByColumn =
-    schema.pets[sortBy as keyof typeof schema.pets] || schema.pets.createdAt;
+    validSortColumns[sortBy as keyof typeof validSortColumns] ||
+    schema.pets.createdAt;
   const orderByClause =
     sortOrder === "asc" ? asc(orderByColumn) : desc(orderByColumn);
 
@@ -84,7 +88,7 @@ export async function createPet(petData: NewPet) {
 export async function updatePet(petId: string, petData: Partial<NewPet>) {
   const result = await db
     .update(schema.pets)
-    .set({ ...petData, updatedAt: new Date() })
+    .set(petData)
     .where(eq(schema.pets.petId, petId))
     .returning();
 
@@ -110,6 +114,6 @@ export async function updatePetStatus(
 ): Promise<void> {
   await db
     .update(schema.pets)
-    .set({ status: status as any, updatedAt: new Date() })
+    .set({ status: status as any })
     .where(eq(schema.pets.petId, petId));
 }
