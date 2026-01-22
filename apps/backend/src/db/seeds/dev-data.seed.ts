@@ -1,5 +1,4 @@
 import { eq } from "drizzle-orm";
-import { env } from "../../config/env";
 import { logger } from "../../config/logger";
 import { hashPassword } from "../../shared/utils/password.util";
 import { db, pool } from "../index";
@@ -9,57 +8,16 @@ import * as schema from "../schema";
  * Development Data Seeder
  * Creates sample data for testing and development
  * 100% Idempotent: Safe to run multiple times without creating duplicates
+ *
+ * NOTE: Admin user is created via production.seed.ts
+ * This seeder focuses on sample operational data only
  */
 async function seedDevData() {
   try {
     logger.info("🌱 Starting development data seeding...");
 
     // ==========================================
-    // 1. CREATE ADMIN USER
-    // ==========================================
-    logger.info("→ Creating admin user...");
-    const adminPasswordHash = await hashPassword(
-      env.ADMIN_DEFAULT_PASSWORD || "Admin123!",
-    );
-
-    const [adminUser] = await db
-      .insert(schema.users)
-      .values({
-        firstName: "Admin",
-        lastName: "Sistema",
-        email: env.ADMIN_DEFAULT_EMAIL,
-        passwordHash: adminPasswordHash,
-        docType: "DNI",
-        docNumber: "99999999",
-        nationalityIso: "AR",
-        phone: "+54 11 4444-5555",
-        birthDate: "1990-01-01",
-      })
-      .onConflictDoUpdate({
-        target: schema.users.email,
-        set: { passwordHash: adminPasswordHash },
-      })
-      .returning();
-
-    // Assign ADMIN role
-    const adminRole = await db
-      .select()
-      .from(schema.roles)
-      .where(eq(schema.roles.name, "ADMIN"))
-      .limit(1)
-      .then((r) => r[0]);
-
-    if (adminRole) {
-      await db
-        .insert(schema.usersRoles)
-        .values({ userId: adminUser.userId, roleId: adminRole.roleId })
-        .onConflictDoNothing();
-    }
-
-    logger.info(`✅ Admin user: ${adminUser.email}`);
-
-    // ==========================================
-    // 2. CREATE CLIENT USERS
+    // 1. CREATE CLIENT USERS
     // ==========================================
     logger.info("→ Creating client users...");
     const clientPasswordHash = await hashPassword("Password123!");
@@ -162,8 +120,33 @@ async function seedDevData() {
       `✅ ${createdClients.length} new clients, ${allClients.length} total`,
     );
 
+    // Get admin user for fallback references
+    const adminRole = await db
+      .select()
+      .from(schema.roles)
+      .where(eq(schema.roles.name, "ADMIN"))
+      .limit(1)
+      .then((r) => r[0]);
+
+    const adminUser = await db
+      .select({ user: schema.users })
+      .from(schema.users)
+      .innerJoin(
+        schema.usersRoles,
+        eq(schema.users.userId, schema.usersRoles.userId),
+      )
+      .where(eq(schema.usersRoles.roleId, adminRole!.roleId))
+      .limit(1)
+      .then((rows) => (rows[0] ? rows[0].user : null));
+
+    if (!adminUser) {
+      throw new Error(
+        "Admin user not found. Run production.seed.ts first to create the admin user.",
+      );
+    }
+
     // ==========================================
-    // 3. CREATE SAMPLE PETS (Only if none exist)
+    // 2. CREATE SAMPLE PETS (Only if none exist)
     // ==========================================
     logger.info("→ Creating sample pets...");
     const allUsers = [adminUser, ...allClients];
@@ -312,7 +295,7 @@ async function seedDevData() {
     }
 
     // ==========================================
-    // 4. ADOPTIONS (Only if none exist)
+    // 3. ADOPTIONS (Only if none exist)
     // ==========================================
     logger.info("→ Creating adoptions...");
     const existingAdoptions = await db
@@ -386,7 +369,7 @@ async function seedDevData() {
     }
 
     // ==========================================
-    // 5. DONATIONS (Only if none exist)
+    // 4. DONATIONS (Only if none exist)
     // ==========================================
     logger.info("→ Creating donations...");
     const existingDonations = await db
@@ -445,7 +428,7 @@ async function seedDevData() {
     }
 
     // ==========================================
-    // 6. TRANSACTIONS (Only if none exist)
+    // 5. TRANSACTIONS (Only if none exist)
     // ==========================================
     logger.info("→ Creating transactions...");
     const existingTransactions = await db
@@ -481,7 +464,7 @@ async function seedDevData() {
     }
 
     // ==========================================
-    // 7. EVENTS (Only if none exist)
+    // 6. EVENTS (Only if none exist)
     // ==========================================
     logger.info("→ Creating events...");
     const existingEvents = await db
@@ -561,7 +544,7 @@ async function seedDevData() {
     }
 
     // ==========================================
-    // 8. NEWS (Only if none exist)
+    // 7. NEWS (Only if none exist)
     // ==========================================
     logger.info("→ Creating news...");
     const existingNews = await db
@@ -621,7 +604,7 @@ async function seedDevData() {
     }
 
     // ==========================================
-    // 9. VOLUNTEERS (Only if none exist)
+    // 8. VOLUNTEERS (Only if none exist)
     // ==========================================
     logger.info("→ Creating volunteers...");
     const existingVolApps = await db
@@ -733,6 +716,450 @@ async function seedDevData() {
       logger.info(`✅ ${apps.length} volunteer applications created`);
     } else {
       logger.info(`✅ ${existingVolApps} volunteer applications already exist`);
+    }
+
+    // ==========================================
+    // 9. MEDIA (Polymorphic - for pets and news)
+    // ==========================================
+    logger.info("→ Creating media...");
+    const existingMedia = await db
+      .select()
+      .from(schema.media)
+      .then((r) => r.length);
+
+    if (existingMedia === 0) {
+      const mediaData = [];
+
+      // Media for first 3 pets (if they exist)
+      if (pets.length > 0) {
+        mediaData.push(
+          {
+            storageUrl: "https://placedog.net/500/500?id=1",
+            type: "IMAGE" as const,
+            altText: "Foto principal de Max",
+            entityType: "pets",
+            entityId: pets[0].petId,
+            isMain: true,
+          },
+          {
+            storageUrl: "https://placedog.net/500/500?id=2",
+            type: "IMAGE" as const,
+            altText: "Foto de Luna jugando",
+            entityType: "pets",
+            entityId: pets[1]?.petId || pets[0].petId,
+            isMain: true,
+          },
+          {
+            storageUrl: "https://placedog.net/500/500?id=3",
+            type: "IMAGE" as const,
+            altText: "Rocky en el parque",
+            entityType: "pets",
+            entityId: pets[2]?.petId || pets[0].petId,
+            isMain: true,
+          },
+        );
+      }
+
+      // Media for news (retrieve existing news first)
+      const existingNews = await db
+        .select()
+        .from(schema.news)
+        .limit(2)
+        .then((r) => r);
+
+      if (existingNews.length > 0) {
+        mediaData.push(
+          {
+            storageUrl: "https://picsum.photos/800/600?random=1",
+            type: "IMAGE" as const,
+            altText: "Banner de noticia",
+            entityType: "news",
+            entityId: existingNews[0].newsId,
+            isMain: true,
+          },
+          {
+            storageUrl: "https://picsum.photos/800/600?random=2",
+            type: "IMAGE" as const,
+            altText: "Foto de evento",
+            entityType: "news",
+            entityId: existingNews[1]?.newsId || existingNews[0].newsId,
+            isMain: false,
+          },
+        );
+      }
+
+      if (mediaData.length > 0) {
+        await db.insert(schema.media).values(mediaData);
+        logger.info(`✅ ${mediaData.length} media items created`);
+      } else {
+        logger.info("⚠️  No entities to attach media to");
+      }
+    } else {
+      logger.info(`✅ ${existingMedia} media items already exist`);
+    }
+
+    // ==========================================
+    // 10. ADDRESSES (Polymorphic - for users and events)
+    // ==========================================
+    logger.info("→ Creating addresses...");
+    const existingAddresses = await db
+      .select()
+      .from(schema.addresses)
+      .then((r) => r.length);
+
+    if (existingAddresses === 0) {
+      const corrientesCity = await db
+        .select()
+        .from(schema.cities)
+        .where(eq(schema.cities.name, "Corrientes"))
+        .limit(1)
+        .then((r) => r[0]);
+
+      if (corrientesCity) {
+        const addressData = [];
+
+        // Addresses for first 3 clients
+        if (allClients.length > 0) {
+          addressData.push(
+            {
+              entityType: "users",
+              entityId: allClients[0].userId,
+              cityId: corrientesCity.cityId,
+              street: "Av. 3 de Abril",
+              number: "1234",
+              unit: "Dpto 5B",
+              zipCode: "W3400",
+              alias: "Casa",
+            },
+            {
+              entityType: "users",
+              entityId: allClients[1]?.userId || allClients[0].userId,
+              cityId: corrientesCity.cityId,
+              street: "Junín",
+              number: "567",
+              zipCode: "W3400",
+              alias: "Principal",
+            },
+            {
+              entityType: "users",
+              entityId: allClients[2]?.userId || allClients[0].userId,
+              cityId: corrientesCity.cityId,
+              street: "San Juan",
+              number: "890",
+              zipCode: "W3400",
+              alias: "Hogar",
+            },
+          );
+        }
+
+        // Address for events
+        const existingEvents = await db
+          .select()
+          .from(schema.events)
+          .limit(1)
+          .then((r) => r);
+
+        if (existingEvents.length > 0) {
+          addressData.push({
+            entityType: "events",
+            entityId: existingEvents[0].eventId,
+            cityId: corrientesCity.cityId,
+            street: "Costanera",
+            number: "S/N",
+            zipCode: "W3400",
+            alias: "Lugar del evento",
+          });
+        }
+
+        if (addressData.length > 0) {
+          await db.insert(schema.addresses).values(addressData);
+          logger.info(`✅ ${addressData.length} addresses created`);
+        }
+      } else {
+        logger.info("⚠️  Corrientes city not found, skipping addresses");
+      }
+    } else {
+      logger.info(`✅ ${existingAddresses} addresses already exist`);
+    }
+
+    // ==========================================
+    // 11. COMMENTS (Polymorphic - for pets and news)
+    // ==========================================
+    logger.info("→ Creating comments...");
+    const existingComments = await db
+      .select()
+      .from(schema.comments)
+      .then((r) => r.length);
+
+    if (existingComments === 0) {
+      const commentData = [];
+
+      // Comments on pets
+      if (pets.length > 0 && allClients.length > 0) {
+        commentData.push(
+          {
+            authorId: allClients[0].userId,
+            entityType: "pets",
+            entityId: pets[0].petId,
+            content: "¡Qué hermoso! ¿Está disponible para adopción?",
+            moderationStatus: "PUBLISHED" as const,
+          },
+          {
+            authorId: allClients[1]?.userId || allClients[0].userId,
+            entityType: "pets",
+            entityId: pets[0].petId,
+            content: "Me encantaría conocerlo, ¿cómo hago?",
+            moderationStatus: "PUBLISHED" as const,
+          },
+          {
+            authorId: allClients[2]?.userId || allClients[0].userId,
+            entityType: "pets",
+            entityId: pets[1]?.petId || pets[0].petId,
+            content: "Qué linda gatita, se ve muy cariñosa",
+            moderationStatus: "PUBLISHED" as const,
+          },
+        );
+      }
+
+      // Comments on news
+      const existingNews = await db
+        .select()
+        .from(schema.news)
+        .limit(1)
+        .then((r) => r);
+
+      if (existingNews.length > 0 && allClients.length > 0) {
+        commentData.push(
+          {
+            authorId: allClients[0].userId,
+            entityType: "news",
+            entityId: existingNews[0].newsId,
+            content: "Excelente noticia, felicitaciones al equipo!",
+            moderationStatus: "PUBLISHED" as const,
+          },
+          {
+            authorId: allClients[1]?.userId || allClients[0].userId,
+            entityType: "news",
+            entityId: existingNews[0].newsId,
+            content: "Me alegra mucho leer esto",
+            moderationStatus: "PUBLISHED" as const,
+          },
+        );
+      }
+
+      if (commentData.length > 0) {
+        await db.insert(schema.comments).values(commentData);
+        logger.info(`✅ ${commentData.length} comments created`);
+      }
+    } else {
+      logger.info(`✅ ${existingComments} comments already exist`);
+    }
+
+    // ==========================================
+    // 12. LIKES (Polymorphic - for pets and news)
+    // ==========================================
+    logger.info("→ Creating likes...");
+    const existingLikes = await db
+      .select()
+      .from(schema.likes)
+      .then((r) => r.length);
+
+    if (existingLikes === 0) {
+      const likeData = [];
+
+      // Likes on pets
+      if (pets.length > 0 && allClients.length >= 3) {
+        likeData.push(
+          {
+            userId: allClients[0].userId,
+            entityType: "pets",
+            entityId: pets[0].petId,
+          },
+          {
+            userId: allClients[1].userId,
+            entityType: "pets",
+            entityId: pets[0].petId,
+          },
+          {
+            userId: allClients[2].userId,
+            entityType: "pets",
+            entityId: pets[0].petId,
+          },
+          {
+            userId: allClients[0].userId,
+            entityType: "pets",
+            entityId: pets[1]?.petId || pets[0].petId,
+          },
+        );
+      }
+
+      // Likes on news
+      const existingNews = await db
+        .select()
+        .from(schema.news)
+        .limit(1)
+        .then((r) => r);
+
+      if (existingNews.length > 0 && allClients.length > 0) {
+        likeData.push(
+          {
+            userId: allClients[0].userId,
+            entityType: "news",
+            entityId: existingNews[0].newsId,
+          },
+          {
+            userId: allClients[1]?.userId || allClients[0].userId,
+            entityType: "news",
+            entityId: existingNews[0].newsId,
+          },
+        );
+      }
+
+      if (likeData.length > 0) {
+        await db.insert(schema.likes).values(likeData);
+        logger.info(`✅ ${likeData.length} likes created`);
+      }
+    } else {
+      logger.info(`✅ ${existingLikes} likes already exist`);
+    }
+
+    // ==========================================
+    // 13. SPONSORS
+    // ==========================================
+    logger.info("→ Creating sponsors...");
+    const existingSponsors = await db
+      .select()
+      .from(schema.sponsors)
+      .then((r) => r.length);
+
+    if (existingSponsors === 0) {
+      const sponsorData = [
+        {
+          name: "Veterinaria Los Amigos",
+          logoUrl: "https://via.placeholder.com/200x100?text=Vet+Amigos",
+          websiteUrl: "https://example.com/vet-amigos",
+          contactEmail: "contacto@vetamigos.com",
+          contactPhone: "+54 379 4111-111",
+          description:
+            "Veterinaria colaboradora con descuentos para adoptantes",
+          isActive: true,
+        },
+        {
+          name: "Pet Shop Corrientes",
+          logoUrl: "https://via.placeholder.com/200x100?text=PetShop",
+          websiteUrl: "https://example.com/petshop",
+          contactEmail: "info@petshopctes.com",
+          contactPhone: "+54 379 4222-222",
+          description: "Proveedor de alimentos y accesorios",
+          isActive: true,
+        },
+        {
+          name: "Fundación Ayuda Animal",
+          logoUrl: "https://via.placeholder.com/200x100?text=FAA",
+          contactEmail: "ayuda@faa.org",
+          contactPhone: "+54 379 4333-333",
+          description: "Organización aliada en rescates",
+          isActive: true,
+        },
+      ];
+
+      const sponsors = await db
+        .insert(schema.sponsors)
+        .values(sponsorData)
+        .returning();
+
+      logger.info(`✅ ${sponsors.length} sponsors created`);
+    } else {
+      logger.info(`✅ ${existingSponsors} sponsors already exist`);
+    }
+
+    // ==========================================
+    // 14. UI FRAGMENTS (CMS Content)
+    // ==========================================
+    logger.info("→ Creating UI fragments...");
+    const existingFragments = await db
+      .select()
+      .from(schema.uiFragments)
+      .then((r) => r.length);
+
+    if (existingFragments === 0) {
+      const fragmentData = [
+        {
+          fragmentKey: "home_hero_title",
+          section: "HOME" as const,
+          type: "TEXT" as const,
+          content: JSON.stringify({
+            es: "Adoptá, Salvá una Vida",
+            en: "Adopt, Save a Life",
+            pt: "Adote, Salve uma Vida",
+          }),
+          isActive: true,
+        },
+        {
+          fragmentKey: "home_hero_subtitle",
+          section: "HOME" as const,
+          type: "TEXT" as const,
+          content: JSON.stringify({
+            es: "Miles de animales esperan un hogar. Vos podés ser su héroe.",
+            en: "Thousands of animals are waiting for a home. You can be their hero.",
+            pt: "Milhares de animais esperam por um lar. Você pode ser o herói deles.",
+          }),
+          isActive: true,
+        },
+        {
+          fragmentKey: "contact_phone",
+          section: "GLOBAL" as const,
+          type: "TEXT" as const,
+          content: JSON.stringify({
+            es: "+54 379 4000-000",
+            en: "+54 379 4000-000",
+            pt: "+54 379 4000-000",
+          }),
+          isActive: true,
+        },
+        {
+          fragmentKey: "contact_email",
+          section: "GLOBAL" as const,
+          type: "TEXT" as const,
+          content: JSON.stringify({
+            es: "contacto@pazanimal.org",
+            en: "contact@pazanimal.org",
+            pt: "contato@pazanimal.org",
+          }),
+          isActive: true,
+        },
+        {
+          fragmentKey: "donation_cta_title",
+          section: "DONATIONS" as const,
+          type: "TEXT" as const,
+          content: JSON.stringify({
+            es: "Tu donación salva vidas",
+            en: "Your donation saves lives",
+            pt: "Sua doação salva vidas",
+          }),
+          isActive: true,
+        },
+        {
+          fragmentKey: "about_mission",
+          section: "ABOUT_US" as const,
+          type: "RICH_TEXT" as const,
+          content: JSON.stringify({
+            es: "Paz Animal es una fundación dedicada al rescate, rehabilitación y adopción de animales en situación de calle en Corrientes, Argentina.",
+            en: "Paz Animal is a foundation dedicated to rescue, rehabilitation and adoption of stray animals in Corrientes, Argentina.",
+            pt: "Paz Animal é uma fundação dedicada ao resgate, reabilitação e adoção de animais de rua em Corrientes, Argentina.",
+          }),
+          isActive: true,
+        },
+      ];
+
+      const fragments = await db
+        .insert(schema.uiFragments)
+        .values(fragmentData)
+        .returning();
+
+      logger.info(`✅ ${fragments.length} UI fragments created`);
+    } else {
+      logger.info(`✅ ${existingFragments} UI fragments already exist`);
     }
 
     logger.info("✨ Development data seeding completed!");
