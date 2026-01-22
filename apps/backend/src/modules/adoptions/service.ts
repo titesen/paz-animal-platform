@@ -15,18 +15,15 @@ export async function createAdoptionApplication(
   // TODO: Validate pet exists and is available for adoption
 
   const application = await adoptionsRepo.createAdoptionApplication({
-    applicantId: userId,
+    clientId: userId,
     petId: data.petId,
-    housingType: data.housingType as any,
-    hasYard: data.hasYard,
-    hasOtherPets: data.hasOtherPets,
-    otherPetsDescription: data.otherPetsDescription,
-    hasChildren: data.hasChildren,
-    childrenAges: data.childrenAges,
-    reasonForAdoption: data.reasonForAdoption,
-    canAffordVetCare: data.canAffordVetCare,
-    willingToFollowUp: data.willingToFollowUp,
-    status: "PENDING" as any,
+    spaceDescription: data.housingType,
+    incomeDescription: data.canAffordVetCare
+      ? "Can afford vet care"
+      : "Limited income",
+    otherPetsDescription: data.otherPetsDescription || "",
+    motivation: data.reasonForAdoption,
+    status: "REQUESTED" as any,
   });
 
   logger.info(

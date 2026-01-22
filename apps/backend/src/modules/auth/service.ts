@@ -38,15 +38,16 @@ export async function register(data: RegisterDTO): Promise<AuthResponse> {
   }
 
   // Hash password
-  const hashedPassword = await hashPassword(data.password);
+  const passwordHash = await hashPassword(data.password);
 
   // Create user
   const newUser = await authRepo.createUser({
     email: data.email,
-    hashedPassword,
+    passwordHash,
     firstName: data.firstName,
     lastName: data.lastName,
-    phoneNumber: data.phoneNumber,
+    phone: data.phoneNumber,
+    docNumber: data.docNumber,
   });
 
   // Assign CLIENT role by default
@@ -95,14 +96,14 @@ export async function login(data: LoginDTO): Promise<AuthResponse> {
   // Find user by email
   const user = await authRepo.findUserByEmail(data.email);
 
-  if (!user || !user.hashedPassword) {
+  if (!user || !user.passwordHash) {
     throw new UnauthorizedError("Invalid credentials", "INVALID_CREDENTIALS");
   }
 
   // Verify password
   const isPasswordValid = await comparePassword(
     data.password,
-    user.hashedPassword,
+    user.passwordHash,
   );
 
   if (!isPasswordValid) {
@@ -119,9 +120,6 @@ export async function login(data: LoginDTO): Promise<AuthResponse> {
 
   // Get user roles
   const roles = await authRepo.getUserRoles(user.userId);
-
-  // Update last login timestamp
-  await authRepo.updateLastLogin(user.userId);
 
   // Generate tokens
   const accessToken = generateAccessToken({
@@ -221,7 +219,7 @@ export async function refreshAccessToken(
  * Login with Google OAuth
  */
 export async function loginWithGoogle(
-  data: GoogleOAuthDTO,
+  _data: GoogleOAuthDTO,
 ): Promise<AuthResponse> {
   // TODO: Verify Google ID token and extract user info
   // This requires integration with Google OAuth client
@@ -255,10 +253,9 @@ export async function getCurrentUser(userId: string) {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
-    phoneNumber: user.phoneNumber,
-    profilePictureUrl: user.profilePictureUrl,
+    phone: user.phone,
+    avatarUrl: user.avatarUrl,
     roles,
     createdAt: user.createdAt,
-    lastLoginAt: user.lastLoginAt,
   };
 }

@@ -52,8 +52,8 @@ export async function createPaymentPreference(data: {
  * @returns True if valid signature
  */
 export function verifyWebhookSignature(
-  payload: string,
-  signature: string,
+  _payload: string,
+  _signature: string,
 ): boolean {
   // TODO: Implement signature verification
   // This is critical for security to prevent fake payment notifications

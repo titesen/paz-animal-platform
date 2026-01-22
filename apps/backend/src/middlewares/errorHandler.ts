@@ -35,12 +35,12 @@ export function errorHandler(
   // Handle Zod validation errors
   if (err instanceof ZodError) {
     const validationErrors: Record<string, string[]> = {};
-    err.errors.forEach((error) => {
-      const path = error.path.join(".");
+    err.issues.forEach((issue) => {
+      const path = issue.path.join(".");
       if (!validationErrors[path]) {
         validationErrors[path] = [];
       }
-      validationErrors[path].push(error.message);
+      validationErrors[path].push(issue.message);
     });
 
     const response: JSendFail = {

@@ -13,18 +13,12 @@ import type { CreatePetDTO, PetQueryParams, UpdatePetDTO } from "./types";
  * Get all pets with pagination
  */
 export async function getAllPets(queryParams: PetQueryParams) {
-  const { page, limit, offset } = parsePagination(
-    queryParams.page,
-    queryParams.limit,
-  );
+  const { page, limit } = parsePagination(queryParams.page, queryParams.limit);
 
   const filters = {
     page,
     limit,
     status: queryParams.status,
-    speciesId: queryParams.speciesId
-      ? parseInt(queryParams.speciesId)
-      : undefined,
     sex: queryParams.sex,
     sortBy: queryParams.sortBy,
     sortOrder: queryParams.sortOrder,
@@ -62,7 +56,7 @@ export async function getPetById(petId: string) {
 export async function createPet(data: CreatePetDTO) {
   const newPet = await petsRepo.createPet({
     ...data,
-    birthDate: data.birthDate ? new Date(data.birthDate) : null,
+    birthDateApprox: data.birthDate,
   });
 
   logger.info({ petId: newPet.petId, name: newPet.name }, "Pet created");
@@ -82,7 +76,7 @@ export async function updatePet(petId: string, data: UpdatePetDTO) {
 
   const updateData = {
     ...data,
-    birthDate: data.birthDate ? new Date(data.birthDate) : undefined,
+    birthDateApprox: data.birthDate,
   };
 
   const updatedPet = await petsRepo.updatePet(petId, updateData);

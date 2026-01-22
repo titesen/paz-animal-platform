@@ -23,6 +23,7 @@ export const registerSchema = z.object({
   firstName: z.string().min(1, "First name is required").max(100),
   lastName: z.string().min(1, "Last name is required").max(100),
   phoneNumber: z.string().regex(/^\+?\d{8,15}$/, "Invalid phone number format"),
+  docNumber: z.string().min(1, "Document number is required").max(50),
 });
 
 export type RegisterDTO = z.infer<typeof registerSchema>;
