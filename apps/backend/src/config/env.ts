@@ -10,6 +10,7 @@ const envSchema = z.object({
 
   // Database
   DATABASE_URL: z.string().url(),
+  DATABASE_MIGRATION_URL: z.string().url().optional(),
 
   // Authentication
   JWT_SECRET: z.string().min(32),
@@ -45,7 +46,23 @@ const envSchema = z.object({
 
   // Admin defaults
   ADMIN_DEFAULT_EMAIL: z.string().email().default("admin@pazanimal.org"),
-  ADMIN_DEFAULT_PASSWORD: z.string().min(8).optional(),
+  ADMIN_DEFAULT_PASSWORD: z
+    .string()
+    .min(8)
+    .refine(
+      (val) => {
+        // In production, password MUST be set explicitly
+        if (process.env.NODE_ENV === "production" && !val) {
+          return false;
+        }
+        return true;
+      },
+      {
+        message:
+          "ADMIN_DEFAULT_PASSWORD is required in production environment for security",
+      },
+    )
+    .optional(),
 
   // Frontend URL for CORS
   FRONTEND_URL: z.string().url().default("http://localhost:5173"),

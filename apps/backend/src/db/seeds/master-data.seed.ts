@@ -5,7 +5,11 @@ import { logger } from "../../config/logger.js";
 import { db, pool } from "../index.js";
 import * as schema from "../schema/index.js";
 
-async function seedMasterData() {
+/**
+ * Seeds master/reference data required for system operation
+ * @param closePool - Whether to close the DB pool after seeding (default: false when imported)
+ */
+async function seedMasterData(closePool = false) {
   try {
     logger.info("🌱 Starting master data seeding...");
 
@@ -243,6 +247,14 @@ async function seedMasterData() {
           .from(schema.provinces)
           .where(eq(schema.provinces.name, "Ciudad Autónoma de Buenos Aires"))
       )[0];
+    const corrientes =
+      provinceResults.find((p) => p.name === "Corrientes") ||
+      (
+        await db
+          .select()
+          .from(schema.provinces)
+          .where(eq(schema.provinces.name, "Corrientes"))
+      )[0];
 
     const cities = [
       // CABA neighborhoods
@@ -262,6 +274,10 @@ async function seedMasterData() {
       { provinceId: buenosAires.provinceId, name: "Avellaneda" },
       { provinceId: buenosAires.provinceId, name: "Tigre" },
       { provinceId: buenosAires.provinceId, name: "San Miguel" },
+      // Corrientes cities
+      { provinceId: corrientes.provinceId, name: "Corrientes" },
+      { provinceId: corrientes.provinceId, name: "Goya" },
+      { provinceId: corrientes.provinceId, name: "Paso de los Libres" },
     ];
 
     await db.insert(schema.cities).values(cities).onConflictDoNothing();
@@ -274,20 +290,21 @@ async function seedMasterData() {
     logger.error({ error }, "❌ Error seeding master data");
     throw error;
   } finally {
-    await pool.end();
+    // Only close pool if running standalone (not imported)
+    if (closePool) {
+      await pool.end();
+    }
   }
 }
 
 // Run seeder if executed directly
 if (import.meta.url.includes("master-data.seed")) {
-  seedMasterData()
-    .then(async () => {
-      await pool.end();
+  seedMasterData(true) // Close pool when running directly
+    .then(() => {
       process.exit(0);
     })
-    .catch(async (error) => {
+    .catch((error) => {
       console.error("Seeder error:", error);
-      await pool.end();
       process.exit(1);
     });
 }

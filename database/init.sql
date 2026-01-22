@@ -771,7 +771,39 @@ CREATE TABLE public.audit_logs (
     CONSTRAINT fk_audit_user FOREIGN KEY (user_id) REFERENCES auth.users(user_id) ON DELETE SET NULL
 );
 
--- Limited user creation for the application
+-- ==========================================
+-- DATABASE USER MANAGEMENT (SEC-03: "Dos Sombreros" Strategy)
+-- ==========================================
+-- Two distinct users following the principle of least privilege:
+-- 1. db_owner: DDL operations (migrations, schema changes) - DEPLOYMENT ONLY
+-- 2. app_paz_animal: DML operations (application runtime) - RUNTIME ONLY
+
+-- User 1: db_owner (Migration & Deployment User)
+DO $do$ BEGIN
+   IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'db_owner') THEN
+      CREATE ROLE db_owner LOGIN PASSWORD 'migration_password';
+   END IF;
+END $do$;
+
+GRANT CONNECT ON DATABASE paz_animal_local TO db_owner;
+GRANT ALL PRIVILEGES ON SCHEMA public TO db_owner;
+GRANT ALL PRIVILEGES ON SCHEMA auth TO db_owner;
+
+-- DDL Permissions (CREATE, ALTER, DROP)
+GRANT CREATE ON SCHEMA public TO db_owner;
+GRANT CREATE ON SCHEMA auth TO db_owner;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO db_owner;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA auth TO db_owner;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO db_owner;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA auth TO db_owner;
+
+-- Ensure future objects are also owned by db_owner
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO db_owner;
+ALTER DEFAULT PRIVILEGES IN SCHEMA auth GRANT ALL ON TABLES TO db_owner;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO db_owner;
+ALTER DEFAULT PRIVILEGES IN SCHEMA auth GRANT ALL ON SEQUENCES TO db_owner;
+
+-- User 2: app_paz_animal (Application Runtime User - Restricted to DML)
 DO $do$ BEGIN
    IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'app_paz_animal') THEN
       CREATE ROLE app_paz_animal LOGIN PASSWORD 'dev_password';
@@ -782,8 +814,14 @@ GRANT CONNECT ON DATABASE paz_animal_local TO app_paz_animal;
 GRANT USAGE ON SCHEMA public TO app_paz_animal;
 GRANT USAGE ON SCHEMA auth TO app_paz_animal;
 
--- CRUD permission assignment
+-- DML Permissions ONLY (SELECT, INSERT, UPDATE, DELETE) - NO DDL
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO app_paz_animal;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA auth TO app_paz_animal;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO app_paz_animal;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA auth TO app_paz_animal;
+
+-- Ensure future tables created by db_owner are accessible to app_paz_animal
+ALTER DEFAULT PRIVILEGES FOR ROLE db_owner IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_paz_animal;
+ALTER DEFAULT PRIVILEGES FOR ROLE db_owner IN SCHEMA auth GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_paz_animal;
+ALTER DEFAULT PRIVILEGES FOR ROLE db_owner IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO app_paz_animal;
+ALTER DEFAULT PRIVILEGES FOR ROLE db_owner IN SCHEMA auth GRANT USAGE, SELECT ON SEQUENCES TO app_paz_animal;
