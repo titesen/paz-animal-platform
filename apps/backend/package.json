@@ -16,7 +16,8 @@
     "db:studio": "drizzle-kit studio",
     "db:seed:master": "tsx src/db/seeds/master-data.seed.ts",
     "db:seed:dev": "tsx src/db/seeds/dev-data.seed.ts",
-    "db:seed": "npm run db:seed:master && npm run db:seed:dev"
+    "db:seed": "npm run db:seed:master && npm run db:seed:dev",
+    "db:reset": "echo 'Warning: This will drop all data!' && npm run db:push -- --force && npm run db:seed"
   },
   "keywords": [],
   "author": "",
