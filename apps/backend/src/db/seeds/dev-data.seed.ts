@@ -211,100 +211,99 @@ async function seedDevData() {
 
       const defaultBreed = mixed?.breedId || 1;
 
-      pets = await db
-        .insert(schema.pets)
-        .values([
-          {
-            name: "Max",
-            status: "ADOPTION_AVAILABLE" as const,
-            sex: "MALE" as const,
-            breedId: golden?.breedId || defaultBreed,
-            birthDateApprox: "2020-03-15",
-            description: "Perro golden muy cariñoso y juguetón.",
-          },
-          {
-            name: "Luna",
-            status: "ADOPTION_AVAILABLE" as const,
-            sex: "FEMALE" as const,
-            breedId: labrador?.breedId || defaultBreed,
-            birthDateApprox: "2021-06-20",
-            description: "Labrador adorable, muy activa.",
-            neuterDate: "2022-01-10",
-          },
-          {
-            name: "Rocky",
-            status: "ADOPTION_AVAILABLE" as const,
-            sex: "MALE" as const,
-            breedId: defaultBreed,
-            birthDateApprox: "2019-08-05",
-            description: "Mestizo mediano, tranquilo.",
-            neuterDate: "2020-12-15",
-          },
-          {
-            name: "Bella",
-            status: "ADOPTION_AVAILABLE" as const,
-            sex: "FEMALE" as const,
-            breedId: persian?.breedId || defaultBreed,
-            birthDateApprox: "2022-02-14",
-            description: "Gata persa elegante.",
-          },
-          {
-            name: "Toby",
-            status: "IN_PROCESS" as const,
-            sex: "MALE" as const,
-            breedId: defaultBreed,
-            birthDateApprox: "2021-11-30",
-            description: "Cachorro en adopción.",
-          },
-          {
-            name: "Mía",
-            status: "IN_PROCESS" as const,
-            sex: "FEMALE" as const,
-            breedId: siamese?.breedId || defaultBreed,
-            birthDateApprox: "2020-05-18",
-            description: "Gata siamesa vocal.",
-            neuterDate: "2021-03-22",
-          },
-          {
-            name: "Coco",
-            status: "OWNED" as const,
-            sex: "MALE" as const,
-            breedId: defaultBreed,
-            birthDateApprox: "2018-09-12",
-            ownerId: allUsers[0]?.userId,
-            description: "Perro adoptado.",
-            neuterDate: "2019-06-01",
-          },
-          {
-            name: "Nina",
-            status: "OWNED" as const,
-            sex: "FEMALE" as const,
-            breedId: defaultBreed,
-            birthDateApprox: "2019-12-03",
-            ownerId: allUsers[1]?.userId,
-            description: "Gata mestiza.",
-            neuterDate: "2020-08-15",
-          },
-          {
-            name: "Thor",
-            status: "OWNED" as const,
-            sex: "MALE" as const,
-            breedId: golden?.breedId || defaultBreed,
-            birthDateApprox: "2017-04-25",
-            ownerId: allUsers[2]?.userId,
-            description: "Golden adulto.",
-            neuterDate: "2018-02-10",
-          },
-          {
-            name: "Lola",
-            status: "ADOPTION_AVAILABLE" as const,
-            sex: "FEMALE" as const,
-            breedId: labrador?.breedId || defaultBreed,
-            birthDateApprox: "2022-07-08",
-            description: "Cachorra labrador juguetona.",
-          },
-        ])
-        .returning();
+      const petData = [
+        {
+          name: "Max",
+          status: "ADOPTION_AVAILABLE" as const,
+          sex: "MALE" as const,
+          breedId: golden?.breedId || defaultBreed,
+          birthDateApprox: "2020-03-15",
+          description: "Perro golden muy cariñoso y juguetón.",
+        },
+        {
+          name: "Luna",
+          status: "ADOPTION_AVAILABLE" as const,
+          sex: "FEMALE" as const,
+          breedId: labrador?.breedId || defaultBreed,
+          birthDateApprox: "2021-06-20",
+          description: "Labrador adorable, muy activa.",
+          neuterDate: "2022-01-10",
+        },
+        {
+          name: "Rocky",
+          status: "ADOPTION_AVAILABLE" as const,
+          sex: "MALE" as const,
+          breedId: defaultBreed,
+          birthDateApprox: "2019-08-05",
+          description: "Mestizo mediano, tranquilo.",
+          neuterDate: "2020-12-15",
+        },
+        {
+          name: "Bella",
+          status: "ADOPTION_AVAILABLE" as const,
+          sex: "FEMALE" as const,
+          breedId: persian?.breedId || defaultBreed,
+          birthDateApprox: "2022-02-14",
+          description: "Gata persa elegante.",
+        },
+        {
+          name: "Toby",
+          status: "IN_PROCESS" as const,
+          sex: "MALE" as const,
+          breedId: defaultBreed,
+          birthDateApprox: "2021-11-30",
+          description: "Cachorro en adopción.",
+        },
+        {
+          name: "Mía",
+          status: "IN_PROCESS" as const,
+          sex: "FEMALE" as const,
+          breedId: siamese?.breedId || defaultBreed,
+          birthDateApprox: "2020-05-18",
+          description: "Gata siamesa vocal.",
+          neuterDate: "2021-03-22",
+        },
+        {
+          name: "Coco",
+          status: "OWNED" as const,
+          sex: "MALE" as const,
+          breedId: defaultBreed,
+          birthDateApprox: "2018-09-12",
+          ownerId: allUsers[0]?.userId,
+          description: "Perro adoptado.",
+          neuterDate: "2019-06-01",
+        },
+        {
+          name: "Nina",
+          status: "OWNED" as const,
+          sex: "FEMALE" as const,
+          breedId: defaultBreed,
+          birthDateApprox: "2019-12-03",
+          ownerId: allUsers[1]?.userId,
+          description: "Gata mestiza.",
+          neuterDate: "2020-08-15",
+        },
+        {
+          name: "Thor",
+          status: "OWNED" as const,
+          sex: "MALE" as const,
+          breedId: golden?.breedId || defaultBreed,
+          birthDateApprox: "2017-04-25",
+          ownerId: allUsers[2]?.userId,
+          description: "Golden adulto.",
+          neuterDate: "2018-02-10",
+        },
+        {
+          name: "Lola",
+          status: "ADOPTION_AVAILABLE" as const,
+          sex: "FEMALE" as const,
+          breedId: labrador?.breedId || defaultBreed,
+          birthDateApprox: "2022-07-08",
+          description: "Cachorra labrador juguetona.",
+        },
+      ];
+
+      pets = await db.insert(schema.pets).values(petData).returning();
 
       logger.info(`✅ ${pets.length} pets created`);
     } else {
@@ -325,58 +324,60 @@ async function seedDevData() {
       const available = pets.filter((p) => p.status === "ADOPTION_AVAILABLE");
       const inProcess = pets.filter((p) => p.status === "IN_PROCESS");
 
+      const adoptionData = [
+        {
+          petId: available[0]?.petId || pets[0].petId,
+          clientId: allUsers[3]?.userId || adminUser.userId,
+          status: "UNDER_REVIEW" as const,
+          spaceDescription: "Casa con jardín 200m2",
+          incomeDescription: "Ingresos estables",
+          otherPetsDescription: "Sin mascotas",
+          motivation: "Compañero para niños",
+        },
+        {
+          petId: available[1]?.petId || pets[1].petId,
+          clientId: allUsers[4]?.userId || adminUser.userId,
+          status: "INTERVIEW_SCHEDULED" as const,
+          spaceDescription: "Depto 2 ambientes con balcón",
+          incomeDescription: "Trabajo independiente",
+          otherPetsDescription: "Un perro castrado",
+          motivation: "Compañía para mi perro",
+          interviewDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+        },
+        {
+          petId: inProcess[0]?.petId || pets[4].petId,
+          clientId: allUsers[1]?.userId || adminUser.userId,
+          status: "APPROVED" as const,
+          spaceDescription: "Casa con patio 150m2",
+          incomeDescription: "Empleado multinacional",
+          otherPetsDescription: "Sin mascotas",
+          motivation: "Vivo solo, busco compañía",
+          approvedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        },
+        {
+          petId: inProcess[1]?.petId || pets[5].petId,
+          clientId: allUsers[2]?.userId || adminUser.userId,
+          status: "APPROVED" as const,
+          spaceDescription: "Depto con balcón",
+          incomeDescription: "Consultorio propio",
+          otherPetsDescription: "Una gata de 3 años",
+          motivation: "Experiencia con gatos",
+          approvedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        },
+        {
+          petId: available[2]?.petId || pets[2].petId,
+          clientId: allClients[0]?.userId || adminUser.userId,
+          status: "REQUESTED" as const,
+          spaceDescription: "Casa quinta",
+          incomeDescription: "Jubilado",
+          otherPetsDescription: "Experiencia con perros",
+          motivation: "Tengo tiempo para él",
+        },
+      ];
+
       const adoptions = await db
         .insert(schema.adoptionApplications)
-        .values([
-          {
-            petId: available[0]?.petId || pets[0].petId,
-            clientId: allUsers[3]?.userId || adminUser.userId,
-            status: "UNDER_REVIEW" as const,
-            spaceDescription: "Casa con jardín 200m2",
-            incomeDescription: "Ingresos estables",
-            otherPetsDescription: "Sin mascotas",
-            motivation: "Compañero para niños",
-          },
-          {
-            petId: available[1]?.petId || pets[1].petId,
-            clientId: allUsers[4]?.userId || adminUser.userId,
-            status: "INTERVIEW_SCHEDULED" as const,
-            spaceDescription: "Depto 2 ambientes con balcón",
-            incomeDescription: "Trabajo independiente",
-            otherPetsDescription: "Un perro castrado",
-            motivation: "Compañía para mi perro",
-            interviewDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-          },
-          {
-            petId: inProcess[0]?.petId || pets[4].petId,
-            clientId: allUsers[1]?.userId || adminUser.userId,
-            status: "APPROVED" as const,
-            spaceDescription: "Casa con patio 150m2",
-            incomeDescription: "Empleado multinacional",
-            otherPetsDescription: "Sin mascotas",
-            motivation: "Vivo solo, busco compañía",
-            approvedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-          },
-          {
-            petId: inProcess[1]?.petId || pets[5].petId,
-            clientId: allUsers[2]?.userId || adminUser.userId,
-            status: "APPROVED" as const,
-            spaceDescription: "Depto con balcón",
-            incomeDescription: "Consultorio propio",
-            otherPetsDescription: "Una gata de 3 años",
-            motivation: "Experiencia con gatos",
-            approvedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-          },
-          {
-            petId: available[2]?.petId || pets[2].petId,
-            clientId: allClients[0]?.userId || adminUser.userId,
-            status: "REQUESTED" as const,
-            spaceDescription: "Casa quinta",
-            incomeDescription: "Jubilado",
-            otherPetsDescription: "Experiencia con perros",
-            motivation: "Tengo tiempo para él",
-          },
-        ])
+        .values(adoptionData)
         .returning();
 
       logger.info(`✅ ${adoptions.length} adoptions created`);
