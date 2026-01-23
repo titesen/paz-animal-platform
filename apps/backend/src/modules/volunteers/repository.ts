@@ -125,7 +125,7 @@ export async function createVolunteerApplication(data: {
     .insert(schema.volunteerApplications)
     .values({
       ...data,
-      birthDate: data.birthDate.toISOString().split('T')[0],
+      birthDate: data.birthDate.toISOString().split("T")[0],
       availability: JSON.stringify(data.availability),
     })
     .returning();
@@ -190,10 +190,7 @@ export async function createVolunteer(data: {
   bio?: string;
   availability: unknown;
 }) {
-  const [result] = await db
-    .insert(schema.volunteers)
-    .values(data)
-    .returning();
+  const [result] = await db.insert(schema.volunteers).values(data).returning();
 
   return result;
 }

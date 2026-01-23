@@ -78,4 +78,3 @@ export const assignTagSchema = z.object({
 export type CreateVolunteerDTO = z.infer<typeof createVolunteerSchema>;
 export type UpdateVolunteerDTO = z.infer<typeof updateVolunteerSchema>;
 export type AssignTagDTO = z.infer<typeof assignTagSchema>;
-

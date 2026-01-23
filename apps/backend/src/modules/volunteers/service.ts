@@ -3,7 +3,11 @@
  * @description Business logic for volunteer management
  */
 
-import { ConflictError, NotFoundError, ValidationError } from "../../types/errors";
+import {
+  ConflictError,
+  NotFoundError,
+  ValidationError,
+} from "../../types/errors";
 import * as authRepository from "../auth/repository";
 import * as repository from "./repository";
 import type {
@@ -264,4 +268,3 @@ export async function removeTag(volunteerId: string, roleId: number) {
 export async function getAllRoles() {
   return repository.findAllVolunteerRoles();
 }
-
