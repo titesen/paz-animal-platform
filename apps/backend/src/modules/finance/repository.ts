@@ -3,16 +3,16 @@
  * @description Data access layer for transactions, donations, and financial records
  */
 
-import { eq, and, sql, desc } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 import type {
-  Transaction,
-  MonetaryDonation,
   InKindDonation,
-  TransactionStatus,
-  PaymentProvider,
+  MonetaryDonation,
   PaymentMethodType,
+  PaymentProvider,
+  Transaction,
+  TransactionStatus,
 } from "./types";
 
 // ===================
@@ -129,12 +129,14 @@ export async function getFinancialSummary(currency: string = "ARS"): Promise<{
       ),
     );
 
-  return summary[0] || {
-    totalDonations: 0,
-    totalAmount: "0",
-    pendingAmount: "0",
-    approvedAmount: "0",
-  };
+  return (
+    summary[0] || {
+      totalDonations: 0,
+      totalAmount: "0",
+      pendingAmount: "0",
+      approvedAmount: "0",
+    }
+  );
 }
 
 // ===================

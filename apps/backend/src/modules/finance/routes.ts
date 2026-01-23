@@ -45,11 +45,7 @@ router.post("/donations", controller.createDonation);
  * Get my donations
  * GET /api/finance/donations/my-donations
  */
-router.get(
-  "/donations/my-donations",
-  authenticate,
-  controller.getMyDonations,
-);
+router.get("/donations/my-donations", authenticate, controller.getMyDonations);
 
 // ===================
 // ADMIN/VOLUNTEER ROUTES

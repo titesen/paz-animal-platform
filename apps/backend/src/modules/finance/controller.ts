@@ -4,13 +4,13 @@
  */
 
 import type { Request, Response } from "express";
-import { asyncHandler } from "../../utils";
-import type { AuthenticatedRequest } from "../../types";
-import * as service from "./service";
 import { logger } from "../../config/logger";
+import type { AuthenticatedRequest } from "../../types";
+import { asyncHandler } from "../../utils";
+import * as service from "./service";
 import type {
-  CreateMonetaryDonationDTO,
   CreateInKindDonationDTO,
+  CreateMonetaryDonationDTO,
   MercadoPagoWebhookPayload,
 } from "./types";
 
@@ -147,11 +147,14 @@ export const handleMercadoPagoWebhook = asyncHandler(
     const payload: MercadoPagoWebhookPayload = req.body;
     const signature = req.headers["x-signature"] as string;
 
-    logger.info({
-      type: payload.type,
-      action: payload.action,
-      dataId: payload.data?.id,
-    }, "Received Mercado Pago webhook");
+    logger.info(
+      {
+        type: payload.type,
+        action: payload.action,
+        dataId: payload.data?.id,
+      },
+      "Received Mercado Pago webhook",
+    );
 
     // Validate signature (in production, this should be strict)
     // For now, we accept all webhooks from Mercado Pago

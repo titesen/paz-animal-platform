@@ -3,13 +3,13 @@
  * @description Business logic for donations, transactions, and Mercado Pago integration
  */
 
+import { logger } from "../../config/logger";
+import * as mercadopago from "../../lib/mercadopago";
 import { NotFoundError, ValidationError } from "../../types/errors";
 import * as repository from "./repository";
-import * as mercadopago from "../../lib/mercadopago";
-import { logger } from "../../config/logger";
 import type {
-  CreateMonetaryDonationDTO,
   CreateInKindDonationDTO,
+  CreateMonetaryDonationDTO,
   DonationWithTransaction,
   FinancialSummary,
   MercadoPagoWebhookPayload,
@@ -70,11 +70,14 @@ export async function createMonetaryDonation(
     payerEmail: userId ? undefined : undefined, // Would need to fetch user email
   });
 
-  logger.info({
-    donationId: donation.donationId,
-    preferenceId: preference.id,
-    amount: data.amount,
-  }, "Mercado Pago preference created");
+  logger.info(
+    {
+      donationId: donation.donationId,
+      preferenceId: preference.id,
+      amount: data.amount,
+    },
+    "Mercado Pago preference created",
+  );
 
   return {
     donation: {
@@ -110,11 +113,14 @@ export async function processMercadoPagoWebhook(
   // Fetch payment details from Mercado Pago
   const paymentData = await mercadopago.getPaymentData(paymentId);
 
-  logger.info({
-    paymentId,
-    status: paymentData.status,
-    amount: paymentData.transaction_amount,
-  }, "Processing Mercado Pago payment");
+  logger.info(
+    {
+      paymentId,
+      status: paymentData.status,
+      amount: paymentData.transaction_amount,
+    },
+    "Processing Mercado Pago payment",
+  );
 
   // Find the donation by external reference
   const donationId = paymentData.external_reference;
@@ -160,11 +166,14 @@ export async function processMercadoPagoWebhook(
   if (paymentData.status === "approved") {
     await repository.confirmDonation(donationId);
 
-    logger.info({
-      donationId,
-      transactionId: transaction.transactionId,
-      amount: paymentData.transaction_amount,
-    }, "Donation confirmed");
+    logger.info(
+      {
+        donationId,
+        transactionId: transaction.transactionId,
+        amount: paymentData.transaction_amount,
+      },
+      "Donation confirmed",
+    );
 
     // TODO: Send thank you email
   }
@@ -173,7 +182,9 @@ export async function processMercadoPagoWebhook(
 /**
  * Map Mercado Pago payment status to our transaction status
  */
-function mapPaymentStatus(mpStatus: string): "PENDING" | "APPROVED" | "REJECTED" {
+function mapPaymentStatus(
+  mpStatus: string,
+): "PENDING" | "APPROVED" | "REJECTED" {
   switch (mpStatus) {
     case "approved":
       return "APPROVED";

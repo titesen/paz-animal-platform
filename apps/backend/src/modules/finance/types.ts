@@ -3,9 +3,25 @@
  * @description Type definitions and DTOs for financial transactions and donations
  */
 
-export type TransactionStatus = "PENDING" | "APPROVED" | "REJECTED" | "REFUNDED" | "PROCESSING";
-export type PaymentProvider = "MERCADOPAGO" | "STRIPE" | "PAYPAL" | "BANK_TRANSFER" | "CASH_REGISTER";
-export type PaymentMethodType = "CREDIT_CARD" | "DEBIT_CARD" | "ACCOUNT_MONEY" | "CASH_TICKET" | "TRANSFER" | "OTHER";
+export type TransactionStatus =
+  | "PENDING"
+  | "APPROVED"
+  | "REJECTED"
+  | "REFUNDED"
+  | "PROCESSING";
+export type PaymentProvider =
+  | "MERCADOPAGO"
+  | "STRIPE"
+  | "PAYPAL"
+  | "BANK_TRANSFER"
+  | "CASH_REGISTER";
+export type PaymentMethodType =
+  | "CREDIT_CARD"
+  | "DEBIT_CARD"
+  | "ACCOUNT_MONEY"
+  | "CASH_TICKET"
+  | "TRANSFER"
+  | "OTHER";
 
 // Database entity types
 export interface Transaction {

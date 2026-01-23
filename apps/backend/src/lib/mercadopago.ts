@@ -5,8 +5,8 @@
 
 import { env } from "../config/env";
 import type {
-  MercadoPagoPreferenceResponse,
   MercadoPagoPaymentData,
+  MercadoPagoPreferenceResponse,
 } from "../modules/finance/types";
 
 const MP_BASE_URL = "https://api.mercadopago.com";
