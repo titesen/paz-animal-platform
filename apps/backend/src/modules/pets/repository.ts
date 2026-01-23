@@ -117,3 +117,63 @@ export async function updatePetStatus(
     .set({ status: status as any })
     .where(eq(schema.pets.petId, petId));
 }
+
+/**
+ * Find pets by owner ID (for CLIENTs)
+ */
+export async function findPetsByOwner(ownerId: string) {
+  return db
+    .select()
+    .from(schema.pets)
+    .where(eq(schema.pets.ownerId, ownerId))
+    .orderBy(desc(schema.pets.createdAt));
+}
+
+/**
+ * Find all active lost pet alerts
+ */
+export async function findActiveLostPetAlerts() {
+  return db
+    .select()
+    .from(schema.lostPetAlerts)
+    .where(eq(schema.lostPetAlerts.isActive, true))
+    .orderBy(desc(schema.lostPetAlerts.lostAt));
+}
+
+/**
+ * Find lost pet alert by ID
+ */
+export async function findLostPetAlertById(alertId: string) {
+  const result = await db
+    .select()
+    .from(schema.lostPetAlerts)
+    .where(eq(schema.lostPetAlerts.alertId, alertId))
+    .limit(1);
+
+  return result[0] || null;
+}
+
+/**
+ * Create lost pet alert
+ */
+export async function createLostPetAlert(data: {
+  petId: string;
+  lastSeenZone: string;
+  contactPhone: string;
+  message?: string;
+  isActive: boolean;
+}) {
+  const result = await db.insert(schema.lostPetAlerts).values(data).returning();
+
+  return result[0];
+}
+
+/**
+ * Resolve lost pet alert
+ */
+export async function resolveLostPetAlert(alertId: string): Promise<void> {
+  await db
+    .update(schema.lostPetAlerts)
+    .set({ isActive: false, resolvedAt: new Date() })
+    .where(eq(schema.lostPetAlerts.alertId, alertId));
+}

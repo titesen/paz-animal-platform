@@ -42,9 +42,91 @@ router.get(
   petsController.getPetById,
 );
 
+// ===================
+// CLIENT PET MANAGEMENT
+// ===================
+
+/**
+ * @route   GET /api/pets/my-pets
+ * @desc    Get my registered pets
+ * @access  Protected (CLIENT)
+ */
+router.get("/my-pets", authenticate, petsController.getMyPets);
+
+/**
+ * @route   POST /api/pets/my-pets
+ * @desc    Register my own pet
+ * @access  Protected (CLIENT)
+ */
+router.post(
+  "/my-pets",
+  authenticate,
+  validate(createPetSchema),
+  petsController.createMyPet,
+);
+
+/**
+ * @route   PATCH /api/pets/my-pets/:petId
+ * @desc    Update my own pet
+ * @access  Protected (CLIENT - owner only)
+ */
+router.patch(
+  "/my-pets/:petId",
+  authenticate,
+  validate(petIdSchema, "params"),
+  validate(updatePetSchema),
+  petsController.updateMyPet,
+);
+
+// ===================
+// LOST & FOUND ALERTS
+// ===================
+
+/**
+ * @route   GET /api/pets/lost-alerts
+ * @desc    Get all active lost pet alerts
+ * @access  Public
+ */
+router.get("/lost-alerts", publicLimiter, petsController.getLostPetAlerts);
+
+/**
+ * @route   POST /api/pets/lost-alerts
+ * @desc    Create lost pet alert for my pet
+ * @access  Protected (CLIENT - owner only)
+ */
+router.post(
+  "/lost-alerts",
+  authenticate,
+  validate(
+    z.object({
+      petId: z.string().uuid(),
+      lastSeenZone: z.string().min(1).max(255),
+      contactPhone: z.string().min(8).max(50),
+      message: z.string().max(500).optional(),
+    }),
+  ),
+  petsController.createLostPetAlert,
+);
+
+/**
+ * @route   PATCH /api/pets/lost-alerts/:alertId/resolve
+ * @desc    Mark lost pet as found
+ * @access  Protected (CLIENT - owner only)
+ */
+router.patch(
+  "/lost-alerts/:alertId/resolve",
+  authenticate,
+  validate(z.object({ alertId: z.string().uuid() }), "params"),
+  petsController.resolveLostPetAlert,
+);
+
+// ===================
+// ADMIN/VOLUNTEER PET MANAGEMENT
+// ===================
+
 /**
  * @route   POST /api/pets
- * @desc    Create a new pet
+ * @desc    Create a new pet (foundation pets)
  * @access  Protected (ADMIN, VOLUNTEER)
  */
 router.post(

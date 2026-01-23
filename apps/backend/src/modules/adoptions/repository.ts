@@ -42,3 +42,10 @@ export async function findAdoptionsByUser(userId: string) {
     .from(schema.adoptionApplications)
     .where(eq(schema.adoptionApplications.clientId, userId));
 }
+
+export async function findAllAdoptions() {
+  return db
+    .select()
+    .from(schema.adoptionApplications)
+    .orderBy(schema.adoptionApplications.requestedAt);
+}

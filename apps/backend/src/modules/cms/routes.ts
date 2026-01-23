@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import { authenticate, requireVolunteerTag } from "../../middlewares/auth";
+import { authenticate, requireVolunteerRole } from "../../middlewares/auth";
 import * as cmsController from "./controller";
 
 const router = Router();
@@ -22,7 +22,7 @@ router.get("/news/:newsId", cmsController.getNewsById);
 router.get(
   "/news/all",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.getAllNews,
 );
 
@@ -30,28 +30,28 @@ router.get(
 router.post(
   "/news",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.createNews,
 );
 
 router.put(
   "/news/:newsId",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.updateNews,
 );
 
 router.put(
   "/news/:newsId/translations/:language",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.updateNewsTranslation,
 );
 
 router.delete(
   "/news/:newsId",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.deleteNews,
 );
 
@@ -67,7 +67,7 @@ router.get("/resources/:resourceId", cmsController.getResourceById);
 router.get(
   "/resources/all",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.getAllResources,
 );
 
@@ -75,28 +75,28 @@ router.get(
 router.post(
   "/resources",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.createResource,
 );
 
 router.put(
   "/resources/:resourceId",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.updateResource,
 );
 
 router.put(
   "/resources/:resourceId/translations/:language",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.updateResourceTranslation,
 );
 
 router.delete(
   "/resources/:resourceId",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.deleteResource,
 );
 
@@ -112,21 +112,21 @@ router.get("/sponsors/:sponsorId", cmsController.getSponsorById);
 router.post(
   "/sponsors",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.createSponsor,
 );
 
 router.put(
   "/sponsors/:sponsorId",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.updateSponsor,
 );
 
 router.delete(
   "/sponsors/:sponsorId",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.deleteSponsor,
 );
 
@@ -142,7 +142,7 @@ router.get("/fragments/section/:section", cmsController.getFragmentsBySection);
 router.get(
   "/fragments",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.getAllFragments,
 );
 
@@ -150,14 +150,14 @@ router.get(
 router.put(
   "/fragments/:fragmentKey",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.upsertFragment,
 );
 
 router.patch(
   "/fragments/:fragmentKey/content",
   authenticate,
-  requireVolunteerTag("CONTENT_MANAGER"),
+  requireVolunteerRole("CONTENT_MANAGER"),
   cmsController.updateFragmentContent,
 );
 
