@@ -16,6 +16,7 @@ import authRoutes from "./modules/auth/routes";
 import cmsRoutes from "./modules/cms/routes";
 import eventsRoutes from "./modules/events/routes";
 import financeRoutes from "./modules/finance/routes";
+import mediaRoutes from "./modules/media/routes";
 import petsRoutes from "./modules/pets/routes";
 import volunteersRoutes from "./modules/volunteers/routes";
 
@@ -155,6 +156,9 @@ app.get("/api-docs.json", (_req, res) => {
   res.send(swaggerSpec);
 });
 
+// Static file serving for uploads
+app.use("/uploads", express.static("uploads"));
+
 // API routes with rate limiting
 app.use("/api", apiLimiter);
 app.use("/api/auth", authRoutes);
@@ -164,6 +168,7 @@ app.use("/api/volunteers", volunteersRoutes);
 app.use("/api/events", eventsRoutes);
 app.use("/api/finance", financeRoutes);
 app.use("/api/cms", cmsRoutes);
+app.use("/api/media", mediaRoutes);
 
 // 404 handler (must be after all routes)
 app.use(notFoundHandler);
