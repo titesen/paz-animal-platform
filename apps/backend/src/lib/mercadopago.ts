@@ -82,12 +82,17 @@ export async function getPaymentData(
 /**
  * Validate webhook signature (if configured)
  * Note: Mercado Pago uses x-signature header for webhook validation
+ *
+ * ⚠️ CRITICAL SECURITY WARNING ⚠️
+ * TODO: MUST IMPLEMENT BEFORE PRODUCTION
+ * This is a placeholder that doesn't perform real cryptographic validation.
+ * Implement HMAC-SHA256 verification using Mercado Pago webhook secret.
  */
 export function validateWebhookSignature(
   _payload: string,
   signature: string,
 ): boolean {
   // For now, return true if signature exists
-  // In production, implement proper HMAC validation
+  // ⚠️ In production, implement proper HMAC validation to prevent fake payment notifications
   return !!signature;
 }

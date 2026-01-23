@@ -27,24 +27,44 @@ export const createAdoptionApplication = asyncHandler(
   },
 );
 
-export const getAdoptionById = asyncHandler(async (req, res: Response) => {
-  const { adoptionId } = req.params;
+export const getAdoptionById = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { adoptionId } = req.params;
+    const userId = req.user.userId;
+    const userRoles = req.user.roles;
 
-  const result = await adoptionsService.getAdoptionById(adoptionId);
+    // Validate access before returning data
+    await adoptionsService.checkAdoptionAccess(adoptionId, userId, userRoles);
 
-  const response: JSendSuccess = {
-    status: "success",
-    data: result,
-  };
+    const result = await adoptionsService.getAdoptionById(adoptionId);
 
-  res.status(200).json(response);
-});
+    const response: JSendSuccess = {
+      status: "success",
+      data: result,
+    };
+
+    res.status(200).json(response);
+  },
+);
 
 export const getMyAdoptions = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user.userId;
 
     const result = await adoptionsService.getMyAdoptions(userId);
+
+    const response: JSendSuccess = {
+      status: "success",
+      data: result,
+    };
+
+    res.status(200).json(response);
+  },
+);
+
+export const getAllAdoptions = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const result = await adoptionsService.getAllAdoptions();
 
     const response: JSendSuccess = {
       status: "success",

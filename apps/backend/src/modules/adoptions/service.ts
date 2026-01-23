@@ -4,7 +4,7 @@
  */
 
 import { logger } from "../../config/logger";
-import { NotFoundError } from "../../types/errors";
+import { ForbiddenError, NotFoundError } from "../../types/errors";
 import * as adoptionsRepo from "./repository";
 import type { CreateAdoptionApplicationDTO } from "./types";
 
@@ -66,4 +66,41 @@ export async function updateAdoptionStatus(adoptionId: string, status: string) {
 
 export async function getMyAdoptions(userId: string) {
   return adoptionsRepo.findAdoptionsByUser(userId);
+}
+
+export async function getAllAdoptions() {
+  return adoptionsRepo.findAllAdoptions();
+}
+
+export async function checkAdoptionAccess(
+  adoptionId: string,
+  userId: string,
+  userRoles: string[],
+): Promise<void> {
+  const adoption = await adoptionsRepo.findAdoptionById(adoptionId);
+
+  if (!adoption) {
+    throw new NotFoundError(
+      "Adoption application not found",
+      "ADOPTION_NOT_FOUND",
+    );
+  }
+
+  // ADMIN can view any adoption
+  if (userRoles.includes("ADMIN")) {
+    return;
+  }
+
+  // VOLUNTEER with ADOPTION_COORD can view any adoption
+  // Note: This will be validated by middleware requireVolunteerRole
+  if (userRoles.includes("VOLUNTEER")) {
+    return;
+  }
+
+  // Otherwise, user can only view their own adoptions
+  if (adoption.clientId !== userId) {
+    throw new ForbiddenError(
+      "You can only view your own adoption applications",
+    );
+  }
 }

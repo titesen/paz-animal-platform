@@ -4,7 +4,7 @@
  */
 
 import type { Response } from "express";
-import type { JSendSuccess } from "../../types";
+import type { AuthenticatedRequest, JSendSuccess } from "../../types";
 import { asyncHandler } from "../../utils";
 import * as petsService from "./service";
 
@@ -111,3 +111,118 @@ export const updatePetStatus = asyncHandler(async (req, res: Response) => {
 
   res.status(200).json(response);
 });
+
+/**
+ * GET /api/pets/my-pets
+ * Get my registered pets
+ */
+export const getMyPets = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user.userId;
+
+    const result = await petsService.getMyPets(userId);
+
+    const response: JSendSuccess = {
+      status: "success",
+      data: result,
+    };
+
+    res.status(200).json(response);
+  },
+);
+
+/**
+ * POST /api/pets/my-pets
+ * Register my own pet
+ */
+export const createMyPet = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user.userId;
+    const data = req.body;
+
+    const result = await petsService.createMyPet(userId, data);
+
+    const response: JSendSuccess = {
+      status: "success",
+      data: result,
+    };
+
+    res.status(201).json(response);
+  },
+);
+
+/**
+ * PATCH /api/pets/my-pets/:petId
+ * Update my own pet
+ */
+export const updateMyPet = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user.userId;
+    const { petId } = req.params;
+    const data = req.body;
+
+    const result = await petsService.updateMyPet(userId, petId, data);
+
+    const response: JSendSuccess = {
+      status: "success",
+      data: result,
+    };
+
+    res.status(200).json(response);
+  },
+);
+
+/**
+ * GET /api/pets/lost-alerts
+ * Get all active lost pet alerts
+ */
+export const getLostPetAlerts = asyncHandler(async (req, res: Response) => {
+  const result = await petsService.getLostPetAlerts();
+
+  const response: JSendSuccess = {
+    status: "success",
+    data: result,
+  };
+
+  res.status(200).json(response);
+});
+
+/**
+ * POST /api/pets/lost-alerts
+ * Create lost pet alert
+ */
+export const createLostPetAlert = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user.userId;
+    const data = req.body;
+
+    const result = await petsService.createLostPetAlert(userId, data);
+
+    const response: JSendSuccess = {
+      status: "success",
+      data: result,
+    };
+
+    res.status(201).json(response);
+  },
+);
+
+/**
+ * PATCH /api/pets/lost-alerts/:alertId/resolve
+ * Resolve lost pet alert
+ */
+export const resolveLostPetAlert = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user.userId;
+    const { alertId } = req.params;
+
+    await petsService.resolveLostPetAlert(userId, alertId);
+
+    const response: JSendSuccess = {
+      status: "success",
+      data: { message: "Lost pet alert resolved successfully" },
+    };
+
+    res.status(200).json(response);
+  },
+);

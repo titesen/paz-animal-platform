@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import { authenticate, requireVolunteerTag } from "../../middlewares/auth";
+import { authenticate, requireVolunteerRole } from "../../middlewares/auth";
 import * as controller from "./controller";
 
 const router = Router();
@@ -58,84 +58,84 @@ router.delete(
 /**
  * Create event
  * POST /api/events
- * Requires: EVENT_ORGANIZER tag
+ * Requires: EVENT_ORGANIZER role
  */
 router.post(
   "/",
   authenticate,
-  requireVolunteerTag("EVENT_ORGANIZER"),
+  requireVolunteerRole("EVENT_ORGANIZER"),
   controller.createEvent,
 );
 
 /**
  * Update event
  * PATCH /api/events/:eventId
- * Requires: EVENT_ORGANIZER tag
+ * Requires: EVENT_ORGANIZER role
  */
 router.patch(
   "/:eventId",
   authenticate,
-  requireVolunteerTag("EVENT_ORGANIZER"),
+  requireVolunteerRole("EVENT_ORGANIZER"),
   controller.updateEvent,
 );
 
 /**
  * Update event translation
  * PATCH /api/events/:eventId/translations/:language
- * Requires: EVENT_ORGANIZER tag
+ * Requires: EVENT_ORGANIZER role
  */
 router.patch(
   "/:eventId/translations/:language",
   authenticate,
-  requireVolunteerTag("EVENT_ORGANIZER"),
+  requireVolunteerRole("EVENT_ORGANIZER"),
   controller.updateEventTranslation,
 );
 
 /**
  * Delete event
  * DELETE /api/events/:eventId
- * Requires: EVENT_ORGANIZER tag
+ * Requires: EVENT_ORGANIZER role
  */
 router.delete(
   "/:eventId",
   authenticate,
-  requireVolunteerTag("EVENT_ORGANIZER"),
+  requireVolunteerRole("EVENT_ORGANIZER"),
   controller.deleteEvent,
 );
 
 /**
  * Get event registrations
  * GET /api/events/:eventId/registrations
- * Requires: EVENT_ORGANIZER tag
+ * Requires: EVENT_ORGANIZER role
  */
 router.get(
   "/:eventId/registrations",
   authenticate,
-  requireVolunteerTag("EVENT_ORGANIZER"),
+  requireVolunteerRole("EVENT_ORGANIZER"),
   controller.getEventRegistrations,
 );
 
 /**
  * Check in user for event
  * POST /api/events/:eventId/check-in
- * Requires: EVENT_ORGANIZER tag
+ * Requires: EVENT_ORGANIZER role
  */
 router.post(
   "/:eventId/check-in",
   authenticate,
-  requireVolunteerTag("EVENT_ORGANIZER"),
+  requireVolunteerRole("EVENT_ORGANIZER"),
   controller.checkInUser,
 );
 
 /**
  * Get event attendances
  * GET /api/events/:eventId/attendances
- * Requires: EVENT_ORGANIZER tag
+ * Requires: EVENT_ORGANIZER role
  */
 router.get(
   "/:eventId/attendances",
   authenticate,
-  requireVolunteerTag("EVENT_ORGANIZER"),
+  requireVolunteerRole("EVENT_ORGANIZER"),
   controller.getEventAttendances,
 );
 

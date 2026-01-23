@@ -182,12 +182,12 @@ export function requireOwnership(
 }
 
 /**
- * Require volunteer to have specific tag(s)
- * Must be used AFTER authenticate and requireRole('VOLUNTEER') middlewares
- * @param requiredTags - Array of volunteer role names (tags) required
- * @example requireVolunteerTag('CONTENT_MANAGER', 'EVENT_ORGANIZER')
+ * Require volunteer to have specific role(s)
+ * Must be used AFTER authenticate middleware
+ * @param requiredRoles - Array of volunteer role names required
+ * @example requireVolunteerRole('CONTENT_MANAGER', 'EVENT_ORGANIZER')
  */
-export function requireVolunteerTag(...requiredTags: string[]) {
+export function requireVolunteerRole(...requiredRoles: string[]) {
   return async (
     req: Request,
     _res: Response,
@@ -219,8 +219,8 @@ export function requireVolunteerTag(...requiredTags: string[]) {
         );
       }
 
-      // Get volunteer's assigned tags/roles
-      const volunteerTags = await db
+      // Get volunteer's assigned roles
+      const volunteerRolesList = await db
         .select({
           roleName: volunteerRoles.name,
         })
@@ -233,16 +233,16 @@ export function requireVolunteerTag(...requiredTags: string[]) {
           eq(volunteersVolunteerRoles.volunteerId, volunteer[0].volunteerId),
         );
 
-      const volunteerTagNames = volunteerTags.map((t) => t.roleName);
+      const volunteerRoleNames = volunteerRolesList.map((t) => t.roleName);
 
-      // Check if volunteer has at least one required tag
-      const hasRequiredTag = requiredTags.some((tag) =>
-        volunteerTagNames.includes(tag),
+      // Check if volunteer has at least one required role
+      const hasRequiredRole = requiredRoles.some((role) =>
+        volunteerRoleNames.includes(role),
       );
 
-      if (!hasRequiredTag) {
+      if (!hasRequiredRole) {
         throw new ForbiddenError(
-          `Access denied. Required volunteer tags: ${requiredTags.join(" or ")}`,
+          `Access denied. Required volunteer roles: ${requiredRoles.join(" or ")}`,
         );
       }
 

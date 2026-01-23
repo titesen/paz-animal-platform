@@ -50,6 +50,12 @@ export async function createPaymentPreference(data: {
  * @param payload - Webhook payload
  * @param signature - X-Signature header value
  * @returns True if valid signature
+ *
+ * ⚠️ CRITICAL SECURITY WARNING ⚠️
+ * TODO: MUST IMPLEMENT BEFORE PRODUCTION
+ * This stub always returns true which allows fake payment notifications!
+ * Implement proper HMAC-SHA256 signature verification using MP secret.
+ * See: https://www.mercadopago.com/developers/en/docs/your-integrations/notifications/webhooks
  */
 export function verifyWebhookSignature(
   _payload: string,
@@ -58,7 +64,9 @@ export function verifyWebhookSignature(
   // TODO: Implement signature verification
   // This is critical for security to prevent fake payment notifications
 
-  logger.warn("Mercado Pago webhook signature verification not implemented");
+  logger.warn(
+    "⚠️  Mercado Pago webhook signature verification STUB - DO NOT USE IN PRODUCTION",
+  );
 
-  return true; // Placeholder - NEVER use in production without verification
+  return true; // ⚠️ PLACEHOLDER - SECURITY RISK - NEVER use in production without verification
 }
