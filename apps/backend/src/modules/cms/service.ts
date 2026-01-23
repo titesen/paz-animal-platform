@@ -7,13 +7,13 @@ import { NotFoundError, ValidationError } from "../../types/errors";
 import * as repository from "./repository";
 import type {
   CreateNewsDTO,
-  UpdateNewsDTO,
-  UpdateNewsTranslationDTO,
   CreateResourceDTO,
-  UpdateResourceDTO,
-  UpdateResourceTranslationDTO,
   NewsWithTranslations,
   ResourceWithTranslations,
+  UpdateNewsDTO,
+  UpdateNewsTranslationDTO,
+  UpdateResourceDTO,
+  UpdateResourceTranslationDTO,
 } from "./types";
 
 /**
@@ -94,7 +94,9 @@ export async function getAllNews(): Promise<NewsWithTranslations[]> {
 /**
  * Get news by ID
  */
-export async function getNewsById(newsId: string): Promise<NewsWithTranslations> {
+export async function getNewsById(
+  newsId: string,
+): Promise<NewsWithTranslations> {
   const news = await repository.findNewsById(newsId);
   if (!news) {
     throw new NotFoundError("News article not found");
@@ -295,7 +297,9 @@ export async function updateResourceTranslation(
     throw new NotFoundError("Resource not found");
   }
 
-  const translation = resource.translations.find((t) => t.language === language);
+  const translation = resource.translations.find(
+    (t) => t.language === language,
+  );
   if (!translation) {
     throw new NotFoundError("Translation not found");
   }

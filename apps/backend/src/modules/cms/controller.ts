@@ -4,14 +4,14 @@
  */
 
 import type { Response } from "express";
-import { asyncHandler } from "../../utils";
 import type { AuthRequest } from "../../types/auth";
+import { asyncHandler } from "../../utils";
 import * as service from "./service";
 import type {
   CreateNewsDTO,
+  CreateResourceDTO,
   UpdateNewsDTO,
   UpdateNewsTranslationDTO,
-  CreateResourceDTO,
   UpdateResourceDTO,
   UpdateResourceTranslationDTO,
 } from "./types";
@@ -24,15 +24,13 @@ import type {
  * GET /api/cms/news
  * Get all published news (public)
  */
-export const getAllPublishedNews = asyncHandler(
-  async (_req, res: Response) => {
-    const news = await service.getAllPublishedNews();
-    res.json({
-      status: "success",
-      data: { news },
-    });
-  },
-);
+export const getAllPublishedNews = asyncHandler(async (_req, res: Response) => {
+  const news = await service.getAllPublishedNews();
+  res.json({
+    status: "success",
+    data: { news },
+  });
+});
 
 /**
  * GET /api/cms/news/all

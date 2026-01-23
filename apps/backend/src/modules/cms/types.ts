@@ -3,7 +3,11 @@
  * @description Type definitions and DTOs for content management (news, resources)
  */
 
-export type PublicationStatus = "DRAFT" | "SCHEDULED" | "PUBLISHED" | "ARCHIVED";
+export type PublicationStatus =
+  | "DRAFT"
+  | "SCHEDULED"
+  | "PUBLISHED"
+  | "ARCHIVED";
 
 // Database entity types
 export interface News {

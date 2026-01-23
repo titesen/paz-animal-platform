@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import { authenticate, requireRole } from "../../middlewares/auth";
+import { authenticate } from "../../middlewares/auth";
 import { requireVolunteerTag } from "../../middlewares/volunteerAuth";
 import * as cmsController from "./controller";
 

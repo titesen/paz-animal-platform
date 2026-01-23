@@ -3,15 +3,15 @@
  * @description Data access layer for news, resources, and content management
  */
 
-import { eq, and, isNull, desc } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 import type {
   News,
   NewsTranslation,
+  PublicationStatus,
   Resource,
   ResourceTranslation,
-  PublicationStatus,
 } from "./types";
 
 // ===================
@@ -48,7 +48,10 @@ export async function createNewsTranslations(
 ): Promise<NewsTranslation[]> {
   if (translations.length === 0) return [];
 
-  return await db.insert(schema.newsTranslations).values(translations).returning();
+  return await db
+    .insert(schema.newsTranslations)
+    .values(translations)
+    .returning();
 }
 
 /**
@@ -109,10 +112,7 @@ export async function findAllPublishedNews(): Promise<
     .select()
     .from(schema.news)
     .where(
-      and(
-        eq(schema.news.status, "PUBLISHED"),
-        isNull(schema.news.deletedAt),
-      ),
+      and(eq(schema.news.status, "PUBLISHED"), isNull(schema.news.deletedAt)),
     )
     .orderBy(desc(schema.news.publishedAt));
 
@@ -293,7 +293,9 @@ export async function findAllPublishedResources(): Promise<
 
   return resources.map((resource) => ({
     ...resource,
-    translations: allTranslations.filter((t) => t.resourceId === resource.resourceId),
+    translations: allTranslations.filter(
+      (t) => t.resourceId === resource.resourceId,
+    ),
   }));
 }
 
@@ -315,7 +317,9 @@ export async function findAllResources(): Promise<
 
   return resources.map((resource) => ({
     ...resource,
-    translations: allTranslations.filter((t) => t.resourceId === resource.resourceId),
+    translations: allTranslations.filter(
+      (t) => t.resourceId === resource.resourceId,
+    ),
   }));
 }
 
