@@ -2,8 +2,10 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
+import swaggerUi from "swagger-ui-express";
 import { env } from "./config/env";
 import { logger } from "./config/logger";
+import { swaggerSpec } from "./config/swagger.config";
 import { apiLimiter, errorHandler, notFoundHandler } from "./middlewares";
 
 // Import module routes
@@ -49,6 +51,24 @@ app.get("/health", (_req, res) => {
     timestamp: new Date().toISOString(),
     environment: env.NODE_ENV,
   });
+});
+
+// API Documentation (Swagger UI)
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customSiteTitle: "Paz Animal API Documentation",
+  customCss: ".swagger-ui .topbar { display: none }",
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    filter: true,
+    tryItOutEnabled: true,
+  },
+}));
+
+// Swagger JSON endpoint
+app.get("/api-docs.json", (_req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
 });
 
 // API routes with rate limiting
