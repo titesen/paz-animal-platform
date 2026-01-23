@@ -52,6 +52,7 @@ npm run dev
 - Backend: http://localhost:3000
 - Frontend: http://localhost:5173
 - Health Check: http://localhost:3000/health
+- **API Documentation (Swagger)**: http://localhost:3000/api-docs
 
 ## 📦 Scripts Disponibles
 
@@ -61,6 +62,47 @@ npm run dev
 - `npm run lint` - Ejecuta linter en todos los workspaces
 - `npm run db:up` - Inicia contenedores de PostgreSQL y pgAdmin
 - `npm run db:down` - Detiene contenedores de base de datos
+
+## 📚 Documentación de la API
+
+El backend incluye documentación completa de la API usando **Swagger/OpenAPI 3.0**.
+
+### Acceder a la documentación interactiva
+
+Una vez iniciado el servidor backend:
+
+```
+http://localhost:3000/api-docs
+```
+
+La interfaz Swagger UI permite:
+
+- ✅ Explorar todos los endpoints disponibles
+- ✅ Ver esquemas de request/response
+- ✅ Probar endpoints directamente desde el navegador
+- ✅ Autenticarse con JWT para probar rutas protegidas
+- ✅ Ver ejemplos de uso para cada endpoint
+
+### Exportar especificación OpenAPI
+
+La especificación OpenAPI en formato JSON está disponible en:
+
+```
+http://localhost:3000/api-docs.json
+```
+
+Puedes importar este archivo en herramientas como Postman, Insomnia, o generar clientes SDK automáticamente.
+
+### Módulos documentados
+
+- **Auth** - Autenticación y gestión de sesiones (Register, Login, OAuth, 2FA)
+- **Pets** - Gestión del catálogo de mascotas
+- **Adoptions** - Flujo completo de adopciones
+- **Volunteers** - Gestión de voluntarios y asignaciones
+- **Events** - Calendario de eventos (ferias, caminatas, talleres)
+- **Donations** - Procesamiento de donaciones (Mercado Pago)
+- **CMS** - Gestión de contenido editorial (News, Resources, Sponsors, UI Fragments)
+- **Media** - Upload de archivos a Cloudflare R2
 
 ## 🛠️ Stack Tecnológico
 

@@ -14,7 +14,7 @@
  *         - PUBLISHED
  *         - ARCHIVED
  *       description: Estado de publicación del contenido
- *     
+ *
  *     LanguageCode:
  *       type: string
  *       enum:

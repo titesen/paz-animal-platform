@@ -236,7 +236,7 @@
  *     description: |
  *       Endpoint para recibir notificaciones de Mercado Pago sobre el estado de los pagos.
  *       Este endpoint no requiere autenticación ya que es llamado por Mercado Pago.
- *       
+ *
  *       **Seguridad**: Se valida la firma digital usando el secret de Mercado Pago.
  *     requestBody:
  *       required: true
