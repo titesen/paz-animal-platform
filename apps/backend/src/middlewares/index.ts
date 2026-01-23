@@ -10,6 +10,7 @@ export {
   requireAnyRole,
   requireOwnership,
   requireRole,
+  requireVolunteerTag,
 } from "./auth";
 export { errorHandler, notFoundHandler } from "./errorHandler";
 export {

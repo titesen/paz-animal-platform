@@ -701,15 +701,27 @@ async function seedDevData() {
             .where(eq(schema.volunteerRoles.name, "Paseador de Perros"))
             .limit(1)
             .then((r) => r[0]);
-          await db
+          
+          const [volunteer] = await db
             .insert(schema.volunteers)
             .values({
               userId: volUser.userId,
-              volunteerRoleId: dogWalker?.roleId,
               bio: "Paseo perros y ayudo en adopciones",
               availability: approved.availability,
             })
-            .onConflictDoNothing();
+            .onConflictDoNothing()
+            .returning();
+          
+          // Assign volunteer role via junction table
+          if (volunteer && dogWalker) {
+            await db
+              .insert(schema.volunteersVolunteerRoles)
+              .values({
+                volunteerId: volunteer.volunteerId,
+                roleId: dogWalker.roleId,
+              })
+              .onConflictDoNothing();
+          }
         }
       }
 

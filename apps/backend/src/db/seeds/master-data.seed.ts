@@ -153,37 +153,46 @@ async function seedMasterData(closePool = false) {
     // 7. Seed Volunteer Roles
     logger.info("→ Seeding volunteer roles...");
     const volunteerRoles = [
+      // Active specializations (with web functionality)
       {
-        name: "Dog Walker",
-        description: "Responsible for walking and exercising dogs",
+        name: "CONTENT_MANAGER",
+        description:
+          "📢 Gestión de Redes y Blog - CMS & Medios: Redacción de noticias, galería de fotos",
       },
       {
-        name: "Foster Caretaker",
-        description: "Provides temporary home for pets",
+        name: "EVENT_ORGANIZER",
+        description:
+          "🎉 Logística de Eventos - Agenda: Creación de eventos y registro de asistencia",
       },
       {
-        name: "Event Coordinator",
-        description: "Organizes and manages adoption events",
+        name: "ADOPTION_COORD",
+        description:
+          "🦴 Coordinador de Adopciones - Gestión E2E: Solicitudes, entrevistas, contacto con adoptantes",
+      },
+      // Identificative specializations (field work, no web tools currently)
+      {
+        name: "PAW_PATROL",
+        description:
+          "🛠️ Mantenimiento y reparación de infraestructura (cuchas, instalaciones)",
       },
       {
-        name: "Social Media Manager",
-        description: "Manages social media presence",
+        name: "ROUTES",
+        description:
+          "🚗 Rutas de alimentación y limpieza en colonias de animales",
       },
       {
-        name: "Veterinary Assistant",
-        description: "Assists with medical care",
+        name: "ART",
+        description: "🎨 Pintura y decoración de casitas para animales",
       },
       {
-        name: "Transport Volunteer",
-        description: "Helps with pet transportation",
+        name: "SALES",
+        description:
+          "🎟️ Atención en stands y venta de rifas (recaudación física)",
       },
       {
-        name: "Photographer",
-        description: "Takes photos of pets for adoption",
-      },
-      {
-        name: "General Volunteer",
-        description: "Helps with various tasks as needed",
+        name: "TRANSIT",
+        description:
+          "🏠 Tránsito: Cuidado temporal de animales en hogar particular",
       },
     ];
 
