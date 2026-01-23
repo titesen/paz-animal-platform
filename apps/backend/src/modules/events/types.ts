@@ -4,8 +4,16 @@
  */
 
 export type EventModality = "VIRTUAL" | "IN_PERSON" | "HYBRID";
-export type EventPaymentOption = "FREE" | "ONLINE_PAYMENT" | "ON_SITE_CASH" | "IN_KIND_DONATION";
-export type RegistrationPaymentStatus = "NA" | "PENDING" | "PAID" | "VERIFIED_ON_SITE";
+export type EventPaymentOption =
+  | "FREE"
+  | "ONLINE_PAYMENT"
+  | "ON_SITE_CASH"
+  | "IN_KIND_DONATION";
+export type RegistrationPaymentStatus =
+  | "NA"
+  | "PENDING"
+  | "PAID"
+  | "VERIFIED_ON_SITE";
 
 // Database entity types
 export interface Event {

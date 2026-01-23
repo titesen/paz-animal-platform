@@ -3,17 +3,21 @@
  * @description Business logic for events, registrations, and attendance
  */
 
-import { NotFoundError, ValidationError, ConflictError } from "../../types/errors";
+import {
+  ConflictError,
+  NotFoundError,
+  ValidationError,
+} from "../../types/errors";
 import * as repository from "./repository";
 import type {
+  CheckInDTO,
   CreateEventDTO,
+  EventRegistrationWithUser,
+  EventWithDetails,
+  EventWithTranslations,
+  RegisterForEventDTO,
   UpdateEventDTO,
   UpdateEventTranslationDTO,
-  RegisterForEventDTO,
-  CheckInDTO,
-  EventWithTranslations,
-  EventWithDetails,
-  EventRegistrationWithUser,
 } from "./types";
 
 // ===================
@@ -114,18 +118,14 @@ export async function createEvent(
 /**
  * Get all upcoming events
  */
-export async function getAllUpcomingEvents(): Promise<
-  EventWithTranslations[]
-> {
+export async function getAllUpcomingEvents(): Promise<EventWithTranslations[]> {
   return await repository.findAllUpcomingEvents();
 }
 
 /**
  * Get event by ID with details
  */
-export async function getEventById(
-  eventId: string,
-): Promise<EventWithDetails> {
+export async function getEventById(eventId: string): Promise<EventWithDetails> {
   const event = await repository.findEventById(eventId);
   if (!event) {
     throw new NotFoundError("Event not found");
@@ -260,8 +260,10 @@ export async function registerForEvent(
   }
 
   // Check if already registered
-  const existingRegistration =
-    await repository.findRegistrationByUserAndEvent(userId, eventId);
+  const existingRegistration = await repository.findRegistrationByUserAndEvent(
+    userId,
+    eventId,
+  );
   if (existingRegistration) {
     throw new ConflictError("Already registered for this event");
   }
@@ -283,30 +285,21 @@ export async function registerForEvent(
       );
     }
 
-    if (
-      paymentOption === "ONLINE_PAYMENT" &&
-      !event.acceptsOnlinePayment
-    ) {
+    if (paymentOption === "ONLINE_PAYMENT" && !event.acceptsOnlinePayment) {
       throw new ValidationError(
         "Online payment not accepted for this event",
         "INVALID_PAYMENT_OPTION",
       );
     }
 
-    if (
-      paymentOption === "ON_SITE_CASH" &&
-      !event.acceptsOnSitePayment
-    ) {
+    if (paymentOption === "ON_SITE_CASH" && !event.acceptsOnSitePayment) {
       throw new ValidationError(
         "On-site payment not accepted for this event",
         "INVALID_PAYMENT_OPTION",
       );
     }
 
-    if (
-      paymentOption === "IN_KIND_DONATION" &&
-      !event.acceptsInKind
-    ) {
+    if (paymentOption === "IN_KIND_DONATION" && !event.acceptsInKind) {
       throw new ValidationError(
         "In-kind payment not accepted for this event",
         "INVALID_PAYMENT_OPTION",
@@ -412,12 +405,11 @@ export async function checkInUser(
   }
 
   // Check if already checked in
-  const existingAttendance =
-    await repository.findAttendanceByUserAndEntity(
-      data.userId,
-      "EVENT",
-      eventId,
-    );
+  const existingAttendance = await repository.findAttendanceByUserAndEntity(
+    data.userId,
+    "EVENT",
+    eventId,
+  );
   if (existingAttendance) {
     throw new ConflictError("User already checked in");
   }

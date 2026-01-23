@@ -4,10 +4,7 @@
  */
 
 import { Router } from "express";
-import {
-  authenticate,
-  requireVolunteerTag,
-} from "../../middlewares/auth";
+import { authenticate, requireVolunteerTag } from "../../middlewares/auth";
 import * as controller from "./controller";
 
 const router = Router();
@@ -36,21 +33,13 @@ router.get("/:eventId", controller.getEventById);
  * Get my registrations
  * GET /api/events/my-registrations
  */
-router.get(
-  "/my-registrations",
-  authenticate,
-  controller.getMyRegistrations,
-);
+router.get("/my-registrations", authenticate, controller.getMyRegistrations);
 
 /**
  * Register for event
  * POST /api/events/:eventId/register
  */
-router.post(
-  "/:eventId/register",
-  authenticate,
-  controller.registerForEvent,
-);
+router.post("/:eventId/register", authenticate, controller.registerForEvent);
 
 /**
  * Cancel registration

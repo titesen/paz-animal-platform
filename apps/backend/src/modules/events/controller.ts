@@ -4,15 +4,15 @@
  */
 
 import type { Response } from "express";
-import { asyncHandler } from "../../utils";
 import type { AuthenticatedRequest } from "../../types";
+import { asyncHandler } from "../../utils";
 import * as service from "./service";
 import type {
+  CheckInDTO,
   CreateEventDTO,
+  RegisterForEventDTO,
   UpdateEventDTO,
   UpdateEventTranslationDTO,
-  RegisterForEventDTO,
-  CheckInDTO,
 } from "./types";
 
 // ===================

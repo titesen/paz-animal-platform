@@ -3,15 +3,15 @@
  * @description Data access layer for events, registrations, and attendance
  */
 
-import { eq, and, gte, isNull, sql } from "drizzle-orm";
+import { and, eq, gte, isNull, sql } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 import type {
-  Event,
-  EventTranslation,
-  EventRegistration,
   Attendance,
+  Event,
   EventPaymentOption,
+  EventRegistration,
+  EventTranslation,
   RegistrationPaymentStatus,
 } from "./types";
 
@@ -35,10 +35,7 @@ export async function createEvent(data: {
   acceptsInKind?: boolean;
   inKindDescription?: string;
 }): Promise<Event> {
-  const [event] = await db
-    .insert(schema.events)
-    .values(data)
-    .returning();
+  const [event] = await db.insert(schema.events).values(data).returning();
 
   return event;
 }
@@ -58,10 +55,12 @@ export async function createEventTranslations(
 
   return await db
     .insert(schema.eventsTranslations)
-    .values(translations.map(t => ({
-      ...t,
-      language: t.language as "es" | "en" | "pt",
-    })))
+    .values(
+      translations.map((t) => ({
+        ...t,
+        language: t.language as "es" | "en" | "pt",
+      })),
+    )
     .returning();
 }
 
@@ -75,10 +74,7 @@ export async function findEventById(
     .select()
     .from(schema.events)
     .where(
-      and(
-        eq(schema.events.eventId, eventId),
-        isNull(schema.events.deletedAt),
-      ),
+      and(eq(schema.events.eventId, eventId), isNull(schema.events.deletedAt)),
     )
     .limit(1);
 
@@ -233,9 +229,7 @@ export async function findRegistrationsByEvent(
 /**
  * Get registrations count for an event
  */
-export async function getRegistrationsCount(
-  eventId: string,
-): Promise<number> {
+export async function getRegistrationsCount(eventId: string): Promise<number> {
   const result = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(schema.eventRegistrations)
