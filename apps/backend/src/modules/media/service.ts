@@ -71,7 +71,10 @@ function validateFile(file: Express.Multer.File) {
 /**
  * Upload a file and create media record
  */
-export async function uploadFile(file: Express.Multer.File, data: UploadFileDTO) {
+export async function uploadFile(
+  file: Express.Multer.File,
+  data: UploadFileDTO,
+) {
   // Validate file
   const mediaType = validateFile(file);
 
@@ -104,7 +107,11 @@ export async function uploadFile(file: Express.Multer.File, data: UploadFileDTO)
 
   // If this is set as main, ensure no other media is marked as main
   if (data.isMain) {
-    await repository.setMainMedia(media.mediaId, data.entityType, data.entityId);
+    await repository.setMainMedia(
+      media.mediaId,
+      data.entityType,
+      data.entityId,
+    );
   }
 
   return media;
