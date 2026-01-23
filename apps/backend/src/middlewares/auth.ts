@@ -3,9 +3,16 @@
  * @description JWT verification and role-based access control (RBAC)
  */
 
+import { eq } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env";
+import { db } from "../db";
+import {
+  volunteerRoles,
+  volunteers,
+  volunteersVolunteerRoles,
+} from "../db/schema";
 import type { AuthenticatedRequest, JWTPayload } from "../types";
 import { ForbiddenError, UnauthorizedError } from "../types/errors";
 
@@ -171,5 +178,77 @@ export function requireOwnership(
     }
 
     next();
+  };
+}
+
+/**
+ * Require volunteer to have specific tag(s)
+ * Must be used AFTER authenticate and requireRole('VOLUNTEER') middlewares
+ * @param requiredTags - Array of volunteer role names (tags) required
+ * @example requireVolunteerTag('CONTENT_MANAGER', 'EVENT_ORGANIZER')
+ */
+export function requireVolunteerTag(...requiredTags: string[]) {
+  return async (
+    req: Request,
+    _res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const authReq = req as AuthenticatedRequest;
+
+      if (!authReq.user) {
+        throw new UnauthorizedError("Authentication required");
+      }
+
+      // Admins bypass tag checks
+      if (authReq.user.roles.includes("ADMIN")) {
+        next();
+        return;
+      }
+
+      // Get volunteer record for this user
+      const volunteer = await db
+        .select()
+        .from(volunteers)
+        .where(eq(volunteers.userId, authReq.user.userId))
+        .limit(1);
+
+      if (!volunteer.length) {
+        throw new ForbiddenError(
+          "You must be a registered volunteer to access this resource",
+        );
+      }
+
+      // Get volunteer's assigned tags/roles
+      const volunteerTags = await db
+        .select({
+          roleName: volunteerRoles.name,
+        })
+        .from(volunteersVolunteerRoles)
+        .innerJoin(
+          volunteerRoles,
+          eq(volunteersVolunteerRoles.roleId, volunteerRoles.roleId),
+        )
+        .where(
+          eq(volunteersVolunteerRoles.volunteerId, volunteer[0].volunteerId),
+        );
+
+      const volunteerTagNames = volunteerTags.map((t) => t.roleName);
+
+      // Check if volunteer has at least one required tag
+      const hasRequiredTag = requiredTags.some((tag) =>
+        volunteerTagNames.includes(tag),
+      );
+
+      if (!hasRequiredTag) {
+        throw new ForbiddenError(
+          `Access denied. Required volunteer tags: ${requiredTags.join(" or ")}`,
+        );
+      }
+
+      next();
+    } catch (error) {
+      next(error);
+    }
   };
 }

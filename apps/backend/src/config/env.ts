@@ -66,6 +66,9 @@ const envSchema = z.object({
 
   // Frontend URL for CORS
   FRONTEND_URL: z.string().url().default("http://localhost:5173"),
+
+  // Backend URL for webhooks
+  BACKEND_URL: z.string().url().default("http://localhost:3000"),
 });
 
 export const env = envSchema.parse(process.env);

@@ -59,9 +59,6 @@ export const volunteers = pgTable("volunteers", {
     .notNull()
     .unique()
     .references(() => users.userId, { onDelete: "cascade" }),
-  volunteerRoleId: serial("volunteer_role_id").references(
-    () => volunteerRoles.roleId,
-  ),
   bio: text("bio"),
   availability: jsonb("availability").notNull().default({}),
   qrCode: uuid("qr_code").defaultRandom().unique(),
@@ -70,6 +67,25 @@ export const volunteers = pgTable("volunteers", {
     .defaultNow(),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
 });
+
+// Junction table for many-to-many relationship between volunteers and roles
+export const volunteersVolunteerRoles = pgTable(
+  "volunteers_volunteer_roles",
+  {
+    volunteerId: uuid("volunteer_id")
+      .notNull()
+      .references(() => volunteers.volunteerId, { onDelete: "cascade" }),
+    roleId: serial("role_id")
+      .notNull()
+      .references(() => volunteerRoles.roleId, { onDelete: "cascade" }),
+    assignedAt: timestamp("assigned_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    pk: index("idx_volunteers_roles_pk").on(table.volunteerId, table.roleId),
+  }),
+);
 
 export const interviews = pgTable(
   "interviews",

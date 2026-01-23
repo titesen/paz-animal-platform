@@ -88,14 +88,44 @@ export function errorHandler(
 }
 
 /**
- * 404 Not Found handler
+ * 404 Not Found handler with helpful suggestions
  * Should be registered before errorHandler but after all routes
  */
 export function notFoundHandler(req: Request, res: Response): void {
+  // Available API routes for suggestions
+  const availableRoutes = [
+    "/health",
+    "/version",
+    "/api-docs",
+    "/api/auth/register",
+    "/api/auth/login",
+    "/api/pets",
+    "/api/adoptions",
+    "/api/volunteers",
+    "/api/events",
+    "/api/finance",
+    "/api/cms",
+  ];
+
+  // Find similar routes (basic string matching)
+  const requestedPath = req.path.toLowerCase();
+  const suggestions = availableRoutes.filter((route) =>
+    route.toLowerCase().includes(requestedPath.split("/")[1] || ""),
+  );
+
   const response: JSendError = {
     status: "error",
     message: `Route ${req.method} ${req.path} not found`,
     code: "NOT_FOUND",
+    ...(suggestions.length > 0 && {
+      suggestions: {
+        message: "Did you mean one of these endpoints?",
+        routes: suggestions,
+      },
+    }),
+    ...(env.NODE_ENV !== "production" && {
+      hint: "Check /api-docs for full API documentation",
+    }),
   };
 
   res.status(404).json(response);
