@@ -3,7 +3,7 @@
  * @description Data access layer for news, resources, and content management
  */
 
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 import type {
@@ -12,6 +12,8 @@ import type {
   PublicationStatus,
   Resource,
   ResourceTranslation,
+  Sponsor,
+  UIFragment,
 } from "./types";
 
 // ===================
@@ -92,7 +94,7 @@ export async function findNewsBySlug(
     .where(
       and(
         eq(schema.newsTranslations.slug, slug),
-        eq(schema.newsTranslations.language, language),
+        eq(schema.newsTranslations.language, language as "es" | "en" | "pt"),
       ),
     )
     .limit(1);
@@ -183,7 +185,7 @@ export async function updateNewsTranslation(
     .where(
       and(
         eq(schema.newsTranslations.newsId, newsId),
-        eq(schema.newsTranslations.language, language),
+        eq(schema.newsTranslations.language, language as "es" | "en" | "pt"),
       ),
     )
     .returning();
@@ -236,7 +238,12 @@ export async function createResourceTranslations(
 
   return await db
     .insert(schema.resourcesTranslations)
-    .values(translations)
+    .values(
+      translations.map((t) => ({
+        ...t,
+        language: t.language as "es" | "en" | "pt",
+      })),
+    )
     .returning();
 }
 
@@ -353,7 +360,10 @@ export async function updateResourceTranslation(
     .where(
       and(
         eq(schema.resourcesTranslations.resourceId, resourceId),
-        eq(schema.resourcesTranslations.language, language),
+        eq(
+          schema.resourcesTranslations.language,
+          language as "es" | "en" | "pt",
+        ),
       ),
     )
     .returning();
@@ -369,4 +379,237 @@ export async function deleteResource(resourceId: string): Promise<void> {
     .update(schema.resources)
     .set({ deletedAt: new Date() })
     .where(eq(schema.resources.resourceId, resourceId));
+}
+
+// ===================
+// SPONSORS REPOSITORY
+// ===================
+
+/**
+ * Get all sponsors (active, ordered by sortOrder)
+ */
+export async function findAllSponsors(): Promise<Sponsor[]> {
+  const sponsors = await db
+    .select()
+    .from(schema.sponsors)
+    .where(isNull(schema.sponsors.deletedAt))
+    .orderBy(asc(schema.sponsors.sortOrder), asc(schema.sponsors.name));
+
+  return sponsors as Sponsor[];
+}
+
+/**
+ * Get sponsor by ID
+ */
+export async function findSponsorById(
+  sponsorId: string,
+): Promise<Sponsor | null> {
+  const [sponsor] = await db
+    .select()
+    .from(schema.sponsors)
+    .where(
+      and(
+        eq(schema.sponsors.sponsorId, sponsorId),
+        isNull(schema.sponsors.deletedAt),
+      ),
+    )
+    .limit(1);
+
+  return (sponsor as Sponsor) || null;
+}
+
+/**
+ * Create sponsor
+ */
+export async function createSponsor(data: {
+  name: string;
+  websiteUrl?: string;
+  contactName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  sortOrder?: number;
+}): Promise<Sponsor> {
+  const [sponsor] = await db
+    .insert(schema.sponsors)
+    .values({
+      name: data.name,
+      websiteUrl: data.websiteUrl || null,
+      contactName: data.contactName || null,
+      contactEmail: data.contactEmail || null,
+      contactPhone: data.contactPhone || null,
+      sortOrder: data.sortOrder ?? 0,
+    })
+    .returning();
+
+  return sponsor as Sponsor;
+}
+
+/**
+ * Update sponsor
+ */
+export async function updateSponsor(
+  sponsorId: string,
+  data: Partial<{
+    name: string;
+    websiteUrl: string | null;
+    contactName: string | null;
+    contactEmail: string | null;
+    contactPhone: string | null;
+    sortOrder: number;
+  }>,
+): Promise<Sponsor | null> {
+  const [updated] = await db
+    .update(schema.sponsors)
+    .set(data)
+    .where(
+      and(
+        eq(schema.sponsors.sponsorId, sponsorId),
+        isNull(schema.sponsors.deletedAt),
+      ),
+    )
+    .returning();
+
+  return (updated as Sponsor) || null;
+}
+
+/**
+ * Soft delete sponsor
+ */
+export async function deleteSponsor(sponsorId: string): Promise<void> {
+  await db
+    .update(schema.sponsors)
+    .set({ deletedAt: new Date() })
+    .where(eq(schema.sponsors.sponsorId, sponsorId));
+}
+
+// ===================
+// UI FRAGMENTS REPOSITORY
+// ===================
+
+/**
+ * Get fragment by key and language
+ */
+export async function findFragmentByKey(
+  fragmentKey: string,
+  language: string = "es",
+): Promise<UIFragment | null> {
+  const [fragment] = await db
+    .select()
+    .from(schema.uiFragments)
+    .where(
+      and(
+        eq(schema.uiFragments.fragmentKey, fragmentKey),
+        eq(schema.uiFragments.language, language as "es" | "en" | "pt"),
+      ),
+    )
+    .limit(1);
+
+  return (fragment as UIFragment) || null;
+}
+
+/**
+ * Get all fragments for a specific section
+ */
+export async function findFragmentsBySection(
+  section: string,
+  language: string = "es",
+): Promise<UIFragment[]> {
+  const fragments = await db
+    .select()
+    .from(schema.uiFragments)
+    .where(
+      and(
+        eq(schema.uiFragments.section, section as any),
+        eq(schema.uiFragments.language, language as "es" | "en" | "pt"),
+      ),
+    );
+
+  return fragments as UIFragment[];
+}
+
+/**
+ * Get all fragments (for admin view)
+ */
+export async function findAllFragments(
+  language?: string,
+): Promise<UIFragment[]> {
+  const query = db.select().from(schema.uiFragments);
+
+  if (language) {
+    query.where(
+      eq(schema.uiFragments.language, language as "es" | "en" | "pt"),
+    );
+  }
+
+  const fragments = await query;
+  return fragments as UIFragment[];
+}
+
+/**
+ * Create or update UI fragment (upsert)
+ */
+export async function upsertFragment(
+  data: {
+    fragmentKey: string;
+    language?: string;
+    description?: string;
+    type: string;
+    section: string;
+    content: Record<string, any>;
+  },
+  updatedBy: string,
+): Promise<UIFragment> {
+  const language = data.language || "es";
+
+  const [fragment] = await db
+    .insert(schema.uiFragments)
+    .values({
+      fragmentKey: data.fragmentKey,
+      language: language as "es" | "en" | "pt",
+      description: data.description || null,
+      type: data.type as any,
+      section: data.section as any,
+      content: data.content,
+      lastUpdatedAt: new Date(),
+      updatedBy: updatedBy,
+    })
+    .onConflictDoUpdate({
+      target: [schema.uiFragments.fragmentKey, schema.uiFragments.language],
+      set: {
+        description: data.description || null,
+        content: data.content,
+        lastUpdatedAt: new Date(),
+        updatedBy: updatedBy,
+      },
+    })
+    .returning();
+
+  return fragment as UIFragment;
+}
+
+/**
+ * Update fragment content (hot-swap)
+ */
+export async function updateFragmentContent(
+  fragmentKey: string,
+  language: string,
+  content: Record<string, any>,
+  updatedBy: string,
+): Promise<UIFragment | null> {
+  const [updated] = await db
+    .update(schema.uiFragments)
+    .set({
+      content,
+      lastUpdatedAt: new Date(),
+      updatedBy,
+    })
+    .where(
+      and(
+        eq(schema.uiFragments.fragmentKey, fragmentKey),
+        eq(schema.uiFragments.language, language as "es" | "en" | "pt"),
+      ),
+    )
+    .returning();
+
+  return (updated as UIFragment) || null;
 }

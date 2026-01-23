@@ -4,8 +4,7 @@
  */
 
 import { Router } from "express";
-import { authenticate } from "../../middlewares/auth";
-import { requireVolunteerTag } from "../../middlewares/volunteerAuth";
+import { authenticate, requireVolunteerTag } from "../../middlewares/auth";
 import * as cmsController from "./controller";
 
 const router = Router();
@@ -99,6 +98,67 @@ router.delete(
   authenticate,
   requireVolunteerTag("CONTENT_MANAGER"),
   cmsController.deleteResource,
+);
+
+// ===================
+// SPONSORS ROUTES
+// ===================
+
+// Public routes
+router.get("/sponsors", cmsController.getAllSponsors);
+router.get("/sponsors/:sponsorId", cmsController.getSponsorById);
+
+// Protected routes - Content managers can create/update/delete
+router.post(
+  "/sponsors",
+  authenticate,
+  requireVolunteerTag("CONTENT_MANAGER"),
+  cmsController.createSponsor,
+);
+
+router.put(
+  "/sponsors/:sponsorId",
+  authenticate,
+  requireVolunteerTag("CONTENT_MANAGER"),
+  cmsController.updateSponsor,
+);
+
+router.delete(
+  "/sponsors/:sponsorId",
+  authenticate,
+  requireVolunteerTag("CONTENT_MANAGER"),
+  cmsController.deleteSponsor,
+);
+
+// ===================
+// UI FRAGMENTS ROUTES
+// ===================
+
+// Public routes - Frontend can fetch UI content
+router.get("/fragments/:fragmentKey", cmsController.getFragmentByKey);
+router.get("/fragments/section/:section", cmsController.getFragmentsBySection);
+
+// Protected routes - Content managers can view all
+router.get(
+  "/fragments",
+  authenticate,
+  requireVolunteerTag("CONTENT_MANAGER"),
+  cmsController.getAllFragments,
+);
+
+// Protected routes - Content managers can update (hot-swap UI)
+router.put(
+  "/fragments/:fragmentKey",
+  authenticate,
+  requireVolunteerTag("CONTENT_MANAGER"),
+  cmsController.upsertFragment,
+);
+
+router.patch(
+  "/fragments/:fragmentKey/content",
+  authenticate,
+  requireVolunteerTag("CONTENT_MANAGER"),
+  cmsController.updateFragmentContent,
 );
 
 export default router;

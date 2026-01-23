@@ -3,11 +3,7 @@
  * @description Type definitions and DTOs for content management (news, resources)
  */
 
-export type PublicationStatus =
-  | "DRAFT"
-  | "SCHEDULED"
-  | "PUBLISHED"
-  | "ARCHIVED";
+export type PublicationStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
 
 // Database entity types
 export interface News {
@@ -33,7 +29,7 @@ export interface Resource {
   resourceId: string;
   authorId: string;
   status: PublicationStatus;
-  createdAt: Date;
+  createdAt: Date | null;
   lastUpdatedAt: Date | null;
   sortOrder: number | null;
   deletedAt: Date | null;
@@ -125,10 +121,96 @@ export interface ResourceWithTranslations extends Resource {
   };
 }
 
+// ===================
+// SPONSORS TYPES
+// ===================
+
+export interface Sponsor {
+  sponsorId: string;
+  name: string;
+  websiteUrl: string | null;
+  contactName: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  sortOrder: number;
+  createdAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface CreateSponsorDTO {
+  name: string;
+  websiteUrl?: string;
+  contactName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  sortOrder?: number;
+}
+
+export interface UpdateSponsorDTO {
+  name?: string;
+  websiteUrl?: string;
+  contactName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  sortOrder?: number;
+}
+
+// ===================
+// UI FRAGMENTS TYPES
+// ===================
+
+export type UIComponentType =
+  | "TEXT"
+  | "RICH_TEXT"
+  | "IMAGE_URL"
+  | "CAROUSEL_LIST"
+  | "CONFIG"
+  | "LINK";
+
+export type UISection =
+  | "GLOBAL"
+  | "HOME"
+  | "FOOTER"
+  | "NAVBAR"
+  | "ADOPTIONS"
+  | "VOLUNTEERS"
+  | "DONATIONS"
+  | "CONTACT"
+  | "ABOUT_US";
+export type LanguageCode = "es" | "en" | "pt";
+
+export interface UIFragment {
+  fragmentKey: string;
+  language: LanguageCode;
+  description: string | null;
+  type: UIComponentType;
+  section: UISection;
+  content: Record<string, any>; // JSONB field
+  lastUpdatedAt: Date;
+  updatedBy: string | null;
+}
+
+export interface CreateUIFragmentDTO {
+  fragmentKey: string;
+  language?: LanguageCode;
+  description?: string;
+  type: UIComponentType;
+  section: UISection;
+  content: Record<string, any>;
+}
+
+export interface UpdateUIFragmentDTO {
+  description?: string;
+  content?: Record<string, any>;
+}
+
 // Validation constants
 export const PUBLICATION_STATUS_VALUES: PublicationStatus[] = [
   "DRAFT",
-  "SCHEDULED",
   "PUBLISHED",
   "ARCHIVED",
 ];
+
+export const LANGUAGE_CODE_VALUES: LanguageCode[] = ["es", "en", "pt"];
+
+export const LANGUAGE_CODE_VALUES: LanguageCode[] = ["es", "en", "pt"];

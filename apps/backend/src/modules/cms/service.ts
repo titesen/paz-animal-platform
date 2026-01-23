@@ -1,6 +1,6 @@
 /**
  * @file CMS Service
- * @description Business logic for content management (news, resources)
+ * @description Business logic for content management (news, resources, sponsors, UI fragments)
  */
 
 import { NotFoundError, ValidationError } from "../../types/errors";
@@ -8,12 +8,18 @@ import * as repository from "./repository";
 import type {
   CreateNewsDTO,
   CreateResourceDTO,
+  CreateSponsorDTO,
+  CreateUIFragmentDTO,
   NewsWithTranslations,
   ResourceWithTranslations,
+  Sponsor,
+  UIFragment,
+  UISection,
   UpdateNewsDTO,
   UpdateNewsTranslationDTO,
   UpdateResourceDTO,
   UpdateResourceTranslationDTO,
+  UpdateSponsorDTO,
 } from "./types";
 
 /**
@@ -48,7 +54,7 @@ export async function createNews(
   }
 
   const status = data.status || "DRAFT";
-  const publishedAt = data.publishedAt ? new Date(data.publishedAt) : null;
+  const publishedAt = data.publishedAt ? new Date(data.publishedAt) : undefined;
 
   // Create news
   const news = await repository.createNews({
@@ -327,4 +333,187 @@ export async function deleteResource(resourceId: string): Promise<void> {
   }
 
   await repository.deleteResource(resourceId);
+}
+
+// ===================
+// SPONSORS MANAGEMENT
+// ===================
+
+/**
+ * Get all sponsors (public view)
+ */
+export async function getAllSponsors(): Promise<Sponsor[]> {
+  return await repository.findAllSponsors();
+}
+
+/**
+ * Get sponsor by ID
+ */
+export async function getSponsorById(sponsorId: string): Promise<Sponsor> {
+  const sponsor = await repository.findSponsorById(sponsorId);
+  if (!sponsor) {
+    throw new NotFoundError("Sponsor not found");
+  }
+
+  return sponsor;
+}
+
+/**
+ * Create sponsor
+ */
+export async function createSponsor(data: CreateSponsorDTO): Promise<Sponsor> {
+  // Validate URL if provided
+  if (data.websiteUrl && !isValidUrl(data.websiteUrl)) {
+    throw new ValidationError("Invalid website URL", "INVALID_URL");
+  }
+
+  return await repository.createSponsor({
+    name: data.name,
+    websiteUrl: data.websiteUrl,
+    contactName: data.contactName,
+    contactEmail: data.contactEmail,
+    contactPhone: data.contactPhone,
+    sortOrder: data.sortOrder ?? 0,
+  });
+}
+
+/**
+ * Update sponsor
+ */
+export async function updateSponsor(
+  sponsorId: string,
+  data: UpdateSponsorDTO,
+): Promise<Sponsor> {
+  const sponsor = await repository.findSponsorById(sponsorId);
+  if (!sponsor) {
+    throw new NotFoundError("Sponsor not found");
+  }
+
+  // Validate URL if provided
+  if (data.websiteUrl && !isValidUrl(data.websiteUrl)) {
+    throw new ValidationError("Invalid website URL", "INVALID_URL");
+  }
+
+  const updateData: any = {};
+  if (data.name) updateData.name = data.name;
+  if (data.websiteUrl !== undefined) updateData.websiteUrl = data.websiteUrl;
+  if (data.contactName !== undefined) updateData.contactName = data.contactName;
+  if (data.contactEmail !== undefined)
+    updateData.contactEmail = data.contactEmail;
+  if (data.contactPhone !== undefined)
+    updateData.contactPhone = data.contactPhone;
+  if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;
+
+  await repository.updateSponsor(sponsorId, updateData);
+
+  return (await repository.findSponsorById(sponsorId))!;
+}
+
+/**
+ * Delete sponsor
+ */
+export async function deleteSponsor(sponsorId: string): Promise<void> {
+  const sponsor = await repository.findSponsorById(sponsorId);
+  if (!sponsor) {
+    throw new NotFoundError("Sponsor not found");
+  }
+
+  await repository.deleteSponsor(sponsorId);
+}
+
+// ===================
+// UI FRAGMENTS MANAGEMENT
+// ===================
+
+/**
+ * Get fragment by key and language
+ */
+export async function getFragmentByKey(
+  fragmentKey: string,
+  language: string = "es",
+): Promise<UIFragment> {
+  const fragment = await repository.findFragmentByKey(fragmentKey, language);
+  if (!fragment) {
+    throw new NotFoundError("UI Fragment not found");
+  }
+
+  return fragment;
+}
+
+/**
+ * Get fragments by section
+ */
+export async function getFragmentsBySection(
+  section: UISection,
+  language: string = "es",
+): Promise<UIFragment[]> {
+  return await repository.findFragmentsBySection(section, language);
+}
+
+/**
+ * Get all fragments (admin view)
+ */
+export async function getAllFragments(
+  language?: string,
+): Promise<UIFragment[]> {
+  return await repository.findAllFragments(language);
+}
+
+/**
+ * Create or update fragment (hot-swap)
+ */
+export async function upsertFragment(
+  data: CreateUIFragmentDTO,
+  userId: string,
+): Promise<UIFragment> {
+  return await repository.upsertFragment(
+    {
+      fragmentKey: data.fragmentKey,
+      language: data.language || "es",
+      description: data.description,
+      type: data.type,
+      section: data.section,
+      content: data.content,
+    },
+    userId,
+  );
+}
+
+/**
+ * Update fragment content only (hot-swap)
+ */
+export async function updateFragmentContent(
+  fragmentKey: string,
+  language: string,
+  content: Record<string, any>,
+  userId: string,
+): Promise<UIFragment> {
+  const fragment = await repository.updateFragmentContent(
+    fragmentKey,
+    language,
+    content,
+    userId,
+  );
+
+  if (!fragment) {
+    throw new NotFoundError("UI Fragment not found");
+  }
+
+  return fragment;
+}
+
+// ===================
+// UTILITIES
+// ===================
+
+/**
+ * Validate URL format
+ */
+function isValidUrl(url: string): boolean {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
 }
