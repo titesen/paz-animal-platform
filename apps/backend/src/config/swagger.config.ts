@@ -16,8 +16,8 @@ Esta API gestiona el ecosistema digital completo de la fundación, incluyendo:
 - CMS para contenido editorial
 - Gestión de eventos y voluntarios
 
-**Arquitectura**: Monolito Modular con separación en 3 capas (Controller-Service-Repository)  
-**Base de Datos**: PostgreSQL 15+ con Drizzle ORM  
+**Arquitectura**: Monolito Modular con separación en 3 capas (Controller-Service-Repository)
+**Base de Datos**: PostgreSQL 15+ con Drizzle ORM
 **Seguridad**: JWT (Access + Refresh), bcrypt, Helmet, CORS, Rate Limiting
     `.trim(),
     contact: {
@@ -32,9 +32,10 @@ Esta API gestiona el ecosistema digital completo de la fundación, incluyendo:
   },
   servers: [
     {
-      url: env.NODE_ENV === "production" 
-        ? "https://api.pazanimal.org" 
-        : `http://localhost:${env.PORT}`,
+      url:
+        env.NODE_ENV === "production"
+          ? "https://api.pazanimal.org"
+          : `http://localhost:${env.PORT}`,
       description:
         env.NODE_ENV === "production"
           ? "Production Server (Railway)"
@@ -50,7 +51,7 @@ Esta API gestiona el ecosistema digital completo de la fundación, incluyendo:
         description: `
 Token de acceso JWT obtenido tras login exitoso.
 
-**Duración**: 15 minutos  
+**Duración**: 15 minutos
 **Header**: \`Authorization: Bearer <access_token>\`
 
 Para obtener un token, use el endpoint \`POST /api/auth/login\` o \`POST /api/auth/register\`.
@@ -63,7 +64,7 @@ Para obtener un token, use el endpoint \`POST /api/auth/login\` o \`POST /api/au
         description: `
 Token de renovación almacenado en cookie HTTP-Only.
 
-**Duración**: 7 días  
+**Duración**: 7 días
 **Uso**: Permite obtener un nuevo access_token sin re-autenticar mediante \`POST /api/auth/refresh\`.
         `.trim(),
       },
@@ -77,7 +78,10 @@ Token de renovación almacenado en cookie HTTP-Only.
               type: "object",
               properties: {
                 status: { type: "string", example: "error" },
-                message: { type: "string", example: "Token inválido o expirado" },
+                message: {
+                  type: "string",
+                  example: "Token inválido o expirado",
+                },
                 code: { type: "string", example: "UNAUTHORIZED" },
               },
             },
@@ -92,7 +96,10 @@ Token de renovación almacenado en cookie HTTP-Only.
               type: "object",
               properties: {
                 status: { type: "string", example: "error" },
-                message: { type: "string", example: "Acceso denegado. Se requiere rol ADMIN" },
+                message: {
+                  type: "string",
+                  example: "Acceso denegado. Se requiere rol ADMIN",
+                },
                 code: { type: "string", example: "FORBIDDEN" },
               },
             },
@@ -116,7 +123,10 @@ Token de renovación almacenado en cookie HTTP-Only.
                         type: "object",
                         properties: {
                           field: { type: "string", example: "email" },
-                          message: { type: "string", example: "Email inválido" },
+                          message: {
+                            type: "string",
+                            example: "Email inválido",
+                          },
                         },
                       },
                     },
@@ -135,7 +145,10 @@ Token de renovación almacenado en cookie HTTP-Only.
               type: "object",
               properties: {
                 status: { type: "string", example: "error" },
-                message: { type: "string", example: "El recurso solicitado no existe" },
+                message: {
+                  type: "string",
+                  example: "El recurso solicitado no existe",
+                },
                 code: { type: "string", example: "NOT_FOUND" },
               },
             },
@@ -150,9 +163,10 @@ Token de renovación almacenado en cookie HTTP-Only.
               type: "object",
               properties: {
                 status: { type: "string", example: "error" },
-                message: { 
-                  type: "string", 
-                  example: "Demasiadas solicitudes. Intenta nuevamente en 15 minutos" 
+                message: {
+                  type: "string",
+                  example:
+                    "Demasiadas solicitudes. Intenta nuevamente en 15 minutos",
                 },
                 code: { type: "string", example: "RATE_LIMIT_EXCEEDED" },
               },
@@ -165,7 +179,8 @@ Token de renovación almacenado en cookie HTTP-Only.
   tags: [
     {
       name: "Auth",
-      description: "Autenticación y gestión de sesiones (Register, Login, OAuth, 2FA)",
+      description:
+        "Autenticación y gestión de sesiones (Register, Login, OAuth, 2FA)",
     },
     {
       name: "Pets",
@@ -173,7 +188,8 @@ Token de renovación almacenado en cookie HTTP-Only.
     },
     {
       name: "Adoptions",
-      description: "Flujo completo de adopciones (Solicitudes, entrevistas, aprobaciones)",
+      description:
+        "Flujo completo de adopciones (Solicitudes, entrevistas, aprobaciones)",
     },
     {
       name: "Volunteers",
@@ -185,11 +201,13 @@ Token de renovación almacenado en cookie HTTP-Only.
     },
     {
       name: "Donations",
-      description: "Procesamiento de donaciones (Monetarias, materiales, Mercado Pago)",
+      description:
+        "Procesamiento de donaciones (Monetarias, materiales, Mercado Pago)",
     },
     {
       name: "CMS",
-      description: "Gestión de contenido editorial (Noticias, recursos, páginas)",
+      description:
+        "Gestión de contenido editorial (Noticias, recursos, páginas)",
     },
   ],
 };
