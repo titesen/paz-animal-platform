@@ -52,7 +52,7 @@ export async function createNewsTranslations(
 
   return await db
     .insert(schema.newsTranslations)
-    .values(translations)
+    .values(translations as any)
     .returning();
 }
 
@@ -146,7 +146,6 @@ export async function findAllNews(): Promise<
 
   if (newsItems.length === 0) return [];
 
-  const newsIds = newsItems.map((n) => n.newsId);
   const allTranslations = await db.select().from(schema.newsTranslations);
 
   return newsItems.map((newsItem) => ({
@@ -181,7 +180,7 @@ export async function updateNewsTranslation(
 ): Promise<NewsTranslation | null> {
   const [updated] = await db
     .update(schema.newsTranslations)
-    .set(data)
+    .set(data as any)
     .where(
       and(
         eq(schema.newsTranslations.newsId, newsId),
@@ -356,7 +355,7 @@ export async function updateResourceTranslation(
 ): Promise<ResourceTranslation | null> {
   const [updated] = await db
     .update(schema.resourcesTranslations)
-    .set(data)
+    .set(data as any)
     .where(
       and(
         eq(schema.resourcesTranslations.resourceId, resourceId),

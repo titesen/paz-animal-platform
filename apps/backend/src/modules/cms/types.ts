@@ -212,5 +212,3 @@ export const PUBLICATION_STATUS_VALUES: PublicationStatus[] = [
 ];
 
 export const LANGUAGE_CODE_VALUES: LanguageCode[] = ["es", "en", "pt"];
-
-export const LANGUAGE_CODE_VALUES: LanguageCode[] = ["es", "en", "pt"];

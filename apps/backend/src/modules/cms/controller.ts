@@ -81,7 +81,7 @@ export const getNewsBySlug = asyncHandler(async (req, res: Response) => {
  */
 export const createNews = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const authorId = req.userId!;
+    const authorId = req.user.userId;
     const data = req.body as CreateNewsDTO;
     const news = await service.createNews(authorId, data);
     res.status(201).json({
@@ -183,7 +183,7 @@ export const getResourceById = asyncHandler(async (req, res: Response) => {
  */
 export const createResource = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const authorId = req.userId!;
+    const authorId = req.user.userId;
     const data = req.body as CreateResourceDTO;
     const resource = await service.createResource(authorId, data);
     res.status(201).json({
@@ -361,7 +361,7 @@ export const getAllFragments = asyncHandler(async (req, res: Response) => {
  */
 export const upsertFragment = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.userId!;
+    const userId = req.user.userId;
     const data = req.body as CreateUIFragmentDTO;
     const fragment = await service.upsertFragment(data, userId);
     res.json({
@@ -377,7 +377,7 @@ export const upsertFragment = asyncHandler(
  */
 export const updateFragmentContent = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.userId!;
+    const userId = req.user.userId;
     const { fragmentKey } = req.params;
     const { lang = "es", content } = req.body;
     const fragment = await service.updateFragmentContent(
