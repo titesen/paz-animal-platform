@@ -3,12 +3,16 @@
  * @description JWT verification and role-based access control (RBAC)
  */
 
-import type { NextFunction, Request, Response } from "express";
 import { eq } from "drizzle-orm";
+import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env";
 import { db } from "../db";
-import { volunteers, volunteersVolunteerRoles, volunteerRoles } from "../db/schema";
+import {
+  volunteerRoles,
+  volunteers,
+  volunteersVolunteerRoles,
+} from "../db/schema";
 import type { AuthenticatedRequest, JWTPayload } from "../types";
 import { ForbiddenError, UnauthorizedError } from "../types/errors";
 
@@ -184,7 +188,11 @@ export function requireOwnership(
  * @example requireVolunteerTag('CONTENT_MANAGER', 'EVENT_ORGANIZER')
  */
 export function requireVolunteerTag(...requiredTags: string[]) {
-  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+  return async (
+    req: Request,
+    _res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const authReq = req as AuthenticatedRequest;
 
@@ -206,7 +214,9 @@ export function requireVolunteerTag(...requiredTags: string[]) {
         .limit(1);
 
       if (!volunteer.length) {
-        throw new ForbiddenError("You must be a registered volunteer to access this resource");
+        throw new ForbiddenError(
+          "You must be a registered volunteer to access this resource",
+        );
       }
 
       // Get volunteer's assigned tags/roles
@@ -219,7 +229,9 @@ export function requireVolunteerTag(...requiredTags: string[]) {
           volunteerRoles,
           eq(volunteersVolunteerRoles.roleId, volunteerRoles.roleId),
         )
-        .where(eq(volunteersVolunteerRoles.volunteerId, volunteer[0].volunteerId));
+        .where(
+          eq(volunteersVolunteerRoles.volunteerId, volunteer[0].volunteerId),
+        );
 
       const volunteerTagNames = volunteerTags.map((t) => t.roleName);
 

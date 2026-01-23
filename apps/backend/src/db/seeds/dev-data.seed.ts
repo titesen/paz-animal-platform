@@ -701,7 +701,7 @@ async function seedDevData() {
             .where(eq(schema.volunteerRoles.name, "Paseador de Perros"))
             .limit(1)
             .then((r) => r[0]);
-          
+
           const [volunteer] = await db
             .insert(schema.volunteers)
             .values({
@@ -711,7 +711,7 @@ async function seedDevData() {
             })
             .onConflictDoNothing()
             .returning();
-          
+
           // Assign volunteer role via junction table
           if (volunteer && dogWalker) {
             await db
