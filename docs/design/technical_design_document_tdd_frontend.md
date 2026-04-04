@@ -118,7 +118,7 @@ src/
 
 ### Enrutamiento
 
-- **Librería:** `react-router-dom` v6.
+- **Librería:** `react-router-dom` v7.
 - **Estrategia:**
 - _Rutas Públicas:_ `/`, `/adoptar`, `/donar`.
 - _Rutas Protegidas:_ `/admin/*`, `/mi-perfil` (Usando un componente `<ProtectedRoute>`).

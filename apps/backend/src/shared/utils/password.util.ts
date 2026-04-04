@@ -1,7 +1,6 @@
 // Password hashing utilities using bcrypt
 import bcrypt from "bcrypt";
-
-const SALT_ROUNDS = 10;
+import { env } from "../../config/env";
 
 /**
  * Hash a plain text password
@@ -9,7 +8,7 @@ const SALT_ROUNDS = 10;
  * @returns Hashed password
  */
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, SALT_ROUNDS);
+  return bcrypt.hash(password, env.BCRYPT_SALT_ROUNDS);
 }
 
 /**
@@ -18,9 +17,6 @@ export async function hashPassword(password: string): Promise<string> {
  * @param hashedPassword - Hashed password
  * @returns True if passwords match
  */
-export async function comparePassword(
-  password: string,
-  hashedPassword: string,
-): Promise<boolean> {
+export async function comparePassword(password: string, hashedPassword: string): Promise<boolean> {
   return bcrypt.compare(password, hashedPassword);
 }

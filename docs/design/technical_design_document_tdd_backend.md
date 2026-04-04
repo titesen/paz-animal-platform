@@ -73,7 +73,7 @@ graph TD
 
 - **Runtime:** Node.js 20+ (LTS).
 
-- **Framework:** Express 4 (Estándar de industria, fácil de migrar).
+- **Framework:** Express 5 (Estándar de industria, con mejoras nativas para routing y middleware).
 
 - **ORM:** **Drizzle ORM**. Elegido por sobre Prisma por su bajo _overhead_ y control SQL directo.
 
