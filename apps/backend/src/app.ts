@@ -134,27 +134,29 @@ app.get("/version", (_req, res) => {
   });
 });
 
-// API Documentation (Swagger UI)
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec, {
-    customSiteTitle: "Paz Animal API Documentation",
-    customCss: ".swagger-ui .topbar { display: none }",
-    swaggerOptions: {
-      persistAuthorization: true,
-      displayRequestDuration: true,
-      filter: true,
-      tryItOutEnabled: true,
-    },
-  }),
-);
+// API Documentation (Swagger UI) - disabled in production
+if (env.NODE_ENV !== "production") {
+  app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, {
+      customSiteTitle: "Paz Animal API Documentation",
+      customCss: ".swagger-ui .topbar { display: none }",
+      swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        filter: true,
+        tryItOutEnabled: true,
+      },
+    }),
+  );
 
-// Swagger JSON endpoint
-app.get("/api-docs.json", (_req, res) => {
-  res.setHeader("Content-Type", "application/json");
-  res.send(swaggerSpec);
-});
+  // Swagger JSON endpoint
+  app.get("/api-docs.json", (_req, res) => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(swaggerSpec);
+  });
+}
 
 // Static file serving for uploads (secured: no directory listing, deny dotfiles)
 app.use(

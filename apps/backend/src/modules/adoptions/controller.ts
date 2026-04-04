@@ -63,7 +63,7 @@ export const getMyAdoptions = asyncHandler(
 );
 
 export const getAllAdoptions = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
+  async (_req: AuthenticatedRequest, res: Response) => {
     const result = await adoptionsService.getAllAdoptions();
 
     const response: JSendSuccess = {

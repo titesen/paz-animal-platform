@@ -47,5 +47,5 @@ export async function findAllAdoptions() {
   return db
     .select()
     .from(schema.adoptionApplications)
-    .orderBy(schema.adoptionApplications.requestedAt);
+    .orderBy(schema.adoptionApplications.appliedAt);
 }

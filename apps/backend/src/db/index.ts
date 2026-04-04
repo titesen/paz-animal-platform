@@ -2,6 +2,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 import { env } from "../config/env.js";
+import { logger } from "../config/logger.js";
 import * as schema from "./schema/index.js";
 const { Pool } = pkg;
 
@@ -15,11 +16,11 @@ const pool = new Pool({
 
 // Test database connection on startup
 pool.on("connect", () => {
-  console.log("✅ Database connection established");
+  logger.info("✅ Database connection established");
 });
 
 pool.on("error", (err) => {
-  console.error("❌ Unexpected database error:", err);
+  logger.error({ err }, "❌ Unexpected database error");
   process.exit(-1);
 });
 

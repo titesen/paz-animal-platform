@@ -1,10 +1,11 @@
 import app from "./app";
 import { env } from "./config/env";
+import { logger } from "./config/logger";
 
 const PORT = env.PORT;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🌍 Environment: ${env.NODE_ENV}`);
+  logger.info(`🚀 Backend server running on http://localhost:${PORT}`);
+  logger.info(`📊 Health check: http://localhost:${PORT}/health`);
+  logger.info(`🌍 Environment: ${env.NODE_ENV}`);
 });
