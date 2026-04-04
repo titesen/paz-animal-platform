@@ -32,7 +32,7 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.3.0",
+    "typescript": "^5.9.3",
     "vite": "^6.0.7"
   }
 }
