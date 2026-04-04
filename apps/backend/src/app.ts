@@ -156,8 +156,14 @@ app.get("/api-docs.json", (_req, res) => {
   res.send(swaggerSpec);
 });
 
-// Static file serving for uploads
-app.use("/uploads", express.static("uploads"));
+// Static file serving for uploads (secured: no directory listing, deny dotfiles)
+app.use(
+  "/uploads",
+  express.static("uploads", {
+    index: false,
+    dotfiles: "deny",
+  }),
+);
 
 // API routes with rate limiting
 app.use("/api", apiLimiter);
