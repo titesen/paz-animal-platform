@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pet } from '../../types';
+import type { Pet } from '../../types';
 
 const pets: Pet[] = [
   {

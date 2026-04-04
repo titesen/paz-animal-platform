@@ -1,6 +1,6 @@
 import { Clock, MapPin } from 'lucide-react';
 import React from 'react';
-import { Event } from '../../types';
+import type { Event } from '../../types';
 
 const events: Event[] = [
   {
