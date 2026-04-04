@@ -13,11 +13,13 @@ import {
   volunteers,
   volunteersVolunteerRoles,
 } from "../db/schema";
+import { isTokenBlacklisted } from "../shared/utils/tokenBlacklist";
 import type { AuthenticatedRequest, JWTPayload } from "../types";
 import { ForbiddenError, UnauthorizedError } from "../types/errors";
 
 /**
  * Verifies JWT token and attaches user to request
+ * Checks token blacklist (Redis) for revoked tokens
  * Usage: Apply to protected routes that require authentication
  */
 export function authenticate(
@@ -25,36 +27,47 @@ export function authenticate(
   _res: Response,
   next: NextFunction,
 ): void {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    next(new UnauthorizedError("Missing or invalid authorization header"));
+    return;
+  }
+
+  const token = authHeader.substring(7);
+
+  // Verify signature first, then check blacklist asynchronously
+  let decoded: JWTPayload;
   try {
-    // Extract token from Authorization header
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new UnauthorizedError("Missing or invalid authorization header");
-    }
-
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-
-    // Verify token
-    const decoded = jwt.verify(token, env.JWT_SECRET) as JWTPayload;
-
-    // Attach user info to request for downstream use
-    (req as AuthenticatedRequest).user = {
-      userId: decoded.userId,
-      email: decoded.email,
-      roles: decoded.roles,
-    };
-
-    next();
+    decoded = jwt.verify(token, env.JWT_SECRET) as JWTPayload;
   } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
-      next(new UnauthorizedError("Invalid token"));
-    } else if (error instanceof jwt.TokenExpiredError) {
+    if (error instanceof jwt.TokenExpiredError) {
       next(new UnauthorizedError("Token expired"));
     } else {
-      next(error);
+      next(new UnauthorizedError("Invalid token"));
     }
+    return;
   }
+
+  // Check if token has been revoked (async)
+  isTokenBlacklisted(token)
+    .then((blacklisted) => {
+      if (blacklisted) {
+        next(new UnauthorizedError("Token has been revoked"));
+        return;
+      }
+
+      (req as AuthenticatedRequest).user = {
+        userId: decoded.userId,
+        email: decoded.email,
+        roles: decoded.roles,
+      };
+
+      next();
+    })
+    .catch((err) => {
+      next(err);
+    });
 }
 
 /**
