@@ -7,7 +7,7 @@ import { env } from "../config/env";
 import type {
   MercadoPagoPaymentData,
   MercadoPagoPreferenceResponse,
-} from "../modules/finance/types";
+} from "../modules/finance/finance.types";
 
 const MP_BASE_URL = "https://api.mercadopago.com";
 
@@ -61,9 +61,7 @@ export async function createPaymentPreference(data: {
 /**
  * Get payment details from Mercado Pago
  */
-export async function getPaymentData(
-  paymentId: string,
-): Promise<MercadoPagoPaymentData> {
+export async function getPaymentData(paymentId: string): Promise<MercadoPagoPaymentData> {
   const response = await fetch(`${MP_BASE_URL}/v1/payments/${paymentId}`, {
     method: "GET",
     headers: {
@@ -88,10 +86,7 @@ export async function getPaymentData(
  * This is a placeholder that doesn't perform real cryptographic validation.
  * Implement HMAC-SHA256 verification using Mercado Pago webhook secret.
  */
-export function validateWebhookSignature(
-  _payload: string,
-  signature: string,
-): boolean {
+export function validateWebhookSignature(_payload: string, signature: string): boolean {
   // For now, return true if signature exists
   // ⚠️ In production, implement proper HMAC validation to prevent fake payment notifications
   return !!signature;
