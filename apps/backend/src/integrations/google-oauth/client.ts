@@ -4,17 +4,15 @@
  */
 
 import { logger } from "../../config/logger";
-import type { GoogleUserInfo } from "../../types";
-import { ServiceUnavailableError } from "../../types/errors";
+import type { GoogleUserInfo } from "../../common/types";
+import { ServiceUnavailableError } from "../../common/errors";
 
 /**
  * Verify Google ID token and extract user info
  * @param idToken - Google ID token from client
  * @returns User information from Google
  */
-export async function verifyGoogleIdToken(
-  _idToken: string,
-): Promise<GoogleUserInfo> {
+export async function verifyGoogleIdToken(_idToken: string): Promise<GoogleUserInfo> {
   // TODO: Implement Google OAuth client verification
   // Using google-auth-library package
 

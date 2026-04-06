@@ -8,17 +8,17 @@ import { env } from "./config/env";
 import { logger } from "./config/logger";
 import { swaggerSpec } from "./config/swagger.config";
 import { pool } from "./db";
-import { apiLimiter, errorHandler, notFoundHandler } from "./middlewares";
+import { apiLimiter, errorHandler, notFoundHandler } from "./common/middlewares";
 
 // Import module routes
-import adoptionsRoutes from "./modules/adoptions/routes";
-import authRoutes from "./modules/auth/routes";
-import cmsRoutes from "./modules/cms/routes";
-import eventsRoutes from "./modules/events/routes";
-import financeRoutes from "./modules/finance/routes";
-import mediaRoutes from "./modules/media/routes";
-import petsRoutes from "./modules/pets/routes";
-import volunteersRoutes from "./modules/volunteers/routes";
+import adoptionsRoutes from "./modules/adoptions/adoptions.routes";
+import authRoutes from "./modules/auth/auth.routes";
+import cmsRoutes from "./modules/cms/cms.routes";
+import eventsRoutes from "./modules/events/events.routes";
+import financeRoutes from "./modules/finance/finance.routes";
+import mediaRoutes from "./modules/media/media.routes";
+import petsRoutes from "./modules/pets/pets.routes";
+import volunteersRoutes from "./modules/volunteers/volunteers.routes";
 
 const app = express();
 
@@ -91,8 +91,7 @@ app.get("/health", async (_req, res) => {
       usage: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
       total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
       percentage: Math.round(
-        (process.memoryUsage().heapUsed / process.memoryUsage().heapTotal) *
-          100,
+        (process.memoryUsage().heapUsed / process.memoryUsage().heapTotal) * 100,
       ),
     },
   };
