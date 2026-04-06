@@ -5,12 +5,8 @@
 
 import { Router } from "express";
 import { z } from "zod";
-import { validate } from "../../middlewares";
-import {
-  authenticate,
-  requireRole,
-  requireVolunteerRole,
-} from "../../middlewares/auth";
+import { validate } from "../../common/middlewares";
+import { authenticate, requireRole, requireVolunteerRole } from "../../common/middlewares/auth";
 import * as adoptionsController from "./controller";
 import { adoptionIdSchema, createAdoptionApplicationSchema } from "./types";
 
@@ -52,12 +48,7 @@ router.get(
  * @desc    Get all adoption applications (for coordinators)
  * @access  Protected (ADMIN, ADOPTION_COORD)
  */
-router.get(
-  "/",
-  authenticate,
-  requireRole("ADMIN"),
-  adoptionsController.getAllAdoptions,
-);
+router.get("/", authenticate, requireRole("ADMIN"), adoptionsController.getAllAdoptions);
 
 /**
  * @route   PATCH /api/adoptions/:adoptionId/status

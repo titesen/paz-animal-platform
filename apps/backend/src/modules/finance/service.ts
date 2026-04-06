@@ -5,7 +5,7 @@
 
 import { logger } from "../../config/logger";
 import * as mercadopago from "../../lib/mercadopago";
-import { NotFoundError, ValidationError } from "../../types/errors";
+import { NotFoundError, ValidationError } from "../../common/types/errors";
 import * as repository from "./repository";
 import type {
   CreateInKindDonationDTO,
@@ -31,10 +31,7 @@ export async function createMonetaryDonation(
 }> {
   // Validate amount
   if (data.amount <= 0) {
-    throw new ValidationError(
-      "Donation amount must be greater than zero",
-      "INVALID_AMOUNT",
-    );
+    throw new ValidationError("Donation amount must be greater than zero", "INVALID_AMOUNT");
   }
 
   const currency = data.currency || "ARS";
@@ -91,9 +88,7 @@ export async function createMonetaryDonation(
 /**
  * Process Mercado Pago webhook notification
  */
-export async function processMercadoPagoWebhook(
-  payload: MercadoPagoWebhookPayload,
-): Promise<void> {
+export async function processMercadoPagoWebhook(payload: MercadoPagoWebhookPayload): Promise<void> {
   // Only process payment notifications
   if (payload.type !== "payment") {
     logger.info({ type: payload.type }, "Ignoring non-payment webhook");
@@ -103,8 +98,7 @@ export async function processMercadoPagoWebhook(
   const paymentId = payload.data.id;
 
   // Check if we already processed this payment
-  const existingTransaction =
-    await repository.findTransactionByExternalId(paymentId);
+  const existingTransaction = await repository.findTransactionByExternalId(paymentId);
   if (existingTransaction && existingTransaction.status !== "PENDING") {
     logger.info({ paymentId }, "Payment already processed");
     return;
@@ -126,10 +120,7 @@ export async function processMercadoPagoWebhook(
   const donationId = paymentData.external_reference;
   if (!donationId) {
     logger.error({ paymentId }, "Payment without external reference");
-    throw new ValidationError(
-      "Payment without donation reference",
-      "MISSING_REFERENCE",
-    );
+    throw new ValidationError("Payment without donation reference", "MISSING_REFERENCE");
   }
 
   const donation = await repository.findDonationById(donationId);
@@ -182,9 +173,7 @@ export async function processMercadoPagoWebhook(
 /**
  * Map Mercado Pago payment status to our transaction status
  */
-function mapPaymentStatus(
-  mpStatus: string,
-): "PENDING" | "APPROVED" | "REJECTED" {
+function mapPaymentStatus(mpStatus: string): "PENDING" | "APPROVED" | "REJECTED" {
   switch (mpStatus) {
     case "approved":
       return "APPROVED";
@@ -217,9 +206,7 @@ function mapPaymentMethod(
 /**
  * Get user's donation history
  */
-export async function getUserDonations(
-  userId: string,
-): Promise<DonationWithTransaction[]> {
+export async function getUserDonations(userId: string): Promise<DonationWithTransaction[]> {
   const donations = await repository.findDonationsByUser(userId);
   const transactions = await repository.findTransactionsByUser(userId);
 
@@ -264,10 +251,7 @@ export async function createInKindDonation(
 ): Promise<void> {
   // Validate that either userId or manual donor info is provided
   if (!data.manualDonorName) {
-    throw new ValidationError(
-      "Donor information is required",
-      "MISSING_DONOR_INFO",
-    );
+    throw new ValidationError("Donor information is required", "MISSING_DONOR_INFO");
   }
 
   await repository.createInKindDonation({

@@ -6,17 +6,13 @@
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
-import type { NewPet } from "../../types";
+import type { NewPet } from "../../common/types";
 
 /**
  * Find pet by ID
  */
 export async function findPetById(petId: string) {
-  const result = await db
-    .select()
-    .from(schema.pets)
-    .where(eq(schema.pets.petId, petId))
-    .limit(1);
+  const result = await db.select().from(schema.pets).where(eq(schema.pets.petId, petId)).limit(1);
 
   return result[0] || null;
 }
@@ -49,10 +45,8 @@ export async function findPets(filters: {
   } as const;
 
   const orderByColumn =
-    validSortColumns[sortBy as keyof typeof validSortColumns] ||
-    schema.pets.createdAt;
-  const orderByClause =
-    sortOrder === "asc" ? asc(orderByColumn) : desc(orderByColumn);
+    validSortColumns[sortBy as keyof typeof validSortColumns] || schema.pets.createdAt;
+  const orderByClause = sortOrder === "asc" ? asc(orderByColumn) : desc(orderByColumn);
 
   // Execute query
   const pets = await db
@@ -99,19 +93,13 @@ export async function updatePet(petId: string, petData: Partial<NewPet>) {
  * Delete pet (soft delete)
  */
 export async function softDeletePet(petId: string): Promise<void> {
-  await db
-    .update(schema.pets)
-    .set({ deletedAt: new Date() })
-    .where(eq(schema.pets.petId, petId));
+  await db.update(schema.pets).set({ deletedAt: new Date() }).where(eq(schema.pets.petId, petId));
 }
 
 /**
  * Update pet status
  */
-export async function updatePetStatus(
-  petId: string,
-  status: string,
-): Promise<void> {
+export async function updatePetStatus(petId: string, status: string): Promise<void> {
   await db
     .update(schema.pets)
     .set({ status: status as any })

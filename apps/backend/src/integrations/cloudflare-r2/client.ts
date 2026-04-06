@@ -4,8 +4,8 @@
  */
 
 import { logger } from "../../config/logger";
-import type { FileUpload } from "../../types";
-import { ServiceUnavailableError } from "../../types/errors";
+import type { FileUpload } from "../../common/types";
+import { ServiceUnavailableError } from "../../common/types/errors";
 
 /**
  * Upload file to R2
@@ -13,19 +13,13 @@ import { ServiceUnavailableError } from "../../types/errors";
  * @param folder - Folder path in bucket (e.g., "pets", "news")
  * @returns Public URL of uploaded file
  */
-export async function uploadFile(
-  file: FileUpload,
-  folder: string,
-): Promise<string> {
+export async function uploadFile(file: FileUpload, folder: string): Promise<string> {
   // TODO: Implement R2 upload using AWS SDK S3 client
   // R2 is S3-compatible so we use @aws-sdk/client-s3
 
   logger.info({ fileName: file.originalName, folder }, "Uploading file to R2");
 
-  throw new ServiceUnavailableError(
-    "R2 upload not yet implemented",
-    "R2_NOT_IMPLEMENTED",
-  );
+  throw new ServiceUnavailableError("R2 upload not yet implemented", "R2_NOT_IMPLEMENTED");
 
   // Example implementation:
   // const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
@@ -62,8 +56,5 @@ export async function deleteFile(fileUrl: string): Promise<void> {
 
   logger.info({ fileUrl }, "Deleting file from R2");
 
-  throw new ServiceUnavailableError(
-    "R2 delete not yet implemented",
-    "R2_NOT_IMPLEMENTED",
-  );
+  throw new ServiceUnavailableError("R2 delete not yet implemented", "R2_NOT_IMPLEMENTED");
 }

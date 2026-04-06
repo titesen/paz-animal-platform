@@ -3,11 +3,7 @@
  * @description Business logic for volunteer management
  */
 
-import {
-  ConflictError,
-  NotFoundError,
-  ValidationError,
-} from "../../types/errors";
+import { ConflictError, NotFoundError, ValidationError } from "../../common/types/errors";
 import * as authRepository from "../auth/repository";
 import * as repository from "./repository";
 import type {
@@ -23,18 +19,13 @@ import type {
 /**
  * Create a new volunteer application
  */
-export async function createVolunteerApplication(
-  data: CreateVolunteerApplicationDTO,
-) {
+export async function createVolunteerApplication(data: CreateVolunteerApplicationDTO) {
   // Check if email already has an application
   const existing = await repository.findAllApplications({ limit: 1000 });
   const duplicate = existing.find((app) => app.email === data.email);
 
   if (duplicate && duplicate.status === "PENDING") {
-    throw new ConflictError(
-      "You already have a pending application",
-      "DUPLICATE_APPLICATION",
-    );
+    throw new ConflictError("You already have a pending application", "DUPLICATE_APPLICATION");
   }
 
   // Create application
@@ -59,8 +50,7 @@ export async function getAllApplications(filters?: {
  * Get application by ID
  */
 export async function getApplicationById(applicationId: string) {
-  const application =
-    await repository.findVolunteerApplicationById(applicationId);
+  const application = await repository.findVolunteerApplicationById(applicationId);
 
   if (!application) {
     throw new NotFoundError("Application not found", "APPLICATION_NOT_FOUND");
@@ -76,43 +66,30 @@ export async function updateApplicationStatus(
   applicationId: string,
   data: UpdateApplicationStatusDTO,
 ) {
-  const application =
-    await repository.findVolunteerApplicationById(applicationId);
+  const application = await repository.findVolunteerApplicationById(applicationId);
 
   if (!application) {
     throw new NotFoundError("Application not found", "APPLICATION_NOT_FOUND");
   }
 
-  return repository.updateApplicationStatus(
-    applicationId,
-    data.status,
-    data.adminNotes,
-  );
+  return repository.updateApplicationStatus(applicationId, data.status, data.adminNotes);
 }
 
 /**
  * Promote approved application to active volunteer
  * Creates a user account and volunteer record
  */
-export async function promoteToVolunteer(
-  applicationId: string,
-  data: CreateVolunteerDTO,
-) {
-  const application =
-    await repository.findVolunteerApplicationById(applicationId);
+export async function promoteToVolunteer(applicationId: string, data: CreateVolunteerDTO) {
+  const application = await repository.findVolunteerApplicationById(applicationId);
 
   if (!application) {
     throw new NotFoundError("Application not found", "APPLICATION_NOT_FOUND");
   }
 
   if (application.status !== "APPROVED") {
-    throw new ValidationError(
-      "Application must be approved first",
-      "APPLICATION_NOT_APPROVED",
-      {
-        status: ["Only approved applications can be promoted to volunteer"],
-      },
-    );
+    throw new ValidationError("Application must be approved first", "APPLICATION_NOT_APPROVED", {
+      status: ["Only approved applications can be promoted to volunteer"],
+    });
   }
 
   // Check if user already exists with this email
@@ -120,14 +97,9 @@ export async function promoteToVolunteer(
 
   if (existingUser) {
     // Check if already a volunteer
-    const existingVolunteer = await repository.findVolunteerByUserId(
-      existingUser.userId,
-    );
+    const existingVolunteer = await repository.findVolunteerByUserId(existingUser.userId);
     if (existingVolunteer) {
-      throw new ConflictError(
-        "User is already a volunteer",
-        "ALREADY_VOLUNTEER",
-      );
+      throw new ConflictError("User is already a volunteer", "ALREADY_VOLUNTEER");
     }
 
     // Assign VOLUNTEER role to existing user
@@ -200,10 +172,7 @@ export async function getVolunteerByUserId(userId: string) {
 /**
  * Update volunteer information
  */
-export async function updateVolunteer(
-  volunteerId: string,
-  data: UpdateVolunteerDTO,
-) {
+export async function updateVolunteer(volunteerId: string, data: UpdateVolunteerDTO) {
   const volunteer = await repository.findVolunteerById(volunteerId);
 
   if (!volunteer) {

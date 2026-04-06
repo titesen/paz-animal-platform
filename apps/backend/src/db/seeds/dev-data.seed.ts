@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { logger } from "../../config/logger";
-import { hashPassword } from "../../shared/utils/password.util";
+import { hashPassword } from "../../common/utils/password.util";
 import { db, pool } from "../index";
 import * as schema from "../schema";
 
@@ -98,27 +98,19 @@ async function seedDevData() {
         userId: user.userId,
         roleId: clientRole.roleId,
       }));
-      await db
-        .insert(schema.usersRoles)
-        .values(userRoles)
-        .onConflictDoNothing();
+      await db.insert(schema.usersRoles).values(userRoles).onConflictDoNothing();
     }
 
     // Get ALL client users (for idempotency)
     const allClients = await db
       .select({ user: schema.users })
       .from(schema.users)
-      .innerJoin(
-        schema.usersRoles,
-        eq(schema.users.userId, schema.usersRoles.userId),
-      )
+      .innerJoin(schema.usersRoles, eq(schema.users.userId, schema.usersRoles.userId))
       .where(eq(schema.usersRoles.roleId, clientRole!.roleId))
       .limit(5)
       .then((rows) => rows.map((r) => r.user));
 
-    logger.info(
-      `✅ ${createdClients.length} new clients, ${allClients.length} total`,
-    );
+    logger.info(`✅ ${createdClients.length} new clients, ${allClients.length} total`);
 
     // Get admin user for fallback references
     const adminRole = await db
@@ -131,10 +123,7 @@ async function seedDevData() {
     const adminUser = await db
       .select({ user: schema.users })
       .from(schema.users)
-      .innerJoin(
-        schema.usersRoles,
-        eq(schema.users.userId, schema.usersRoles.userId),
-      )
+      .innerJoin(schema.usersRoles, eq(schema.users.userId, schema.usersRoles.userId))
       .where(eq(schema.usersRoles.roleId, adminRole!.roleId))
       .limit(1)
       .then((rows) => (rows[0] ? rows[0].user : null));
@@ -438,12 +427,7 @@ async function seedDevData() {
 
     if (existingTransactions === 0) {
       const confirmed = donations.filter((d) => d.isConfirmed);
-      const providers = [
-        "MERCADOPAGO",
-        "STRIPE",
-        "BANK_TRANSFER",
-        "CASH_REGISTER",
-      ] as const;
+      const providers = ["MERCADOPAGO", "STRIPE", "BANK_TRANSFER", "CASH_REGISTER"] as const;
 
       const txs = confirmed.map((d, i) => ({
         userId: d.userId,
@@ -1052,8 +1036,7 @@ async function seedDevData() {
           websiteUrl: "https://example.com/vet-amigos",
           contactEmail: "contacto@vetamigos.com",
           contactPhone: "+54 379 4111-111",
-          description:
-            "Veterinaria colaboradora con descuentos para adoptantes",
+          description: "Veterinaria colaboradora con descuentos para adoptantes",
           isActive: true,
         },
         {
@@ -1075,10 +1058,7 @@ async function seedDevData() {
         },
       ];
 
-      const sponsors = await db
-        .insert(schema.sponsors)
-        .values(sponsorData)
-        .returning();
+      const sponsors = await db.insert(schema.sponsors).values(sponsorData).returning();
 
       logger.info(`✅ ${sponsors.length} sponsors created`);
     } else {
@@ -1164,10 +1144,7 @@ async function seedDevData() {
         },
       ];
 
-      const fragments = await db
-        .insert(schema.uiFragments)
-        .values(fragmentData)
-        .returning();
+      const fragments = await db.insert(schema.uiFragments).values(fragmentData).returning();
 
       logger.info(`✅ ${fragments.length} UI fragments created`);
     } else {

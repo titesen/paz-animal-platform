@@ -6,20 +6,15 @@
 
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
-import { env } from "../config/env";
-import { logger } from "../config/logger";
+import { env } from "../../config/env";
+import { logger } from "../../config/logger";
 import type { JSendError, JSendFail } from "../types";
 import { AppError, ValidationError } from "../types/errors";
 
 /**
  * Global error handler - MUST be registered last in middleware chain
  */
-export function errorHandler(
-  err: Error,
-  req: Request,
-  res: Response,
-  _next: NextFunction,
-): void {
+export function errorHandler(err: Error, req: Request, res: Response, _next: NextFunction): void {
   // Log error for observability
   logger.error({
     err,
@@ -78,8 +73,7 @@ export function errorHandler(
   // Handle unknown errors (programming errors)
   const response: JSendError = {
     status: "error",
-    message:
-      env.NODE_ENV === "production" ? "Internal server error" : err.message,
+    message: env.NODE_ENV === "production" ? "Internal server error" : err.message,
     code: "INTERNAL_ERROR",
     ...(env.NODE_ENV !== "production" && { details: err.stack }),
   };

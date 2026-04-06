@@ -6,16 +6,11 @@
 
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import type { AuthenticatedRequest, JSendSuccess } from "../../types";
-import { blacklistToken } from "../../shared/utils/tokenBlacklist";
-import { asyncHandler } from "../../utils";
+import type { AuthenticatedRequest, JSendSuccess } from "../../common/types";
+import { blacklistToken } from "../../common/utils/tokenBlacklist";
+import { asyncHandler } from "../../common/utils";
 import * as authService from "./service";
-import type {
-  AuthResponse,
-  LoginDTO,
-  RefreshTokenDTO,
-  RegisterDTO,
-} from "./types";
+import type { AuthResponse, LoginDTO, RefreshTokenDTO, RegisterDTO } from "./types";
 
 /**
  * POST /api/auth/register
@@ -89,20 +84,18 @@ export const googleAuth = asyncHandler(async (req, res: Response) => {
  * GET /api/auth/me
  * Get current authenticated user profile
  */
-export const getCurrentUser = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user.userId;
+export const getCurrentUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user.userId;
 
-    const result = await authService.getCurrentUser(userId);
+  const result = await authService.getCurrentUser(userId);
 
-    const response: JSendSuccess = {
-      status: "success",
-      data: result,
-    };
+  const response: JSendSuccess = {
+    status: "success",
+    data: result,
+  };
 
-    res.status(200).json(response);
-  },
-);
+  res.status(200).json(response);
+});
 
 /**
  * POST /api/auth/logout

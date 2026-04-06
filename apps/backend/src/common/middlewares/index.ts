@@ -13,10 +13,5 @@ export {
   requireVolunteerRole,
 } from "./auth";
 export { errorHandler, notFoundHandler } from "./errorHandler";
-export {
-  apiLimiter,
-  authLimiter,
-  publicLimiter,
-  uploadLimiter,
-} from "./rateLimiter";
+export { apiLimiter, authLimiter, publicLimiter, uploadLimiter } from "./rateLimiter";
 export { validate, validateMultiple } from "./validate";

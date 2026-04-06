@@ -47,10 +47,7 @@ export async function generateQRCodeBuffer(data: string): Promise<Buffer> {
  * @param baseUrl - Base URL of the frontend application
  * @returns QR code data URL
  */
-export async function generatePetQRCode(
-  petId: string,
-  baseUrl: string,
-): Promise<string> {
+export async function generatePetQRCode(petId: string, baseUrl: string): Promise<string> {
   const petUrl = `${baseUrl}/pets/${petId}`;
   return generateQRCode(petUrl, { errorCorrectionLevel: "H" }); // High error correction for physical tags
 }

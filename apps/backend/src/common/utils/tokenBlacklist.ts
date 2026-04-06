@@ -29,10 +29,7 @@ function tokenKey(token: string): string {
  * @param token - The full JWT token string
  * @param expiresInSeconds - TTL matching the token's remaining lifetime
  */
-export async function blacklistToken(
-  token: string,
-  expiresInSeconds: number,
-): Promise<void> {
+export async function blacklistToken(token: string, expiresInSeconds: number): Promise<void> {
   try {
     if (redis.status !== "ready") return;
     await redis.set(tokenKey(token), "1", "EX", expiresInSeconds);

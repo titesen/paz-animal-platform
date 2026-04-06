@@ -4,8 +4,8 @@
  */
 
 import type { Response } from "express";
-import type { AuthenticatedRequest } from "../../types";
-import { asyncHandler } from "../../utils";
+import type { AuthenticatedRequest } from "../../common/types";
+import { asyncHandler } from "../../common/utils";
 import * as service from "./service";
 import type {
   CheckInDTO,
@@ -24,72 +24,64 @@ import type {
  * POST /api/events
  * Requires: EVENT_ORGANIZER tag
  */
-export const createEvent = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user!.userId;
-    const data: CreateEventDTO = req.body;
+export const createEvent = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.userId;
+  const data: CreateEventDTO = req.body;
 
-    const event = await service.createEvent(userId, data);
+  const event = await service.createEvent(userId, data);
 
-    res.status(201).json({
-      status: "success",
-      data: { event },
-    });
-  },
-);
+  res.status(201).json({
+    status: "success",
+    data: { event },
+  });
+});
 
 /**
  * Get all upcoming events
  * GET /api/events
  * Public endpoint
  */
-export const getAllEvents = asyncHandler(
-  async (_req: AuthenticatedRequest, res: Response) => {
-    const events = await service.getAllUpcomingEvents();
+export const getAllEvents = asyncHandler(async (_req: AuthenticatedRequest, res: Response) => {
+  const events = await service.getAllUpcomingEvents();
 
-    res.json({
-      status: "success",
-      data: { events },
-    });
-  },
-);
+  res.json({
+    status: "success",
+    data: { events },
+  });
+});
 
 /**
  * Get event by ID
  * GET /api/events/:eventId
  * Public endpoint
  */
-export const getEventById = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const { eventId } = req.params;
+export const getEventById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const { eventId } = req.params;
 
-    const event = await service.getEventById(eventId);
+  const event = await service.getEventById(eventId);
 
-    res.json({
-      status: "success",
-      data: { event },
-    });
-  },
-);
+  res.json({
+    status: "success",
+    data: { event },
+  });
+});
 
 /**
  * Update event
  * PATCH /api/events/:eventId
  * Requires: EVENT_ORGANIZER tag
  */
-export const updateEvent = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const { eventId } = req.params;
-    const data: UpdateEventDTO = req.body;
+export const updateEvent = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const { eventId } = req.params;
+  const data: UpdateEventDTO = req.body;
 
-    const event = await service.updateEvent(eventId, data);
+  const event = await service.updateEvent(eventId, data);
 
-    res.json({
-      status: "success",
-      data: { event },
-    });
-  },
-);
+  res.json({
+    status: "success",
+    data: { event },
+  });
+});
 
 /**
  * Update event translation
@@ -115,18 +107,16 @@ export const updateEventTranslation = asyncHandler(
  * DELETE /api/events/:eventId
  * Requires: EVENT_ORGANIZER tag
  */
-export const deleteEvent = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const { eventId } = req.params;
+export const deleteEvent = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const { eventId } = req.params;
 
-    await service.deleteEvent(eventId);
+  await service.deleteEvent(eventId);
 
-    res.json({
-      status: "success",
-      message: "Event deleted successfully",
-    });
-  },
-);
+  res.json({
+    status: "success",
+    message: "Event deleted successfully",
+  });
+});
 
 // ===================
 // REGISTRATIONS
@@ -137,57 +127,51 @@ export const deleteEvent = asyncHandler(
  * POST /api/events/:eventId/register
  * Requires: Authenticated user
  */
-export const registerForEvent = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user!.userId;
-    const { eventId } = req.params;
-    const data: RegisterForEventDTO = req.body;
+export const registerForEvent = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.userId;
+  const { eventId } = req.params;
+  const data: RegisterForEventDTO = req.body;
 
-    await service.registerForEvent(userId, eventId, data);
+  await service.registerForEvent(userId, eventId, data);
 
-    res.status(201).json({
-      status: "success",
-      message: "Successfully registered for event",
-    });
-  },
-);
+  res.status(201).json({
+    status: "success",
+    message: "Successfully registered for event",
+  });
+});
 
 /**
  * Get my registrations
  * GET /api/events/my-registrations
  * Requires: Authenticated user
  */
-export const getMyRegistrations = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user!.userId;
+export const getMyRegistrations = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.userId;
 
-    const registrations = await service.getMyRegistrations(userId);
+  const registrations = await service.getMyRegistrations(userId);
 
-    res.json({
-      status: "success",
-      data: { registrations },
-    });
-  },
-);
+  res.json({
+    status: "success",
+    data: { registrations },
+  });
+});
 
 /**
  * Cancel registration
  * DELETE /api/events/:eventId/register
  * Requires: Authenticated user
  */
-export const cancelRegistration = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user!.userId;
-    const { eventId } = req.params;
+export const cancelRegistration = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.userId;
+  const { eventId } = req.params;
 
-    await service.cancelRegistration(userId, eventId);
+  await service.cancelRegistration(userId, eventId);
 
-    res.json({
-      status: "success",
-      message: "Registration cancelled successfully",
-    });
-  },
-);
+  res.json({
+    status: "success",
+    message: "Registration cancelled successfully",
+  });
+});
 
 /**
  * Get event registrations
@@ -216,20 +200,18 @@ export const getEventRegistrations = asyncHandler(
  * POST /api/events/:eventId/check-in
  * Requires: EVENT_ORGANIZER tag
  */
-export const checkInUser = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const checkedInBy = req.user!.userId;
-    const { eventId } = req.params;
-    const data: CheckInDTO = req.body;
+export const checkInUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const checkedInBy = req.user!.userId;
+  const { eventId } = req.params;
+  const data: CheckInDTO = req.body;
 
-    await service.checkInUser(eventId, checkedInBy, data);
+  await service.checkInUser(eventId, checkedInBy, data);
 
-    res.status(201).json({
-      status: "success",
-      message: "User checked in successfully",
-    });
-  },
-);
+  res.status(201).json({
+    status: "success",
+    message: "User checked in successfully",
+  });
+});
 
 /**
  * Get event attendances

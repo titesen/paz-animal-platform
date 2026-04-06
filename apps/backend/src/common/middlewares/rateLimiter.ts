@@ -36,8 +36,7 @@ export const authLimiter = rateLimit({
   handler: (_req, res) => {
     const response: JSendError = {
       status: "error",
-      message:
-        "Too many authentication attempts, please try again in 15 minutes",
+      message: "Too many authentication attempts, please try again in 15 minutes",
       code: "AUTH_RATE_LIMIT_EXCEEDED",
     };
     res.status(429).json(response);

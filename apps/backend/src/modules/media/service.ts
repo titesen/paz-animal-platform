@@ -5,7 +5,7 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import { ValidationError } from "../../types/errors";
+import { ValidationError } from "../../common/types/errors";
 import * as repository from "./repository";
 import {
   ALL_ALLOWED_MIMES,
@@ -59,9 +59,7 @@ function validateFile(file: Express.Multer.File) {
 
   if (file.size > maxSize) {
     throw new ValidationError("File too large", "FILE_TOO_LARGE", {
-      size: [
-        `File size ${file.size} exceeds maximum allowed size of ${maxSize} bytes`,
-      ],
+      size: [`File size ${file.size} exceeds maximum allowed size of ${maxSize} bytes`],
     });
   }
 
@@ -71,10 +69,7 @@ function validateFile(file: Express.Multer.File) {
 /**
  * Upload a file and create media record
  */
-export async function uploadFile(
-  file: Express.Multer.File,
-  data: UploadFileDTO,
-) {
+export async function uploadFile(file: Express.Multer.File, data: UploadFileDTO) {
   // Validate file
   const mediaType = validateFile(file);
 
@@ -107,11 +102,7 @@ export async function uploadFile(
 
   // If this is set as main, ensure no other media is marked as main
   if (data.isMain) {
-    await repository.setMainMedia(
-      media.mediaId,
-      data.entityType,
-      data.entityId,
-    );
+    await repository.setMainMedia(media.mediaId, data.entityType, data.entityId);
   }
 
   return media;

@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import { authenticate, requireRole } from "../../middlewares/auth";
+import { authenticate, requireRole } from "../../common/middlewares/auth";
 import * as controller from "./controller";
 
 const router = Router();
@@ -84,11 +84,6 @@ router.get(
  * GET /api/finance/summary
  * Requires: ADMIN role
  */
-router.get(
-  "/summary",
-  authenticate,
-  requireRole("ADMIN"),
-  controller.getFinancialSummary,
-);
+router.get("/summary", authenticate, requireRole("ADMIN"), controller.getFinancialSummary);
 
 export default router;

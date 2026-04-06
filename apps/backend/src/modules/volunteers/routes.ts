@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import { authenticate, requireRole } from "../../middlewares";
+import { authenticate, requireRole } from "../../common/middlewares";
 import * as controller from "./controller";
 
 const router = Router();
@@ -23,12 +23,7 @@ router.post("/applications", controller.createVolunteerApplication);
  * GET /api/volunteers/applications
  * Auth: ADMIN only
  */
-router.get(
-  "/applications",
-  authenticate,
-  requireRole("ADMIN"),
-  controller.getAllApplications,
-);
+router.get("/applications", authenticate, requireRole("ADMIN"), controller.getAllApplications);
 
 /**
  * Get application by ID
@@ -73,12 +68,7 @@ router.post(
  * GET /api/volunteers/roles
  * Auth: ADMIN or VOLUNTEER
  */
-router.get(
-  "/roles",
-  authenticate,
-  requireRole("ADMIN", "VOLUNTEER"),
-  controller.getAllRoles,
-);
+router.get("/roles", authenticate, requireRole("ADMIN", "VOLUNTEER"), controller.getAllRoles);
 
 // ===== VOLUNTEER MANAGEMENT =====
 
@@ -87,24 +77,14 @@ router.get(
  * GET /api/volunteers/me
  * Auth: VOLUNTEER or ADMIN
  */
-router.get(
-  "/me",
-  authenticate,
-  requireRole("VOLUNTEER", "ADMIN"),
-  controller.getMyProfile,
-);
+router.get("/me", authenticate, requireRole("VOLUNTEER", "ADMIN"), controller.getMyProfile);
 
 /**
  * Get all volunteers
  * GET /api/volunteers
  * Auth: ADMIN or VOLUNTEER
  */
-router.get(
-  "/",
-  authenticate,
-  requireRole("ADMIN", "VOLUNTEER"),
-  controller.getAllVolunteers,
-);
+router.get("/", authenticate, requireRole("ADMIN", "VOLUNTEER"), controller.getAllVolunteers);
 
 /**
  * Get volunteer by ID
@@ -123,24 +103,14 @@ router.get(
  * PATCH /api/volunteers/:volunteerId
  * Auth: ADMIN only
  */
-router.patch(
-  "/:volunteerId",
-  authenticate,
-  requireRole("ADMIN"),
-  controller.updateVolunteer,
-);
+router.patch("/:volunteerId", authenticate, requireRole("ADMIN"), controller.updateVolunteer);
 
 /**
  * Delete volunteer
  * DELETE /api/volunteers/:volunteerId
  * Auth: ADMIN only
  */
-router.delete(
-  "/:volunteerId",
-  authenticate,
-  requireRole("ADMIN"),
-  controller.deleteVolunteer,
-);
+router.delete("/:volunteerId", authenticate, requireRole("ADMIN"), controller.deleteVolunteer);
 
 // ===== TAG MANAGEMENT =====
 
@@ -149,12 +119,7 @@ router.delete(
  * POST /api/volunteers/:volunteerId/tags
  * Auth: ADMIN only
  */
-router.post(
-  "/:volunteerId/tags",
-  authenticate,
-  requireRole("ADMIN"),
-  controller.assignTag,
-);
+router.post("/:volunteerId/tags", authenticate, requireRole("ADMIN"), controller.assignTag);
 
 /**
  * Remove tag/role from volunteer

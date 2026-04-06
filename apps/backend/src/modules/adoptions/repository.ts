@@ -6,7 +6,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
-import type { NewAdoptionApplication } from "../../types";
+import type { NewAdoptionApplication } from "../../common/types";
 
 export async function findAdoptionById(adoptionId: string) {
   const result = await db
@@ -19,10 +19,7 @@ export async function findAdoptionById(adoptionId: string) {
 }
 
 export async function createAdoptionApplication(data: NewAdoptionApplication) {
-  const result = await db
-    .insert(schema.adoptionApplications)
-    .values(data)
-    .returning();
+  const result = await db.insert(schema.adoptionApplications).values(data).returning();
   return result[0];
 }
 

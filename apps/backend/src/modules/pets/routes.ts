@@ -5,16 +5,11 @@
 
 import { Router } from "express";
 import { z } from "zod";
-import { validate } from "../../middlewares";
-import { authenticate, requireRole } from "../../middlewares/auth";
-import { publicLimiter } from "../../middlewares/rateLimiter";
+import { validate } from "../../common/middlewares";
+import { authenticate, requireRole } from "../../common/middlewares/auth";
+import { publicLimiter } from "../../common/middlewares/rateLimiter";
 import * as petsController from "./controller";
-import {
-  createPetSchema,
-  petIdSchema,
-  petQuerySchema,
-  updatePetSchema,
-} from "./types";
+import { createPetSchema, petIdSchema, petQuerySchema, updatePetSchema } from "./types";
 
 const router = Router();
 
@@ -23,24 +18,14 @@ const router = Router();
  * @desc    Get all pets with pagination
  * @access  Public
  */
-router.get(
-  "/",
-  publicLimiter,
-  validate(petQuerySchema, "query"),
-  petsController.getAllPets,
-);
+router.get("/", publicLimiter, validate(petQuerySchema, "query"), petsController.getAllPets);
 
 /**
  * @route   GET /api/pets/:petId
  * @desc    Get pet by ID
  * @access  Public
  */
-router.get(
-  "/:petId",
-  publicLimiter,
-  validate(petIdSchema, "params"),
-  petsController.getPetById,
-);
+router.get("/:petId", publicLimiter, validate(petIdSchema, "params"), petsController.getPetById);
 
 // ===================
 // CLIENT PET MANAGEMENT
@@ -58,12 +43,7 @@ router.get("/my-pets", authenticate, petsController.getMyPets);
  * @desc    Register my own pet
  * @access  Protected (CLIENT)
  */
-router.post(
-  "/my-pets",
-  authenticate,
-  validate(createPetSchema),
-  petsController.createMyPet,
-);
+router.post("/my-pets", authenticate, validate(createPetSchema), petsController.createMyPet);
 
 /**
  * @route   PATCH /api/pets/my-pets/:petId

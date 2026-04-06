@@ -1,12 +1,7 @@
 // JWT token utilities
 import jwt, { type SignOptions } from "jsonwebtoken";
-import { env } from "../../config/env.js";
-
-export interface JWTPayload {
-  userId: string;
-  email: string;
-  roles: string[];
-}
+import { env } from "../../config/env";
+import type { JWTPayload } from "../types";
 
 /**
  * Generate an access token
@@ -48,10 +43,10 @@ export function verifyAccessToken(token: string): JWTPayload {
     }) as JWTPayload;
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      throw new Error("TOKEN_EXPIRED");
+      throw new Error("TOKEN_EXPIRED", { cause: error });
     }
     if (error instanceof jwt.JsonWebTokenError) {
-      throw new Error("INVALID_TOKEN");
+      throw new Error("INVALID_TOKEN", { cause: error });
     }
     throw error;
   }
@@ -71,11 +66,21 @@ export function verifyRefreshToken(token: string): JWTPayload {
     }) as JWTPayload;
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      throw new Error("REFRESH_TOKEN_EXPIRED");
+      throw new Error("REFRESH_TOKEN_EXPIRED", { cause: error });
     }
     if (error instanceof jwt.JsonWebTokenError) {
-      throw new Error("INVALID_REFRESH_TOKEN");
+      throw new Error("INVALID_REFRESH_TOKEN", { cause: error });
     }
     throw error;
   }
+}
+
+/**
+ * Decode a JWT token without verification
+ * Useful for reading expired tokens or debugging
+ * @param token - JWT token to decode
+ * @returns Decoded payload or null if invalid format
+ */
+export function decodeToken(token: string): JWTPayload | null {
+  return jwt.decode(token) as JWTPayload | null;
 }

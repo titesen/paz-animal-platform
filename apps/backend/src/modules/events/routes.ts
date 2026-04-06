@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import { authenticate, requireVolunteerRole } from "../../middlewares/auth";
+import { authenticate, requireVolunteerRole } from "../../common/middlewares/auth";
 import * as controller from "./controller";
 
 const router = Router();
@@ -45,11 +45,7 @@ router.post("/:eventId/register", authenticate, controller.registerForEvent);
  * Cancel registration
  * DELETE /api/events/:eventId/register
  */
-router.delete(
-  "/:eventId/register",
-  authenticate,
-  controller.cancelRegistration,
-);
+router.delete("/:eventId/register", authenticate, controller.cancelRegistration);
 
 // ===================
 // EVENT_ORGANIZER ROUTES
@@ -60,12 +56,7 @@ router.delete(
  * POST /api/events
  * Requires: EVENT_ORGANIZER role
  */
-router.post(
-  "/",
-  authenticate,
-  requireVolunteerRole("EVENT_ORGANIZER"),
-  controller.createEvent,
-);
+router.post("/", authenticate, requireVolunteerRole("EVENT_ORGANIZER"), controller.createEvent);
 
 /**
  * Update event

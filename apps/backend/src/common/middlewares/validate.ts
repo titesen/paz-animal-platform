@@ -11,10 +11,7 @@ import type { ZodSchema } from "zod";
  * @param schema - Zod schema to validate against
  * @param source - Which part of the request to validate (body, query, params)
  */
-export function validate(
-  schema: ZodSchema,
-  source: "body" | "query" | "params" = "body",
-) {
+export function validate(schema: ZodSchema, source: "body" | "query" | "params" = "body") {
   return (req: Request, _res: Response, next: NextFunction): void => {
     try {
       const dataToValidate = req[source];

@@ -5,7 +5,7 @@
 
 import { Router } from "express";
 import multer from "multer";
-import { authenticate, requireRole, uploadLimiter } from "../../middlewares";
+import { authenticate, requireRole, uploadLimiter } from "../../common/middlewares";
 import * as controller from "./controller";
 
 const router = Router();
@@ -53,23 +53,13 @@ router.get("/entity/:entityType/:entityId", controller.getEntityMedia);
  * PATCH /api/media/:mediaId
  * Auth: Required (VOLUNTEER or ADMIN)
  */
-router.patch(
-  "/:mediaId",
-  authenticate,
-  requireRole("VOLUNTEER", "ADMIN"),
-  controller.updateMedia,
-);
+router.patch("/:mediaId", authenticate, requireRole("VOLUNTEER", "ADMIN"), controller.updateMedia);
 
 /**
  * Delete media
  * DELETE /api/media/:mediaId
  * Auth: Required (ADMIN only)
  */
-router.delete(
-  "/:mediaId",
-  authenticate,
-  requireRole("ADMIN"),
-  controller.deleteMedia,
-);
+router.delete("/:mediaId", authenticate, requireRole("ADMIN"), controller.deleteMedia);
 
 export default router;

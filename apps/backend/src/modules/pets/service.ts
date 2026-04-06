@@ -4,8 +4,8 @@
  */
 
 import { logger } from "../../config/logger";
-import { ForbiddenError, NotFoundError } from "../../types/errors";
-import { calculateTotalPages, parsePagination } from "../../utils/formatter";
+import { ForbiddenError, NotFoundError } from "../../common/types/errors";
+import { calculateTotalPages, parsePagination } from "../../common/utils/formatter";
 import * as petsRepo from "./repository";
 import type { CreatePetDTO, PetQueryParams, UpdatePetDTO } from "./types";
 
@@ -104,10 +104,7 @@ export async function deletePet(petId: string): Promise<void> {
 /**
  * Update pet status
  */
-export async function updatePetStatus(
-  petId: string,
-  status: string,
-): Promise<void> {
+export async function updatePetStatus(petId: string, status: string): Promise<void> {
   const pet = await petsRepo.findPetById(petId);
 
   if (!pet) {
@@ -116,18 +113,12 @@ export async function updatePetStatus(
 
   // Validate status transition
   if (pet.status === "DECEASED" && status !== "DECEASED") {
-    throw new ForbiddenError(
-      "Cannot change status of deceased pet",
-      "INVALID_STATUS_TRANSITION",
-    );
+    throw new ForbiddenError("Cannot change status of deceased pet", "INVALID_STATUS_TRANSITION");
   }
 
   await petsRepo.updatePetStatus(petId, status);
 
-  logger.info(
-    { petId, oldStatus: pet.status, newStatus: status },
-    "Pet status updated",
-  );
+  logger.info({ petId, oldStatus: pet.status, newStatus: status }, "Pet status updated");
 }
 
 /**
@@ -151,10 +142,7 @@ export async function createMyPet(userId: string, data: CreatePetDTO) {
     ownerId: userId,
   });
 
-  logger.info(
-    { petId: newPet.petId, name: newPet.name, ownerId: userId },
-    "Client pet registered",
-  );
+  logger.info({ petId: newPet.petId, name: newPet.name, ownerId: userId }, "Client pet registered");
 
   return newPet;
 }
@@ -162,11 +150,7 @@ export async function createMyPet(userId: string, data: CreatePetDTO) {
 /**
  * Update CLIENT's own pet
  */
-export async function updateMyPet(
-  userId: string,
-  petId: string,
-  data: UpdatePetDTO,
-) {
+export async function updateMyPet(userId: string, petId: string, data: UpdatePetDTO) {
   const existingPet = await petsRepo.findPetById(petId);
 
   if (!existingPet) {
@@ -175,10 +159,7 @@ export async function updateMyPet(
 
   // Validate ownership
   if (existingPet.ownerId !== userId) {
-    throw new ForbiddenError(
-      "You can only update your own pets",
-      "NOT_PET_OWNER",
-    );
+    throw new ForbiddenError("You can only update your own pets", "NOT_PET_OWNER");
   }
 
   const updateData = {
@@ -188,10 +169,7 @@ export async function updateMyPet(
 
   const updatedPet = await petsRepo.updatePet(petId, updateData);
 
-  logger.info(
-    { petId, ownerId: userId, updates: Object.keys(data) },
-    "Client pet updated",
-  );
+  logger.info({ petId, ownerId: userId, updates: Object.keys(data) }, "Client pet updated");
 
   return updatedPet;
 }
@@ -223,10 +201,7 @@ export async function createLostPetAlert(
 
   // Validate ownership
   if (pet.ownerId !== userId) {
-    throw new ForbiddenError(
-      "You can only create alerts for your own pets",
-      "NOT_PET_OWNER",
-    );
+    throw new ForbiddenError("You can only create alerts for your own pets", "NOT_PET_OWNER");
   }
 
   // Update pet status to LOST
@@ -263,10 +238,7 @@ export async function resolveLostPetAlert(userId: string, alertId: string) {
   const pet = await petsRepo.findPetById(alert.petId);
 
   if (!pet || pet.ownerId !== userId) {
-    throw new ForbiddenError(
-      "You can only resolve alerts for your own pets",
-      "NOT_PET_OWNER",
-    );
+    throw new ForbiddenError("You can only resolve alerts for your own pets", "NOT_PET_OWNER");
   }
 
   // Resolve alert
@@ -275,8 +247,5 @@ export async function resolveLostPetAlert(userId: string, alertId: string) {
   // Update pet status back to OWNED
   await petsRepo.updatePetStatus(alert.petId, "OWNED");
 
-  logger.info(
-    { alertId, petId: alert.petId, ownerId: userId },
-    "Lost pet alert resolved",
-  );
+  logger.info({ alertId, petId: alert.petId, ownerId: userId }, "Lost pet alert resolved");
 }

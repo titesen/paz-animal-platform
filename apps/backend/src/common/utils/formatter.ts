@@ -25,8 +25,7 @@ export function formatCurrency(
   currency: string = "ARS",
   locale: string = "es-AR",
 ): string {
-  const numericAmount =
-    typeof amount === "string" ? parseFloat(amount) : amount;
+  const numericAmount = typeof amount === "string" ? parseFloat(amount) : amount;
 
   return new Intl.NumberFormat(locale, {
     style: "currency",
@@ -56,11 +55,7 @@ export function formatFileSize(bytes: number): string {
  * @param suffix - Suffix to append (default: "...")
  * @returns Truncated text
  */
-export function truncateText(
-  text: string,
-  maxLength: number,
-  suffix: string = "...",
-): string {
+export function truncateText(text: string, maxLength: number, suffix: string = "..."): string {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength - suffix.length) + suffix;
 }

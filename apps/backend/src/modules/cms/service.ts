@@ -3,7 +3,7 @@
  * @description Business logic for content management (news, resources, sponsors, UI fragments)
  */
 
-import { NotFoundError, ValidationError } from "../../types/errors";
+import { NotFoundError, ValidationError } from "../../common/types/errors";
 import * as repository from "./repository";
 import type {
   CreateNewsDTO,
@@ -47,10 +47,7 @@ export async function createNews(
 ): Promise<NewsWithTranslations> {
   // Validate translations
   if (!data.translations || data.translations.length === 0) {
-    throw new ValidationError(
-      "At least one translation is required",
-      "MISSING_TRANSLATIONS",
-    );
+    throw new ValidationError("At least one translation is required", "MISSING_TRANSLATIONS");
   }
 
   const status = data.status || "DRAFT";
@@ -100,9 +97,7 @@ export async function getAllNews(): Promise<NewsWithTranslations[]> {
 /**
  * Get news by ID
  */
-export async function getNewsById(
-  newsId: string,
-): Promise<NewsWithTranslations> {
+export async function getNewsById(newsId: string): Promise<NewsWithTranslations> {
   const news = await repository.findNewsById(newsId);
   if (!news) {
     throw new NotFoundError("News article not found");
@@ -173,8 +168,7 @@ export async function updateNewsTranslation(
   if (data.excerpt !== undefined) updateData.excerpt = data.excerpt;
   if (data.content) updateData.content = data.content;
   if (data.metaTitle !== undefined) updateData.metaTitle = data.metaTitle;
-  if (data.metaDescription !== undefined)
-    updateData.metaDescription = data.metaDescription;
+  if (data.metaDescription !== undefined) updateData.metaDescription = data.metaDescription;
 
   await repository.updateNewsTranslation(newsId, language, updateData);
 }
@@ -204,10 +198,7 @@ export async function createResource(
 ): Promise<ResourceWithTranslations> {
   // Validate translations
   if (!data.translations || data.translations.length === 0) {
-    throw new ValidationError(
-      "At least one translation is required",
-      "MISSING_TRANSLATIONS",
-    );
+    throw new ValidationError("At least one translation is required", "MISSING_TRANSLATIONS");
   }
 
   const status = data.status || "DRAFT";
@@ -242,9 +233,7 @@ export async function createResource(
 /**
  * Get all published resources (public view)
  */
-export async function getAllPublishedResources(): Promise<
-  ResourceWithTranslations[]
-> {
+export async function getAllPublishedResources(): Promise<ResourceWithTranslations[]> {
   return await repository.findAllPublishedResources();
 }
 
@@ -258,9 +247,7 @@ export async function getAllResources(): Promise<ResourceWithTranslations[]> {
 /**
  * Get resource by ID
  */
-export async function getResourceById(
-  resourceId: string,
-): Promise<ResourceWithTranslations> {
+export async function getResourceById(resourceId: string): Promise<ResourceWithTranslations> {
   const resource = await repository.findResourceById(resourceId);
   if (!resource) {
     throw new NotFoundError("Resource not found");
@@ -303,9 +290,7 @@ export async function updateResourceTranslation(
     throw new NotFoundError("Resource not found");
   }
 
-  const translation = resource.translations.find(
-    (t) => t.language === language,
-  );
+  const translation = resource.translations.find((t) => t.language === language);
   if (!translation) {
     throw new NotFoundError("Translation not found");
   }
@@ -317,8 +302,7 @@ export async function updateResourceTranslation(
   }
   if (data.content) updateData.content = data.content;
   if (data.metaTitle !== undefined) updateData.metaTitle = data.metaTitle;
-  if (data.metaDescription !== undefined)
-    updateData.metaDescription = data.metaDescription;
+  if (data.metaDescription !== undefined) updateData.metaDescription = data.metaDescription;
 
   await repository.updateResourceTranslation(resourceId, language, updateData);
 }
@@ -380,10 +364,7 @@ export async function createSponsor(data: CreateSponsorDTO): Promise<Sponsor> {
 /**
  * Update sponsor
  */
-export async function updateSponsor(
-  sponsorId: string,
-  data: UpdateSponsorDTO,
-): Promise<Sponsor> {
+export async function updateSponsor(sponsorId: string, data: UpdateSponsorDTO): Promise<Sponsor> {
   const sponsor = await repository.findSponsorById(sponsorId);
   if (!sponsor) {
     throw new NotFoundError("Sponsor not found");
@@ -398,10 +379,8 @@ export async function updateSponsor(
   if (data.name) updateData.name = data.name;
   if (data.websiteUrl !== undefined) updateData.websiteUrl = data.websiteUrl;
   if (data.contactName !== undefined) updateData.contactName = data.contactName;
-  if (data.contactEmail !== undefined)
-    updateData.contactEmail = data.contactEmail;
-  if (data.contactPhone !== undefined)
-    updateData.contactPhone = data.contactPhone;
+  if (data.contactEmail !== undefined) updateData.contactEmail = data.contactEmail;
+  if (data.contactPhone !== undefined) updateData.contactPhone = data.contactPhone;
   if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;
 
   await repository.updateSponsor(sponsorId, updateData);
@@ -453,9 +432,7 @@ export async function getFragmentsBySection(
 /**
  * Get all fragments (admin view)
  */
-export async function getAllFragments(
-  language?: string,
-): Promise<UIFragment[]> {
+export async function getAllFragments(language?: string): Promise<UIFragment[]> {
   return await repository.findAllFragments(language);
 }
 
@@ -488,12 +465,7 @@ export async function updateFragmentContent(
   content: Record<string, any>,
   userId: string,
 ): Promise<UIFragment> {
-  const fragment = await repository.updateFragmentContent(
-    fragmentKey,
-    language,
-    content,
-    userId,
-  );
+  const fragment = await repository.updateFragmentContent(fragmentKey, language, content, userId);
 
   if (!fragment) {
     throw new NotFoundError("UI Fragment not found");

@@ -3,11 +3,7 @@
  * @description Business logic for events, registrations, and attendance
  */
 
-import {
-  ConflictError,
-  NotFoundError,
-  ValidationError,
-} from "../../types/errors";
+import { ConflictError, NotFoundError, ValidationError } from "../../common/types/errors";
 import * as repository from "./repository";
 import type {
   CheckInDTO,
@@ -34,30 +30,16 @@ export async function createEvent(
   // Validate event date is in the future
   const eventDate = new Date(data.eventDate);
   if (eventDate <= new Date()) {
-    throw new ValidationError(
-      "Event date must be in the future",
-      "INVALID_DATE",
-    );
+    throw new ValidationError("Event date must be in the future", "INVALID_DATE");
   }
 
   // Validate payment configuration
   if (data.isFree) {
-    if (
-      data.acceptsOnlinePayment ||
-      data.acceptsOnSitePayment ||
-      data.acceptsInKind
-    ) {
-      throw new ValidationError(
-        "Free events cannot accept payments",
-        "INVALID_PAYMENT_CONFIG",
-      );
+    if (data.acceptsOnlinePayment || data.acceptsOnSitePayment || data.acceptsInKind) {
+      throw new ValidationError("Free events cannot accept payments", "INVALID_PAYMENT_CONFIG");
     }
   } else {
-    if (
-      !data.acceptsOnlinePayment &&
-      !data.acceptsOnSitePayment &&
-      !data.acceptsInKind
-    ) {
+    if (!data.acceptsOnlinePayment && !data.acceptsOnSitePayment && !data.acceptsInKind) {
       throw new ValidationError(
         "Paid events must have at least one payment option",
         "INVALID_PAYMENT_CONFIG",
@@ -66,10 +48,7 @@ export async function createEvent(
   }
 
   // Validate virtual link for virtual/hybrid events
-  if (
-    (data.modality === "VIRTUAL" || data.modality === "HYBRID") &&
-    !data.virtualLink
-  ) {
+  if ((data.modality === "VIRTUAL" || data.modality === "HYBRID") && !data.virtualLink) {
     throw new ValidationError(
       "Virtual link is required for virtual/hybrid events",
       "MISSING_VIRTUAL_LINK",
@@ -78,10 +57,7 @@ export async function createEvent(
 
   // Validate translations
   if (!data.translations || data.translations.length === 0) {
-    throw new ValidationError(
-      "At least one translation is required",
-      "MISSING_TRANSLATIONS",
-    );
+    throw new ValidationError("At least one translation is required", "MISSING_TRANSLATIONS");
   }
 
   // Create event
@@ -157,10 +133,7 @@ export async function updateEvent(
   if (data.eventDate) {
     const eventDate = new Date(data.eventDate);
     if (eventDate <= new Date()) {
-      throw new ValidationError(
-        "Event date must be in the future",
-        "INVALID_DATE",
-      );
+      throw new ValidationError("Event date must be in the future", "INVALID_DATE");
     }
   }
 
@@ -184,16 +157,12 @@ export async function updateEvent(
   if (data.isFree !== undefined) updateData.isFree = data.isFree;
   if (data.acceptsOnlinePayment !== undefined)
     updateData.acceptsOnlinePayment = data.acceptsOnlinePayment;
-  if (data.onlinePrice !== undefined)
-    updateData.onlinePrice = data.onlinePrice?.toString();
+  if (data.onlinePrice !== undefined) updateData.onlinePrice = data.onlinePrice?.toString();
   if (data.acceptsOnSitePayment !== undefined)
     updateData.acceptsOnSitePayment = data.acceptsOnSitePayment;
-  if (data.onSitePrice !== undefined)
-    updateData.onSitePrice = data.onSitePrice?.toString();
-  if (data.acceptsInKind !== undefined)
-    updateData.acceptsInKind = data.acceptsInKind;
-  if (data.inKindDescription !== undefined)
-    updateData.inKindDescription = data.inKindDescription;
+  if (data.onSitePrice !== undefined) updateData.onSitePrice = data.onSitePrice?.toString();
+  if (data.acceptsInKind !== undefined) updateData.acceptsInKind = data.acceptsInKind;
+  if (data.inKindDescription !== undefined) updateData.inKindDescription = data.inKindDescription;
 
   await repository.updateEvent(eventId, updateData);
 
@@ -253,17 +222,11 @@ export async function registerForEvent(
 
   // Check if event date is in the future
   if (event.eventDate <= new Date()) {
-    throw new ValidationError(
-      "Cannot register for past events",
-      "EVENT_ALREADY_PASSED",
-    );
+    throw new ValidationError("Cannot register for past events", "EVENT_ALREADY_PASSED");
   }
 
   // Check if already registered
-  const existingRegistration = await repository.findRegistrationByUserAndEvent(
-    userId,
-    eventId,
-  );
+  const existingRegistration = await repository.findRegistrationByUserAndEvent(userId, eventId);
   if (existingRegistration) {
     throw new ConflictError("Already registered for this event");
   }
@@ -271,18 +234,12 @@ export async function registerForEvent(
   // Validate payment option
   const paymentOption = data.selectedPaymentOption;
   if (event.isFree && paymentOption !== "FREE") {
-    throw new ValidationError(
-      "This event is free, no payment required",
-      "INVALID_PAYMENT_OPTION",
-    );
+    throw new ValidationError("This event is free, no payment required", "INVALID_PAYMENT_OPTION");
   }
 
   if (!event.isFree) {
     if (paymentOption === "FREE") {
-      throw new ValidationError(
-        "This event requires payment",
-        "INVALID_PAYMENT_OPTION",
-      );
+      throw new ValidationError("This event requires payment", "INVALID_PAYMENT_OPTION");
     }
 
     if (paymentOption === "ONLINE_PAYMENT" && !event.acceptsOnlinePayment) {
@@ -332,9 +289,7 @@ export async function registerForEvent(
 /**
  * Get user's registrations
  */
-export async function getMyRegistrations(
-  _userId: string,
-): Promise<EventWithTranslations[]> {
+export async function getMyRegistrations(_userId: string): Promise<EventWithTranslations[]> {
   // This would need a new repository method to join events with registrations
   // For now, return empty array
   return [];
@@ -343,9 +298,7 @@ export async function getMyRegistrations(
 /**
  * Get all registrations for an event
  */
-export async function getEventRegistrations(
-  eventId: string,
-): Promise<EventRegistrationWithUser[]> {
+export async function getEventRegistrations(eventId: string): Promise<EventRegistrationWithUser[]> {
   const event = await repository.findEventById(eventId);
   if (!event) {
     throw new NotFoundError("Event not found");
@@ -360,14 +313,8 @@ export async function getEventRegistrations(
 /**
  * Cancel user's registration
  */
-export async function cancelRegistration(
-  userId: string,
-  eventId: string,
-): Promise<void> {
-  const registration = await repository.findRegistrationByUserAndEvent(
-    userId,
-    eventId,
-  );
+export async function cancelRegistration(userId: string, eventId: string): Promise<void> {
+  const registration = await repository.findRegistrationByUserAndEvent(userId, eventId);
   if (!registration) {
     throw new NotFoundError("Registration not found");
   }
@@ -393,15 +340,9 @@ export async function checkInUser(
   }
 
   // Check if user is registered
-  const registration = await repository.findRegistrationByUserAndEvent(
-    data.userId,
-    eventId,
-  );
+  const registration = await repository.findRegistrationByUserAndEvent(data.userId, eventId);
   if (!registration) {
-    throw new ValidationError(
-      "User is not registered for this event",
-      "NOT_REGISTERED",
-    );
+    throw new ValidationError("User is not registered for this event", "NOT_REGISTERED");
   }
 
   // Check if already checked in

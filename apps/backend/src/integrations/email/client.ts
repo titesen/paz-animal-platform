@@ -4,8 +4,8 @@
  */
 
 import { logger } from "../../config/logger";
-import type { EmailPayload } from "../../types";
-import { ServiceUnavailableError } from "../../types/errors";
+import type { EmailPayload } from "../../common/types";
+import { ServiceUnavailableError } from "../../common/types/errors";
 
 /**
  * Send email using configured provider
@@ -19,10 +19,7 @@ export async function sendEmail(payload: EmailPayload): Promise<void> {
     "Sending email",
   );
 
-  throw new ServiceUnavailableError(
-    "Email service not yet implemented",
-    "EMAIL_NOT_IMPLEMENTED",
-  );
+  throw new ServiceUnavailableError("Email service not yet implemented", "EMAIL_NOT_IMPLEMENTED");
 
   // Example with Nodemailer:
   // const nodemailer = require('nodemailer');
@@ -50,10 +47,7 @@ export async function sendEmail(payload: EmailPayload): Promise<void> {
 /**
  * Send welcome email to new user
  */
-export async function sendWelcomeEmail(
-  email: string,
-  firstName: string,
-): Promise<void> {
+export async function sendWelcomeEmail(email: string, firstName: string): Promise<void> {
   await sendEmail({
     to: email,
     subject: "Welcome to Paz Animal!",
@@ -65,10 +59,7 @@ export async function sendWelcomeEmail(
 /**
  * Send adoption confirmation email
  */
-export async function sendAdoptionConfirmationEmail(
-  email: string,
-  petName: string,
-): Promise<void> {
+export async function sendAdoptionConfirmationEmail(email: string, petName: string): Promise<void> {
   await sendEmail({
     to: email,
     subject: `Your adoption application for ${petName}`,

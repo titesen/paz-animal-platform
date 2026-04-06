@@ -4,8 +4,8 @@
  */
 
 import { logger } from "../../config/logger";
-import type { MercadoPagoPreference } from "../../types";
-import { ServiceUnavailableError } from "../../types/errors";
+import type { MercadoPagoPreference } from "../../common/types";
+import { ServiceUnavailableError } from "../../common/types/errors";
 
 /**
  * Create a payment preference in Mercado Pago
@@ -57,16 +57,11 @@ export async function createPaymentPreference(data: {
  * Implement proper HMAC-SHA256 signature verification using MP secret.
  * See: https://www.mercadopago.com/developers/en/docs/your-integrations/notifications/webhooks
  */
-export function verifyWebhookSignature(
-  _payload: string,
-  _signature: string,
-): boolean {
+export function verifyWebhookSignature(_payload: string, _signature: string): boolean {
   // TODO: Implement signature verification
   // This is critical for security to prevent fake payment notifications
 
-  logger.warn(
-    "⚠️  Mercado Pago webhook signature verification STUB - DO NOT USE IN PRODUCTION",
-  );
+  logger.warn("⚠️  Mercado Pago webhook signature verification STUB - DO NOT USE IN PRODUCTION");
 
   return true; // ⚠️ PLACEHOLDER - SECURITY RISK - NEVER use in production without verification
 }

@@ -4,7 +4,7 @@
  */
 
 import type { Request } from "express";
-import type * as schema from "../db/schema";
+import type * as schema from "../../db/schema";
 
 /**
  * JSend Response Envelope (Standard API Response Format)
@@ -27,10 +27,7 @@ export type JSendFail = {
   data: Record<string, unknown>;
 };
 
-export type JSendResponse<T = unknown> =
-  | JSendSuccess<T>
-  | JSendError
-  | JSendFail;
+export type JSendResponse<T = unknown> = JSendSuccess<T> | JSendError | JSendFail;
 
 /**
  * Authenticated Request
@@ -76,10 +73,8 @@ export type NewUser = typeof schema.users.$inferInsert;
 export type Pet = typeof schema.pets.$inferSelect;
 export type NewPet = typeof schema.pets.$inferInsert;
 
-export type AdoptionApplication =
-  typeof schema.adoptionApplications.$inferSelect;
-export type NewAdoptionApplication =
-  typeof schema.adoptionApplications.$inferInsert;
+export type AdoptionApplication = typeof schema.adoptionApplications.$inferSelect;
+export type NewAdoptionApplication = typeof schema.adoptionApplications.$inferInsert;
 
 export type Event = typeof schema.events.$inferSelect;
 export type NewEvent = typeof schema.events.$inferInsert;

@@ -6,14 +6,10 @@
 import { eq } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { env } from "../config/env";
-import { db } from "../db";
-import {
-  volunteerRoles,
-  volunteers,
-  volunteersVolunteerRoles,
-} from "../db/schema";
-import { isTokenBlacklisted } from "../shared/utils/tokenBlacklist";
+import { env } from "../../config/env";
+import { db } from "../../db";
+import { volunteerRoles, volunteers, volunteersVolunteerRoles } from "../../db/schema";
+import { isTokenBlacklisted } from "../utils/tokenBlacklist";
 import type { AuthenticatedRequest, JWTPayload } from "../types";
 import { ForbiddenError, UnauthorizedError } from "../types/errors";
 
@@ -22,11 +18,7 @@ import { ForbiddenError, UnauthorizedError } from "../types/errors";
  * Checks token blacklist (Redis) for revoked tokens
  * Usage: Apply to protected routes that require authentication
  */
-export function authenticate(
-  req: Request,
-  _res: Response,
-  next: NextFunction,
-): void {
+export function authenticate(req: Request, _res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -74,11 +66,7 @@ export function authenticate(
  * Optional authentication - doesn't fail if no token provided
  * Useful for endpoints that work differently for authenticated vs anonymous users
  */
-export function optionalAuthenticate(
-  req: Request,
-  _res: Response,
-  next: NextFunction,
-): void {
+export function optionalAuthenticate(req: Request, _res: Response, next: NextFunction): void {
   try {
     const authHeader = req.headers.authorization;
 
@@ -98,7 +86,7 @@ export function optionalAuthenticate(
     };
 
     next();
-  } catch (error) {
+  } catch {
     // Invalid token - continue as anonymous (don't throw error)
     next();
   }
@@ -117,14 +105,10 @@ export function requireRole(...allowedRoles: string[]) {
       throw new UnauthorizedError("Authentication required");
     }
 
-    const hasRole = authReq.user.roles.some((role) =>
-      allowedRoles.includes(role),
-    );
+    const hasRole = authReq.user.roles.some((role) => allowedRoles.includes(role));
 
     if (!hasRole) {
-      throw new ForbiddenError(
-        `Access denied. Required roles: ${allowedRoles.join(" or ")}`,
-      );
+      throw new ForbiddenError(`Access denied. Required roles: ${allowedRoles.join(" or ")}`);
     }
 
     next();
@@ -149,14 +133,10 @@ export function requireAllRoles(...requiredRoles: string[]) {
       throw new UnauthorizedError("Authentication required");
     }
 
-    const hasAllRoles = requiredRoles.every((role) =>
-      authReq.user.roles.includes(role),
-    );
+    const hasAllRoles = requiredRoles.every((role) => authReq.user.roles.includes(role));
 
     if (!hasAllRoles) {
-      throw new ForbiddenError(
-        `Access denied. Required all roles: ${requiredRoles.join(", ")}`,
-      );
+      throw new ForbiddenError(`Access denied. Required all roles: ${requiredRoles.join(", ")}`);
     }
 
     next();
@@ -168,9 +148,7 @@ export function requireAllRoles(...requiredRoles: string[]) {
  * Useful for endpoints like "update own profile" or "delete own comment"
  * @param getUserIdFromRequest - Function to extract resource owner ID from request
  */
-export function requireOwnership(
-  getUserIdFromRequest: (req: Request) => string,
-) {
+export function requireOwnership(getUserIdFromRequest: (req: Request) => string) {
   return (req: Request, _res: Response, next: NextFunction): void => {
     const authReq = req as AuthenticatedRequest;
 
@@ -201,11 +179,7 @@ export function requireOwnership(
  * @example requireVolunteerRole('CONTENT_MANAGER', 'EVENT_ORGANIZER')
  */
 export function requireVolunteerRole(...requiredRoles: string[]) {
-  return async (
-    req: Request,
-    _res: Response,
-    next: NextFunction,
-  ): Promise<void> => {
+  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
       const authReq = req as AuthenticatedRequest;
 
@@ -227,9 +201,7 @@ export function requireVolunteerRole(...requiredRoles: string[]) {
         .limit(1);
 
       if (!volunteer.length) {
-        throw new ForbiddenError(
-          "You must be a registered volunteer to access this resource",
-        );
+        throw new ForbiddenError("You must be a registered volunteer to access this resource");
       }
 
       // Get volunteer's assigned roles
@@ -238,20 +210,13 @@ export function requireVolunteerRole(...requiredRoles: string[]) {
           roleName: volunteerRoles.name,
         })
         .from(volunteersVolunteerRoles)
-        .innerJoin(
-          volunteerRoles,
-          eq(volunteersVolunteerRoles.roleId, volunteerRoles.roleId),
-        )
-        .where(
-          eq(volunteersVolunteerRoles.volunteerId, volunteer[0].volunteerId),
-        );
+        .innerJoin(volunteerRoles, eq(volunteersVolunteerRoles.roleId, volunteerRoles.roleId))
+        .where(eq(volunteersVolunteerRoles.volunteerId, volunteer[0].volunteerId));
 
       const volunteerRoleNames = volunteerRolesList.map((t) => t.roleName);
 
       // Check if volunteer has at least one required role
-      const hasRequiredRole = requiredRoles.some((role) =>
-        volunteerRoleNames.includes(role),
-      );
+      const hasRequiredRole = requiredRoles.some((role) => volunteerRoleNames.includes(role));
 
       if (!hasRequiredRole) {
         throw new ForbiddenError(

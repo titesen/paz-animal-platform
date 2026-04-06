@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import { authenticate, requireVolunteerRole } from "../../middlewares/auth";
+import { authenticate, requireVolunteerRole } from "../../common/middlewares/auth";
 import * as cmsController from "./controller";
 
 const router = Router();

@@ -12,11 +12,7 @@ export class AppError extends Error {
   public readonly code: string;
   public readonly isOperational: boolean;
 
-  constructor(
-    message: string,
-    statusCode: number = 500,
-    code: string = "INTERNAL_ERROR",
-  ) {
+  constructor(message: string, statusCode: number = 500, code: string = "INTERNAL_ERROR") {
     super(message);
     this.statusCode = statusCode;
     this.code = code;
@@ -62,10 +58,7 @@ export class ForbiddenError extends AppError {
  * 404 Not Found - Resource doesn't exist
  */
 export class NotFoundError extends AppError {
-  constructor(
-    message: string = "Resource not found",
-    code: string = "NOT_FOUND",
-  ) {
+  constructor(message: string = "Resource not found", code: string = "NOT_FOUND") {
     super(message, 404, code);
     Object.setPrototypeOf(this, NotFoundError.prototype);
   }
@@ -75,10 +68,7 @@ export class NotFoundError extends AppError {
  * 409 Conflict - Resource conflict (e.g., duplicate email)
  */
 export class ConflictError extends AppError {
-  constructor(
-    message: string = "Resource conflict",
-    code: string = "CONFLICT",
-  ) {
+  constructor(message: string = "Resource conflict", code: string = "CONFLICT") {
     super(message, 409, code);
     Object.setPrototypeOf(this, ConflictError.prototype);
   }
@@ -102,10 +92,7 @@ export class ValidationError extends AppError {
  * 429 Too Many Requests - Rate limit exceeded
  */
 export class RateLimitError extends AppError {
-  constructor(
-    message: string = "Too many requests",
-    code: string = "RATE_LIMIT_EXCEEDED",
-  ) {
+  constructor(message: string = "Too many requests", code: string = "RATE_LIMIT_EXCEEDED") {
     super(message, 429, code);
     Object.setPrototypeOf(this, RateLimitError.prototype);
   }
@@ -115,10 +102,7 @@ export class RateLimitError extends AppError {
  * 500 Internal Server Error - Unexpected server error
  */
 export class InternalError extends AppError {
-  constructor(
-    message: string = "Internal server error",
-    code: string = "INTERNAL_ERROR",
-  ) {
+  constructor(message: string = "Internal server error", code: string = "INTERNAL_ERROR") {
     super(message, 500, code);
     Object.setPrototypeOf(this, InternalError.prototype);
   }
@@ -128,10 +112,7 @@ export class InternalError extends AppError {
  * 503 Service Unavailable - External dependency failure
  */
 export class ServiceUnavailableError extends AppError {
-  constructor(
-    message: string = "Service unavailable",
-    code: string = "SERVICE_UNAVAILABLE",
-  ) {
+  constructor(message: string = "Service unavailable", code: string = "SERVICE_UNAVAILABLE") {
     super(message, 503, code);
     Object.setPrototypeOf(this, ServiceUnavailableError.prototype);
   }

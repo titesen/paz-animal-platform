@@ -7,17 +7,13 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
-import type { NewUser } from "../../types";
+import type { NewUser } from "../../common/types";
 
 /**
  * Find user by email
  */
 export async function findUserByEmail(email: string) {
-  const result = await db
-    .select()
-    .from(schema.users)
-    .where(eq(schema.users.email, email))
-    .limit(1);
+  const result = await db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1);
 
   return result[0] || null;
 }
@@ -62,16 +58,9 @@ export async function getUserRoles(userId: string): Promise<string[]> {
 /**
  * Assign role to user
  */
-export async function assignRoleToUser(
-  userId: string,
-  roleName: string,
-): Promise<void> {
+export async function assignRoleToUser(userId: string, roleName: string): Promise<void> {
   // First, find the role ID
-  const role = await db
-    .select()
-    .from(schema.roles)
-    .where(eq(schema.roles.name, roleName))
-    .limit(1);
+  const role = await db.select().from(schema.roles).where(eq(schema.roles.name, roleName)).limit(1);
 
   if (!role[0]) {
     throw new Error(`Role ${roleName} not found`);
@@ -90,10 +79,7 @@ export async function assignRoleToUser(
 /**
  * Update user password
  */
-export async function updateUserPassword(
-  userId: string,
-  passwordHash: string,
-): Promise<void> {
+export async function updateUserPassword(userId: string, passwordHash: string): Promise<void> {
   await db
     .update(schema.users)
     .set({

@@ -4,11 +4,7 @@
  */
 
 export { asyncHandler } from "./asyncHandler";
-export {
-  comparePassword,
-  generateSecureToken,
-  hashPassword,
-} from "./encryption";
+export { comparePassword, generateSecureToken, hashPassword } from "./password.util";
 export {
   calculateTotalPages,
   formatCurrency,
@@ -23,8 +19,9 @@ export {
   decodeToken,
   generateAccessToken,
   generateRefreshToken,
-  verifyToken,
-} from "./jwt";
+  verifyAccessToken,
+  verifyRefreshToken,
+} from "./jwt.util";
 export {
   generateEventQRCode,
   generatePetQRCode,

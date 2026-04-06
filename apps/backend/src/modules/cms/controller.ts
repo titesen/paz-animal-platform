@@ -4,8 +4,8 @@
  */
 
 import type { Response } from "express";
-import type { AuthenticatedRequest } from "../../types";
-import { asyncHandler } from "../../utils";
+import type { AuthenticatedRequest } from "../../common/types";
+import { asyncHandler } from "../../common/utils";
 import * as service from "./service";
 import type {
   CreateNewsDTO,
@@ -79,17 +79,15 @@ export const getNewsBySlug = asyncHandler(async (req, res: Response) => {
  * POST /api/cms/news
  * Create news article
  */
-export const createNews = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const authorId = req.user.userId;
-    const data = req.body as CreateNewsDTO;
-    const news = await service.createNews(authorId, data);
-    res.status(201).json({
-      status: "success",
-      data: { news },
-    });
-  },
-);
+export const createNews = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const authorId = req.user.userId;
+  const data = req.body as CreateNewsDTO;
+  const news = await service.createNews(authorId, data);
+  res.status(201).json({
+    status: "success",
+    data: { news },
+  });
+});
 
 /**
  * PUT /api/cms/news/:newsId
@@ -109,17 +107,15 @@ export const updateNews = asyncHandler(async (req, res: Response) => {
  * PUT /api/cms/news/:newsId/translations/:language
  * Update news translation
  */
-export const updateNewsTranslation = asyncHandler(
-  async (req, res: Response) => {
-    const { newsId, language } = req.params;
-    const data = req.body as UpdateNewsTranslationDTO;
-    await service.updateNewsTranslation(newsId, language, data);
-    res.json({
-      status: "success",
-      message: "Translation updated successfully",
-    });
-  },
-);
+export const updateNewsTranslation = asyncHandler(async (req, res: Response) => {
+  const { newsId, language } = req.params;
+  const data = req.body as UpdateNewsTranslationDTO;
+  await service.updateNewsTranslation(newsId, language, data);
+  res.json({
+    status: "success",
+    message: "Translation updated successfully",
+  });
+});
 
 /**
  * DELETE /api/cms/news/:newsId
@@ -142,15 +138,13 @@ export const deleteNews = asyncHandler(async (req, res: Response) => {
  * GET /api/cms/resources
  * Get all published resources (public)
  */
-export const getAllPublishedResources = asyncHandler(
-  async (_req, res: Response) => {
-    const resources = await service.getAllPublishedResources();
-    res.json({
-      status: "success",
-      data: { resources },
-    });
-  },
-);
+export const getAllPublishedResources = asyncHandler(async (_req, res: Response) => {
+  const resources = await service.getAllPublishedResources();
+  res.json({
+    status: "success",
+    data: { resources },
+  });
+});
 
 /**
  * GET /api/cms/resources/all
@@ -181,17 +175,15 @@ export const getResourceById = asyncHandler(async (req, res: Response) => {
  * POST /api/cms/resources
  * Create resource
  */
-export const createResource = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const authorId = req.user.userId;
-    const data = req.body as CreateResourceDTO;
-    const resource = await service.createResource(authorId, data);
-    res.status(201).json({
-      status: "success",
-      data: { resource },
-    });
-  },
-);
+export const createResource = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const authorId = req.user.userId;
+  const data = req.body as CreateResourceDTO;
+  const resource = await service.createResource(authorId, data);
+  res.status(201).json({
+    status: "success",
+    data: { resource },
+  });
+});
 
 /**
  * PUT /api/cms/resources/:resourceId
@@ -211,17 +203,15 @@ export const updateResource = asyncHandler(async (req, res: Response) => {
  * PUT /api/cms/resources/:resourceId/translations/:language
  * Update resource translation
  */
-export const updateResourceTranslation = asyncHandler(
-  async (req, res: Response) => {
-    const { resourceId, language } = req.params;
-    const data = req.body as UpdateResourceTranslationDTO;
-    await service.updateResourceTranslation(resourceId, language, data);
-    res.json({
-      status: "success",
-      message: "Translation updated successfully",
-    });
-  },
-);
+export const updateResourceTranslation = asyncHandler(async (req, res: Response) => {
+  const { resourceId, language } = req.params;
+  const data = req.body as UpdateResourceTranslationDTO;
+  await service.updateResourceTranslation(resourceId, language, data);
+  res.json({
+    status: "success",
+    message: "Translation updated successfully",
+  });
+});
 
 /**
  * DELETE /api/cms/resources/:resourceId
@@ -327,20 +317,15 @@ export const getFragmentByKey = asyncHandler(async (req, res: Response) => {
  * GET /api/cms/fragments/section/:section
  * Get fragments by section
  */
-export const getFragmentsBySection = asyncHandler(
-  async (req, res: Response) => {
-    const { section } = req.params;
-    const { lang = "es" } = req.query;
-    const fragments = await service.getFragmentsBySection(
-      section as UISection,
-      lang as string,
-    );
-    res.json({
-      status: "success",
-      data: { fragments },
-    });
-  },
-);
+export const getFragmentsBySection = asyncHandler(async (req, res: Response) => {
+  const { section } = req.params;
+  const { lang = "es" } = req.query;
+  const fragments = await service.getFragmentsBySection(section as UISection, lang as string);
+  res.json({
+    status: "success",
+    data: { fragments },
+  });
+});
 
 /**
  * GET /api/cms/fragments
@@ -359,17 +344,15 @@ export const getAllFragments = asyncHandler(async (req, res: Response) => {
  * PUT /api/cms/fragments/:fragmentKey
  * Create or update fragment
  */
-export const upsertFragment = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user.userId;
-    const data = req.body as CreateUIFragmentDTO;
-    const fragment = await service.upsertFragment(data, userId);
-    res.json({
-      status: "success",
-      data: { fragment },
-    });
-  },
-);
+export const upsertFragment = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user.userId;
+  const data = req.body as CreateUIFragmentDTO;
+  const fragment = await service.upsertFragment(data, userId);
+  res.json({
+    status: "success",
+    data: { fragment },
+  });
+});
 
 /**
  * PATCH /api/cms/fragments/:fragmentKey/content
@@ -380,12 +363,7 @@ export const updateFragmentContent = asyncHandler(
     const userId = req.user.userId;
     const { fragmentKey } = req.params;
     const { lang = "es", content } = req.body;
-    const fragment = await service.updateFragmentContent(
-      fragmentKey,
-      lang,
-      content,
-      userId,
-    );
+    const fragment = await service.updateFragmentContent(fragmentKey, lang, content, userId);
     res.json({
       status: "success",
       data: { fragment },

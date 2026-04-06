@@ -8,7 +8,7 @@ import { env } from "./config/env";
 import { logger } from "./config/logger";
 import { swaggerSpec } from "./config/swagger.config";
 import { pool } from "./db";
-import { apiLimiter, errorHandler, notFoundHandler } from "./middlewares";
+import { apiLimiter, errorHandler, notFoundHandler } from "./common/middlewares";
 
 // Import module routes
 import adoptionsRoutes from "./modules/adoptions/routes";
@@ -91,8 +91,7 @@ app.get("/health", async (_req, res) => {
       usage: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
       total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
       percentage: Math.round(
-        (process.memoryUsage().heapUsed / process.memoryUsage().heapTotal) *
-          100,
+        (process.memoryUsage().heapUsed / process.memoryUsage().heapTotal) * 100,
       ),
     },
   };

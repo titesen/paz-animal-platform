@@ -26,8 +26,7 @@ export function isValidCUIT(cuit: string): boolean {
   }
 
   const checkDigit = 11 - (sum % 11);
-  const expectedDigit =
-    checkDigit === 11 ? 0 : checkDigit === 10 ? 9 : checkDigit;
+  const expectedDigit = checkDigit === 11 ? 0 : checkDigit === 10 ? 9 : checkDigit;
 
   return parseInt(cleanCuit[10]) === expectedDigit;
 }
@@ -60,10 +59,7 @@ export function isValidPhone(phone: string): boolean {
  * @param allowedTypes - Array of allowed MIME types
  * @throws BadRequestError if MIME type not allowed
  */
-export function validateMimeType(
-  mimetype: string,
-  allowedTypes: string[],
-): void {
+export function validateMimeType(mimetype: string, allowedTypes: string[]): void {
   if (!allowedTypes.includes(mimetype)) {
     throw new BadRequestError(
       `Invalid file type. Allowed: ${allowedTypes.join(", ")}`,
@@ -81,10 +77,7 @@ export function validateMimeType(
 export function validateFileSize(size: number, maxSize: number): void {
   if (size > maxSize) {
     const maxSizeMB = (maxSize / (1024 * 1024)).toFixed(2);
-    throw new BadRequestError(
-      `File too large. Maximum size: ${maxSizeMB} MB`,
-      "FILE_TOO_LARGE",
-    );
+    throw new BadRequestError(`File too large. Maximum size: ${maxSizeMB} MB`, "FILE_TOO_LARGE");
   }
 }
 
@@ -108,18 +101,12 @@ export function validateFutureDate(date: Date | string): void {
  * @param endDate - End date
  * @throws BadRequestError if end date is before start date
  */
-export function validateDateRange(
-  startDate: Date | string,
-  endDate: Date | string,
-): void {
+export function validateDateRange(startDate: Date | string, endDate: Date | string): void {
   const start = typeof startDate === "string" ? new Date(startDate) : startDate;
   const end = typeof endDate === "string" ? new Date(endDate) : endDate;
 
   if (end <= start) {
-    throw new BadRequestError(
-      "End date must be after start date",
-      "INVALID_DATE_RANGE",
-    );
+    throw new BadRequestError("End date must be after start date", "INVALID_DATE_RANGE");
   }
 }
 
@@ -129,10 +116,7 @@ export function validateDateRange(
  * @param minAge - Minimum required age
  * @throws BadRequestError if user is underage
  */
-export function validateMinimumAge(
-  birthDate: Date | string,
-  minAge: number = 18,
-): void {
+export function validateMinimumAge(birthDate: Date | string, minAge: number = 18): void {
   const birth = typeof birthDate === "string" ? new Date(birthDate) : birthDate;
   const today = new Date();
   let age = today.getFullYear() - birth.getFullYear();
@@ -143,10 +127,7 @@ export function validateMinimumAge(
   }
 
   if (age < minAge) {
-    throw new BadRequestError(
-      `You must be at least ${minAge} years old`,
-      "MINIMUM_AGE_NOT_MET",
-    );
+    throw new BadRequestError(`You must be at least ${minAge} years old`, "MINIMUM_AGE_NOT_MET");
   }
 }
 
@@ -156,8 +137,7 @@ export function validateMinimumAge(
  * @returns True if valid UUID v4
  */
 export function isValidUUID(uuid: string): boolean {
-  const uuidRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
 }
 
@@ -188,7 +168,7 @@ export function validatePasswordStrength(password: string): {
     errors.push("Password must contain at least one number");
   }
 
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+  if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
     errors.push("Password must contain at least one special character");
   }
 

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { env } from "../../config/env";
 import { logger } from "../../config/logger";
-import { hashPassword } from "../../shared/utils/password.util";
+import { hashPassword } from "../../common/utils/password.util";
 import { db, pool } from "../index";
 import * as schema from "../schema";
 
@@ -40,9 +40,7 @@ async function seedProduction() {
     }
 
     // Hash password (fallback only allowed in non-production)
-    const adminPasswordHash = await hashPassword(
-      env.ADMIN_DEFAULT_PASSWORD || "Admin123!",
-    );
+    const adminPasswordHash = await hashPassword(env.ADMIN_DEFAULT_PASSWORD || "Admin123!");
 
     // Create or update admin user
     const [adminUser] = await db
@@ -76,9 +74,7 @@ async function seedProduction() {
       .then((r) => r[0]);
 
     if (!adminRole) {
-      throw new Error(
-        "ADMIN role not found. Ensure master-data.seed.ts ran successfully.",
-      );
+      throw new Error("ADMIN role not found. Ensure master-data.seed.ts ran successfully.");
     }
 
     await db
@@ -89,9 +85,7 @@ async function seedProduction() {
     logger.info(`✅ Admin user created: ${adminUser.email}`);
 
     if (env.NODE_ENV !== "production") {
-      logger.warn(
-        "⚠️  Default password used. Change it immediately via admin panel!",
-      );
+      logger.warn("⚠️  Default password used. Change it immediately via admin panel!");
     }
 
     logger.info("✅ Production seeding completed successfully!");
