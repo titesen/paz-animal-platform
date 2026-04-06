@@ -20,6 +20,7 @@ import {
 import * as authRepo from "./auth.repository";
 import type { GoogleOAuthDTO, LoginDTO, RefreshTokenDTO, RegisterDTO } from "./auth.dto";
 import type { AuthResponse } from "./auth.types";
+import type { NewUser } from "../../common/types";
 
 /**
  * Register a new user
@@ -225,4 +226,27 @@ export async function getCurrentUser(userId: string) {
     roles,
     createdAt: user.createdAt,
   };
+}
+
+// ===== INTER-MODULE API =====
+
+/**
+ * Find user by email (exposed for cross-module use)
+ */
+export async function findUserByEmail(email: string) {
+  return authRepo.findUserByEmail(email);
+}
+
+/**
+ * Create a user account (exposed for cross-module use, e.g. volunteer promotion)
+ */
+export async function createUser(userData: NewUser) {
+  return authRepo.createUser(userData);
+}
+
+/**
+ * Assign a role to a user (exposed for cross-module use)
+ */
+export async function assignRoleToUser(userId: string, roleName: string): Promise<void> {
+  return authRepo.assignRoleToUser(userId, roleName);
 }

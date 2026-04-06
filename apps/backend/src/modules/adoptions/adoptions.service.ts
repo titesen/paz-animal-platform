@@ -4,7 +4,8 @@
  */
 
 import { logger } from "../../config/logger";
-import { ForbiddenError, NotFoundError } from "../../common/types/errors";
+import { ForbiddenError, NotFoundError, ValidationError } from "../../common/types/errors";
+import * as petsService from "../pets/pets.service";
 import * as adoptionsRepo from "./adoptions.repository";
 import type { CreateAdoptionApplicationDTO } from "./adoptions.dto";
 
@@ -12,7 +13,13 @@ export async function createAdoptionApplication(
   userId: string,
   data: CreateAdoptionApplicationDTO,
 ) {
-  // TODO: Validate pet exists and is available for adoption
+  const pet = await petsService.getPetById(data.petId);
+
+  if (pet.status !== "ADOPTION_AVAILABLE") {
+    throw new ValidationError("Pet is not available for adoption", "PET_NOT_AVAILABLE", {
+      petId: [`Pet is currently ${pet.status}`],
+    });
+  }
 
   const application = await adoptionsRepo.createAdoptionApplication({
     clientId: userId,
