@@ -7,12 +7,12 @@ import type { Response } from "express";
 import type { AuthenticatedRequest } from "../../common/types";
 import { asyncHandler } from "../../common/utils";
 import * as service from "./volunteers.service";
-import {
-  assignTagSchema,
-  createVolunteerApplicationSchema,
-  createVolunteerSchema,
-  updateApplicationStatusSchema,
-  updateVolunteerSchema,
+import type {
+  AssignTagDTO,
+  CreateVolunteerApplicationDTO,
+  CreateVolunteerDTO,
+  UpdateApplicationStatusDTO,
+  UpdateVolunteerDTO,
 } from "./volunteers.dto";
 
 // ===== VOLUNTEER APPLICATIONS =====
@@ -23,7 +23,7 @@ import {
  */
 export const createVolunteerApplication = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const data = createVolunteerApplicationSchema.parse(req.body);
+    const data = req.body as CreateVolunteerApplicationDTO;
     const application = await service.createVolunteerApplication(data);
 
     res.status(201).json({
@@ -73,7 +73,7 @@ export const getApplicationById = asyncHandler(async (req: AuthenticatedRequest,
 export const updateApplicationStatus = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const { applicationId } = req.params;
-    const data = updateApplicationStatusSchema.parse(req.body);
+    const data = req.body as UpdateApplicationStatusDTO;
 
     const application = await service.updateApplicationStatus(applicationId, data);
 
@@ -90,7 +90,7 @@ export const updateApplicationStatus = asyncHandler(
  */
 export const promoteToVolunteer = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const { applicationId } = req.params;
-  const data = createVolunteerSchema.parse(req.body);
+  const data = req.body as CreateVolunteerDTO;
 
   const volunteer = await service.promoteToVolunteer(applicationId, data);
 
@@ -148,7 +148,7 @@ export const getMyProfile = asyncHandler(async (req: AuthenticatedRequest, res: 
  */
 export const updateVolunteer = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const { volunteerId } = req.params;
-  const data = updateVolunteerSchema.parse(req.body);
+  const data = req.body as UpdateVolunteerDTO;
 
   const volunteer = await service.updateVolunteer(volunteerId, data);
 
@@ -176,7 +176,7 @@ export const deleteVolunteer = asyncHandler(async (req: AuthenticatedRequest, re
  */
 export const assignTag = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const { volunteerId } = req.params;
-  const data = assignTagSchema.parse(req.body);
+  const data = req.body as AssignTagDTO;
 
   const result = await service.assignTag(volunteerId, data);
 

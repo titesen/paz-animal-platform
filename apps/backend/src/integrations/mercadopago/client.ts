@@ -8,7 +8,7 @@ import crypto from "node:crypto";
 import { env } from "../../config/env";
 import { logger } from "../../config/logger";
 import type { MercadoPagoPreference } from "../../common/types";
-import { ServiceUnavailableError } from "../../common/types/errors";
+import { ServiceUnavailableError } from "../../common/errors";
 
 /**
  * Create a payment preference in Mercado Pago

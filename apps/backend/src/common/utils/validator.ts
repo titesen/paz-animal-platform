@@ -3,7 +3,7 @@
  * @description Business logic validation functions beyond Zod schema validation
  */
 
-import { BadRequestError } from "../types/errors";
+import { BadRequestError } from "../errors";
 
 /**
  * Validate Argentine CUIT/CUIL format

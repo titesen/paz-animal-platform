@@ -5,7 +5,7 @@
 
 import { logger } from "../../config/logger";
 import type { EmailPayload } from "../../common/types";
-import { ServiceUnavailableError } from "../../common/types/errors";
+import { ServiceUnavailableError } from "../../common/errors";
 
 /**
  * Send email using configured provider

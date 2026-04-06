@@ -5,7 +5,7 @@
 
 import { logger } from "../../config/logger";
 import type { GoogleUserInfo } from "../../common/types";
-import { ServiceUnavailableError } from "../../common/types/errors";
+import { ServiceUnavailableError } from "../../common/errors";
 
 /**
  * Verify Google ID token and extract user info

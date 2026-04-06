@@ -5,7 +5,18 @@
 
 import { Router } from "express";
 import { authenticate, requireRole } from "../../common/middlewares";
+import { validate } from "../../common/middlewares/validate";
 import * as controller from "./volunteers.controller";
+import {
+  applicationIdParamSchema,
+  assignTagSchema,
+  createVolunteerApplicationSchema,
+  createVolunteerSchema,
+  updateApplicationStatusSchema,
+  updateVolunteerSchema,
+  volunteerIdParamSchema,
+  volunteerTagParamSchema,
+} from "./volunteers.dto";
 
 const router = Router();
 
@@ -16,7 +27,11 @@ const router = Router();
  * POST /api/volunteers/applications
  * Auth: Public (anyone can apply)
  */
-router.post("/applications", controller.createVolunteerApplication);
+router.post(
+  "/applications",
+  validate(createVolunteerApplicationSchema),
+  controller.createVolunteerApplication,
+);
 
 /**
  * Get all applications
@@ -34,6 +49,7 @@ router.get(
   "/applications/:applicationId",
   authenticate,
   requireRole("ADMIN"),
+  validate(applicationIdParamSchema, "params"),
   controller.getApplicationById,
 );
 
@@ -46,6 +62,8 @@ router.patch(
   "/applications/:applicationId/status",
   authenticate,
   requireRole("ADMIN"),
+  validate(applicationIdParamSchema, "params"),
+  validate(updateApplicationStatusSchema),
   controller.updateApplicationStatus,
 );
 
@@ -58,6 +76,8 @@ router.post(
   "/applications/:applicationId/promote",
   authenticate,
   requireRole("ADMIN"),
+  validate(applicationIdParamSchema, "params"),
+  validate(createVolunteerSchema),
   controller.promoteToVolunteer,
 );
 
@@ -95,6 +115,7 @@ router.get(
   "/:volunteerId",
   authenticate,
   requireRole("ADMIN", "VOLUNTEER"),
+  validate(volunteerIdParamSchema, "params"),
   controller.getVolunteerById,
 );
 
@@ -103,14 +124,27 @@ router.get(
  * PATCH /api/volunteers/:volunteerId
  * Auth: ADMIN only
  */
-router.patch("/:volunteerId", authenticate, requireRole("ADMIN"), controller.updateVolunteer);
+router.patch(
+  "/:volunteerId",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(volunteerIdParamSchema, "params"),
+  validate(updateVolunteerSchema),
+  controller.updateVolunteer,
+);
 
 /**
  * Delete volunteer
  * DELETE /api/volunteers/:volunteerId
  * Auth: ADMIN only
  */
-router.delete("/:volunteerId", authenticate, requireRole("ADMIN"), controller.deleteVolunteer);
+router.delete(
+  "/:volunteerId",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(volunteerIdParamSchema, "params"),
+  controller.deleteVolunteer,
+);
 
 // ===== TAG MANAGEMENT =====
 
@@ -119,7 +153,14 @@ router.delete("/:volunteerId", authenticate, requireRole("ADMIN"), controller.de
  * POST /api/volunteers/:volunteerId/tags
  * Auth: ADMIN only
  */
-router.post("/:volunteerId/tags", authenticate, requireRole("ADMIN"), controller.assignTag);
+router.post(
+  "/:volunteerId/tags",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(volunteerIdParamSchema, "params"),
+  validate(assignTagSchema),
+  controller.assignTag,
+);
 
 /**
  * Remove tag/role from volunteer
@@ -130,6 +171,7 @@ router.delete(
   "/:volunteerId/tags/:roleId",
   authenticate,
   requireRole("ADMIN"),
+  validate(volunteerTagParamSchema, "params"),
   controller.removeTag,
 );
 

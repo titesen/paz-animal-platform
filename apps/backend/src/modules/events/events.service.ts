@@ -3,7 +3,7 @@
  * @description Business logic for events, registrations, and attendance
  */
 
-import { ConflictError, NotFoundError, ValidationError } from "../../common/types/errors";
+import { ConflictError, NotFoundError, ValidationError } from "../../common/errors";
 import * as repository from "./events.repository";
 import type {
   CheckInDTO,

@@ -9,7 +9,7 @@ import { ZodError } from "zod";
 import { env } from "../../config/env";
 import { logger } from "../../config/logger";
 import type { JSendError, JSendFail } from "../types";
-import { AppError, ValidationError } from "../types/errors";
+import { AppError, ValidationError } from "../errors";
 
 /**
  * Global error handler - MUST be registered last in middleware chain

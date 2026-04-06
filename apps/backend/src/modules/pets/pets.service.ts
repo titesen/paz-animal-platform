@@ -4,7 +4,7 @@
  */
 
 import { logger } from "../../config/logger";
-import { ForbiddenError, NotFoundError } from "../../common/types/errors";
+import { ForbiddenError, NotFoundError } from "../../common/errors";
 import { calculateTotalPages, parsePagination } from "../../common/utils/formatter";
 import * as petsRepo from "./pets.repository";
 import type { CreatePetDTO, PetQueryParams, UpdatePetDTO } from "./pets.dto";

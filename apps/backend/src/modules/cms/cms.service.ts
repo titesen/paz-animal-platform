@@ -3,7 +3,7 @@
  * @description Business logic for content management (news, resources, sponsors, UI fragments)
  */
 
-import { NotFoundError, ValidationError } from "../../common/types/errors";
+import { NotFoundError, ValidationError } from "../../common/errors";
 import * as repository from "./cms.repository";
 import type {
   CreateNewsDTO,

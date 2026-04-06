@@ -74,3 +74,17 @@ export const assignTagSchema = z.object({
 export type CreateVolunteerDTO = z.infer<typeof createVolunteerSchema>;
 export type UpdateVolunteerDTO = z.infer<typeof updateVolunteerSchema>;
 export type AssignTagDTO = z.infer<typeof assignTagSchema>;
+
+// Param schemas
+export const applicationIdParamSchema = z.object({
+  applicationId: z.string().uuid(),
+});
+
+export const volunteerIdParamSchema = z.object({
+  volunteerId: z.string().uuid(),
+});
+
+export const volunteerTagParamSchema = z.object({
+  volunteerId: z.string().uuid(),
+  roleId: z.string().regex(/^\d+$/),
+});

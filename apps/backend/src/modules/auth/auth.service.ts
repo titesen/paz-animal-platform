@@ -10,7 +10,7 @@ import {
   ConflictError,
   NotFoundError,
   UnauthorizedError,
-} from "../../common/types/errors";
+} from "../../common/errors";
 import { comparePassword, hashPassword } from "../../common/utils/password.util";
 import {
   generateAccessToken,

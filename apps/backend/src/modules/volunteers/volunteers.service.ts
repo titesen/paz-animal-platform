@@ -3,7 +3,7 @@
  * @description Business logic for volunteer management
  */
 
-import { ConflictError, NotFoundError, ValidationError } from "../../common/types/errors";
+import { ConflictError, NotFoundError, ValidationError } from "../../common/errors";
 import * as authService from "../auth/auth.service";
 import * as repository from "./volunteers.repository";
 import type {

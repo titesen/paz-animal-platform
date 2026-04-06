@@ -11,7 +11,7 @@ import { db } from "../../db";
 import { volunteerRoles, volunteers, volunteersVolunteerRoles } from "../../db/schema";
 import { isTokenBlacklisted } from "../utils/tokenBlacklist";
 import type { AuthenticatedRequest, JWTPayload } from "../types";
-import { ForbiddenError, UnauthorizedError } from "../types/errors";
+import { ForbiddenError, UnauthorizedError } from "../errors";
 
 /**
  * Verifies JWT token and attaches user to request

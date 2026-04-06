@@ -5,7 +5,7 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import { ValidationError } from "../../common/types/errors";
+import { ValidationError } from "../../common/errors";
 import * as repository from "./media.repository";
 import { type UploadFileDTO } from "./media.dto";
 import {

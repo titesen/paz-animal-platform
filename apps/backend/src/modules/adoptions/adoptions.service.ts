@@ -4,7 +4,7 @@
  */
 
 import { logger } from "../../config/logger";
-import { ForbiddenError, NotFoundError, ValidationError } from "../../common/types/errors";
+import { ForbiddenError, NotFoundError, ValidationError } from "../../common/errors";
 import * as petsService from "../pets/pets.service";
 import * as adoptionsRepo from "./adoptions.repository";
 import type { CreateAdoptionApplicationDTO } from "./adoptions.dto";
