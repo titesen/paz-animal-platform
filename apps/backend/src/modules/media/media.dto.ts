@@ -14,3 +14,20 @@ export const uploadFileSchema = z.object({
 });
 
 export type UploadFileDTO = z.infer<typeof uploadFileSchema>;
+
+export const updateMediaSchema = z.object({
+  altText: z.string().max(255).optional(),
+  isMain: z.boolean().optional(),
+});
+
+export type UpdateMediaDTO = z.infer<typeof updateMediaSchema>;
+
+// Param schemas
+export const mediaIdParamSchema = z.object({
+  mediaId: z.string().uuid(),
+});
+
+export const entityParamSchema = z.object({
+  entityType: z.enum(ENTITY_TYPES),
+  entityId: z.string().uuid(),
+});

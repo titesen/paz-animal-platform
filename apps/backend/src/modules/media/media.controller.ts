@@ -7,7 +7,7 @@ import type { Response } from "express";
 import type { AuthenticatedRequest } from "../../common/types";
 import { asyncHandler } from "../../common/utils/asyncHandler";
 import * as service from "./media.service";
-import { uploadFileSchema } from "./media.dto";
+import type { UpdateMediaDTO, UploadFileDTO } from "./media.dto";
 
 /**
  * Upload a file
@@ -22,8 +22,7 @@ export const uploadFile = asyncHandler(async (req: AuthenticatedRequest, res: Re
     return;
   }
 
-  // Parse and validate request body
-  const data = uploadFileSchema.parse(req.body);
+  const data = req.body as UploadFileDTO;
 
   // Upload file and create media record
   const media = await service.uploadFile(req.file, data);
@@ -70,12 +69,9 @@ export const getEntityMedia = asyncHandler(async (req: AuthenticatedRequest, res
  */
 export const updateMedia = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const { mediaId } = req.params;
-  const { altText, isMain } = req.body;
+  const data = req.body as UpdateMediaDTO;
 
-  const media = await service.updateMediaMetadata(mediaId, {
-    altText,
-    isMain,
-  });
+  const media = await service.updateMediaMetadata(mediaId, data);
 
   res.json({
     status: "success",
