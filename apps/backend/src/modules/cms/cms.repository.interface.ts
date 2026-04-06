@@ -37,7 +37,10 @@ export interface ICmsRepository {
     slug: string,
     language: string,
   ): Promise<(News & { translations: NewsTranslation[] }) | null>;
-  findAllPublishedNews(): Promise<(News & { translations: NewsTranslation[] })[]>;
+  findAllPublishedNews(
+    page?: number,
+    limit?: number,
+  ): Promise<{ items: (News & { translations: NewsTranslation[] })[]; total: number }>;
   findAllNews(): Promise<(News & { translations: NewsTranslation[] })[]>;
   updateNews(newsId: string, data: Partial<News>): Promise<News | null>;
   updateNewsTranslation(

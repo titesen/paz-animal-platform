@@ -7,6 +7,7 @@ import type { Request, Response } from "express";
 import { logger } from "../../config/logger";
 import type { AuthenticatedRequest } from "../../common/types";
 import { asyncHandler } from "../../common/utils";
+import * as mercadopago from "../../lib/mercadopago";
 import * as service from "./finance.service";
 import type { CreateInKindDonationDTO, CreateMonetaryDonationDTO } from "./finance.dto";
 import type { MercadoPagoWebhookPayload } from "./finance.types";
@@ -135,7 +136,8 @@ export const getFinancialSummary = asyncHandler(
  */
 export const handleMercadoPagoWebhook = asyncHandler(async (req: Request, res: Response) => {
   const payload: MercadoPagoWebhookPayload = req.body;
-  const signature = req.headers["x-signature"] as string;
+  const xSignature = req.headers["x-signature"] as string;
+  const xRequestId = req.headers["x-request-id"] as string;
 
   logger.info(
     {
@@ -146,13 +148,22 @@ export const handleMercadoPagoWebhook = asyncHandler(async (req: Request, res: R
     "Received Mercado Pago webhook",
   );
 
-  // Validate signature (in production, this should be strict)
-  // For now, we accept all webhooks from Mercado Pago
-  if (!signature) {
-    logger.warn("Webhook received without signature");
+  // Validate webhook signature
+  if (!xSignature || !xRequestId) {
+    logger.warn("Webhook received without signature headers");
+    res.status(400).json({ status: "error", message: "Missing signature headers" });
+    return;
   }
 
-  // Process the webhook asynchronously
+  const isValid = mercadopago.validateWebhookSignature(payload.data?.id, xRequestId, xSignature);
+
+  if (!isValid) {
+    logger.warn("Webhook signature validation failed");
+    res.status(403).json({ status: "error", message: "Invalid webhook signature" });
+    return;
+  }
+
+  // Process the webhook
   await service.processMercadoPagoWebhook(payload);
 
   // Always respond 200 OK to Mercado Pago

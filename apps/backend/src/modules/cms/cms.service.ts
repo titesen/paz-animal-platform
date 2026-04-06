@@ -85,8 +85,11 @@ export async function createNews(
 /**
  * Get all published news (public view)
  */
-export async function getAllPublishedNews(): Promise<NewsWithTranslations[]> {
-  return await repository.findAllPublishedNews();
+export async function getAllPublishedNews(
+  page = 1,
+  limit = 20,
+): Promise<{ items: NewsWithTranslations[]; total: number }> {
+  return await repository.findAllPublishedNews(page, limit);
 }
 
 /**

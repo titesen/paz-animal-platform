@@ -96,8 +96,11 @@ export async function createEvent(
 /**
  * Get all upcoming events
  */
-export async function getAllUpcomingEvents(): Promise<EventWithTranslations[]> {
-  return await repository.findAllUpcomingEvents();
+export async function getAllUpcomingEvents(
+  page = 1,
+  limit = 20,
+): Promise<{ items: EventWithTranslations[]; total: number }> {
+  return await repository.findAllUpcomingEvents(page, limit);
 }
 
 /**

@@ -41,12 +41,18 @@ export const createEvent = asyncHandler(async (req: AuthenticatedRequest, res: R
  * GET /api/events
  * Public endpoint
  */
-export const getAllEvents = asyncHandler(async (_req: AuthenticatedRequest, res: Response) => {
-  const events = await service.getAllUpcomingEvents();
+export const getAllEvents = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Math.min(Number(req.query.limit) || 20, 100);
+
+  const { items, total } = await service.getAllUpcomingEvents(page, limit);
 
   res.json({
     status: "success",
-    data: { events },
+    data: {
+      events: items,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    },
   });
 });
 

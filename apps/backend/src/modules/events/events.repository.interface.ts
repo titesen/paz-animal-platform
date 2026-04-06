@@ -36,7 +36,10 @@ export interface IEventsRepository {
     }[],
   ): Promise<EventTranslation[]>;
   findEventById(eventId: string): Promise<(Event & { translations: EventTranslation[] }) | null>;
-  findAllUpcomingEvents(): Promise<(Event & { translations: EventTranslation[] })[]>;
+  findAllUpcomingEvents(
+    page?: number,
+    limit?: number,
+  ): Promise<{ items: (Event & { translations: EventTranslation[] })[]; total: number }>;
   updateEvent(eventId: string, data: Partial<Event>): Promise<Event | null>;
   updateEventTranslation(
     eventId: string,

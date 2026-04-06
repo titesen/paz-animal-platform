@@ -91,29 +91,44 @@ export async function findEventById(
 }
 
 /**
- * Find all upcoming events (not deleted, eventDate >= now)
+ * Find all upcoming events with pagination (not deleted, eventDate >= now)
  */
-export async function findAllUpcomingEvents(): Promise<
-  (Event & { translations: EventTranslation[] })[]
-> {
+export async function findAllUpcomingEvents(
+  page = 1,
+  limit = 20,
+): Promise<{ items: (Event & { translations: EventTranslation[] })[]; total: number }> {
+  const offset = (page - 1) * limit;
+
+  const [countResult] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(schema.events)
+    .where(and(isNull(schema.events.deletedAt), gte(schema.events.eventDate, new Date())));
+
+  const total = countResult?.count ?? 0;
+  if (total === 0) return { items: [], total: 0 };
+
   const events = await db
     .select()
     .from(schema.events)
     .where(and(isNull(schema.events.deletedAt), gte(schema.events.eventDate, new Date())))
-    .orderBy(schema.events.eventDate);
+    .orderBy(schema.events.eventDate)
+    .limit(limit)
+    .offset(offset);
 
   const eventIds = events.map((e) => e.eventId);
-  if (eventIds.length === 0) return [];
+  if (eventIds.length === 0) return { items: [], total };
 
   const translations = await db
     .select()
     .from(schema.eventsTranslations)
     .where(sql`${schema.eventsTranslations.eventId} = ANY(${eventIds})`);
 
-  return events.map((event) => ({
+  const items = events.map((event) => ({
     ...event,
     translations: translations.filter((t) => t.eventId === event.eventId),
   }));
+
+  return { items, total };
 }
 
 /**

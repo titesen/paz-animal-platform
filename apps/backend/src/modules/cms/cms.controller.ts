@@ -28,11 +28,17 @@ import type { UISection } from "./cms.types";
  * GET /api/cms/news
  * Get all published news (public)
  */
-export const getAllPublishedNews = asyncHandler(async (_req, res: Response) => {
-  const news = await service.getAllPublishedNews();
+export const getAllPublishedNews = asyncHandler(async (req, res: Response) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Math.min(Number(req.query.limit) || 20, 100);
+
+  const { items, total } = await service.getAllPublishedNews(page, limit);
   res.json({
     status: "success",
-    data: { news },
+    data: {
+      news: items,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    },
   });
 });
 

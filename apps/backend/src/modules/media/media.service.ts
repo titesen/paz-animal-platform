@@ -90,15 +90,22 @@ export async function uploadFile(file: Express.Multer.File, data: UploadFileDTO)
   // Save file to disk
   await fs.writeFile(absolutePath, file.buffer);
 
-  // Create media record in database
-  const media = await repository.createMedia({
-    storageUrl: `/uploads/${relativePath.replace(/\\/g, "/")}`, // Normalize path for URLs
-    type: mediaType,
-    entityType: data.entityType,
-    entityId: data.entityId,
-    altText: data.altText,
-    isMain: data.isMain,
-  });
+  // Create media record in database — clean up file if DB insert fails
+  let media;
+  try {
+    media = await repository.createMedia({
+      storageUrl: `/uploads/${relativePath.replace(/\\/g, "/")}`, // Normalize path for URLs
+      type: mediaType,
+      entityType: data.entityType,
+      entityId: data.entityId,
+      altText: data.altText,
+      isMain: data.isMain,
+    });
+  } catch (error) {
+    // Remove orphaned file if DB insert fails
+    await fs.unlink(absolutePath).catch(() => {});
+    throw error;
+  }
 
   // If this is set as main, ensure no other media is marked as main
   if (data.isMain) {

@@ -3,7 +3,7 @@
  * @description Data access layer for news, resources, and content management
  */
 
-import { and, asc, desc, eq, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 import type {
@@ -106,29 +106,44 @@ export async function findNewsBySlug(
 }
 
 /**
- * Get all published news
+ * Get all published news with pagination
  */
-export async function findAllPublishedNews(): Promise<
-  (News & { translations: NewsTranslation[] })[]
-> {
+export async function findAllPublishedNews(
+  page = 1,
+  limit = 20,
+): Promise<{ items: (News & { translations: NewsTranslation[] })[]; total: number }> {
+  const offset = (page - 1) * limit;
+
+  const [countResult] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(schema.news)
+    .where(and(eq(schema.news.status, "PUBLISHED"), isNull(schema.news.deletedAt)));
+
+  const total = countResult?.count ?? 0;
+  if (total === 0) return { items: [], total: 0 };
+
   const newsItems = await db
     .select()
     .from(schema.news)
     .where(and(eq(schema.news.status, "PUBLISHED"), isNull(schema.news.deletedAt)))
-    .orderBy(desc(schema.news.publishedAt));
+    .orderBy(desc(schema.news.publishedAt))
+    .limit(limit)
+    .offset(offset);
 
-  if (newsItems.length === 0) return [];
+  if (newsItems.length === 0) return { items: [], total };
 
   const newsIds = newsItems.map((n) => n.newsId);
   const translations = await db
     .select()
     .from(schema.newsTranslations)
-    .where(eq(schema.newsTranslations.newsId, newsIds[0])); // Simplified, would need IN clause
+    .where(inArray(schema.newsTranslations.newsId, newsIds));
 
-  return newsItems.map((newsItem) => ({
+  const items = newsItems.map((newsItem) => ({
     ...newsItem,
     translations: translations.filter((t) => t.newsId === newsItem.newsId),
   }));
+
+  return { items, total };
 }
 
 /**
@@ -143,7 +158,11 @@ export async function findAllNews(): Promise<(News & { translations: NewsTransla
 
   if (newsItems.length === 0) return [];
 
-  const allTranslations = await db.select().from(schema.newsTranslations);
+  const newsIds = newsItems.map((n) => n.newsId);
+  const allTranslations = await db
+    .select()
+    .from(schema.newsTranslations)
+    .where(inArray(schema.newsTranslations.newsId, newsIds));
 
   return newsItems.map((newsItem) => ({
     ...newsItem,
@@ -276,7 +295,11 @@ export async function findAllPublishedResources(): Promise<
 
   if (resources.length === 0) return [];
 
-  const allTranslations = await db.select().from(schema.resourcesTranslations);
+  const resourceIds = resources.map((r) => r.resourceId);
+  const allTranslations = await db
+    .select()
+    .from(schema.resourcesTranslations)
+    .where(inArray(schema.resourcesTranslations.resourceId, resourceIds));
 
   return resources.map((resource) => ({
     ...resource,
@@ -298,7 +321,11 @@ export async function findAllResources(): Promise<
 
   if (resources.length === 0) return [];
 
-  const allTranslations = await db.select().from(schema.resourcesTranslations);
+  const resourceIds = resources.map((r) => r.resourceId);
+  const allTranslations = await db
+    .select()
+    .from(schema.resourcesTranslations)
+    .where(inArray(schema.resourcesTranslations.resourceId, resourceIds));
 
   return resources.map((resource) => ({
     ...resource,
