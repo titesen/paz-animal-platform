@@ -14,6 +14,7 @@ import type {
   Transaction,
   TransactionStatus,
 } from "./finance.types";
+import type { IFinanceRepository } from "./finance.repository.interface";
 
 // ===================
 // TRANSACTIONS (Immutable Ledger)
@@ -240,3 +241,21 @@ export async function findAllInKindDonations(): Promise<InKindDonation[]> {
     .from(schema.inKindDonations)
     .orderBy(desc(schema.inKindDonations.receivedAt));
 }
+
+// Compile-time contract verification
+void ({
+  createTransaction,
+  findTransactionById,
+  findTransactionByExternalId,
+  updateTransactionStatus,
+  findTransactionsByUser,
+  getFinancialSummary,
+  createMonetaryDonation,
+  findDonationById,
+  confirmDonation,
+  findDonationsByUser,
+  findAllConfirmedDonations,
+  createInKindDonation,
+  findInKindDonationById,
+  findAllInKindDonations,
+} satisfies IFinanceRepository);

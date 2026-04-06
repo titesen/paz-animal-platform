@@ -6,6 +6,7 @@
 import { eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
+import type { IVolunteersRepository } from "./volunteers.repository.interface";
 
 export async function findVolunteerApplicationById(applicationId: string) {
   const result = await db
@@ -250,3 +251,21 @@ export async function deleteVolunteer(volunteerId: string) {
 
   return result || null;
 }
+
+// Compile-time contract verification
+void ({
+  findVolunteerApplicationById,
+  findVolunteerByUserId,
+  findVolunteerWithTags,
+  assignVolunteerTag,
+  removeVolunteerTag,
+  findAllVolunteerRoles,
+  createVolunteerApplication,
+  findAllApplications,
+  updateApplicationStatus,
+  createVolunteer,
+  findAllVolunteers,
+  findVolunteerById,
+  updateVolunteer,
+  deleteVolunteer,
+} satisfies IVolunteersRepository);

@@ -14,6 +14,7 @@ import type {
   EventTranslation,
   RegistrationPaymentStatus,
 } from "./events.types";
+import type { IEventsRepository } from "./events.repository.interface";
 
 // ===================
 // EVENTS CRUD
@@ -327,3 +328,24 @@ export async function getAttendancesCount(eventId: string): Promise<number> {
 
   return result[0]?.count || 0;
 }
+
+// Compile-time contract verification
+void ({
+  createEvent,
+  createEventTranslations,
+  findEventById,
+  findAllUpcomingEvents,
+  updateEvent,
+  updateEventTranslation,
+  deleteEvent,
+  createEventRegistration,
+  findRegistrationByUserAndEvent,
+  findRegistrationsByEvent,
+  getRegistrationsCount,
+  updateRegistrationStatus,
+  cancelRegistration,
+  createAttendance,
+  findAttendanceByUserAndEntity,
+  findAttendancesByEvent,
+  getAttendancesCount,
+} satisfies IEventsRepository);

@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 import type { NewAdoptionApplication } from "../../common/types";
+import type { IAdoptionsRepository } from "./adoptions.repository.interface";
 
 export async function findAdoptionById(adoptionId: string) {
   const result = await db
@@ -46,3 +47,12 @@ export async function findAllAdoptions() {
     .from(schema.adoptionApplications)
     .orderBy(schema.adoptionApplications.appliedAt);
 }
+
+// Compile-time contract verification
+void ({
+  findAdoptionById,
+  createAdoptionApplication,
+  updateAdoptionStatus,
+  findAdoptionsByUser,
+  findAllAdoptions,
+} satisfies IAdoptionsRepository);

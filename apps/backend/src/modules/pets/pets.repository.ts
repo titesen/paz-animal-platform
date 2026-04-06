@@ -7,6 +7,7 @@ import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 import type { NewPet } from "../../common/types";
+import type { IPetsRepository } from "./pets.repository.interface";
 
 /**
  * Find pet by ID
@@ -165,3 +166,18 @@ export async function resolveLostPetAlert(alertId: string): Promise<void> {
     .set({ isActive: false, resolvedAt: new Date() })
     .where(eq(schema.lostPetAlerts.alertId, alertId));
 }
+
+// Compile-time contract verification
+void ({
+  findPetById,
+  findPets,
+  createPet,
+  updatePet,
+  softDeletePet,
+  updatePetStatus,
+  findPetsByOwner,
+  findActiveLostPetAlerts,
+  findLostPetAlertById,
+  createLostPetAlert,
+  resolveLostPetAlert,
+} satisfies IPetsRepository);

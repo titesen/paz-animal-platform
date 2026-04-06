@@ -6,6 +6,7 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "../../db";
 import { media } from "../../db/schema";
+import type { IMediaRepository } from "./media.repository.interface";
 
 /**
  * Create a new media record
@@ -105,3 +106,14 @@ export async function updateMedia(mediaId: string, data: { altText?: string; isM
 
   return result || null;
 }
+
+// Compile-time contract verification
+void ({
+  createMedia,
+  findMediaById,
+  findMediaByEntity,
+  findMainMedia,
+  setMainMedia,
+  deleteMedia,
+  updateMedia,
+} satisfies IMediaRepository);

@@ -15,6 +15,7 @@ import type {
   Sponsor,
   UIFragment,
 } from "./cms.types";
+import type { ICmsRepository } from "./cms.repository.interface";
 
 // ===================
 // NEWS CRUD
@@ -569,3 +570,34 @@ export async function updateFragmentContent(
 
   return (updated as UIFragment) || null;
 }
+
+// Compile-time contract verification
+void ({
+  createNews,
+  createNewsTranslations,
+  findNewsById,
+  findNewsBySlug,
+  findAllPublishedNews,
+  findAllNews,
+  updateNews,
+  updateNewsTranslation,
+  deleteNews,
+  createResource,
+  createResourceTranslations,
+  findResourceById,
+  findAllPublishedResources,
+  findAllResources,
+  updateResource,
+  updateResourceTranslation,
+  deleteResource,
+  findAllSponsors,
+  findSponsorById,
+  createSponsor,
+  updateSponsor,
+  deleteSponsor,
+  findFragmentByKey,
+  findFragmentsBySection,
+  findAllFragments,
+  upsertFragment,
+  updateFragmentContent,
+} satisfies ICmsRepository);

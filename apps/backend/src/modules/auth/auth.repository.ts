@@ -8,6 +8,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 import type { NewUser } from "../../common/types";
+import type { IAuthRepository } from "./auth.repository.interface";
 
 /**
  * Find user by email
@@ -125,3 +126,16 @@ export async function isEmailTaken(email: string): Promise<boolean> {
 
   return existing.length > 0;
 }
+
+// Compile-time contract verification
+void ({
+  findUserByEmail,
+  findUserById,
+  createUser,
+  getUserRoles,
+  assignRoleToUser,
+  updateUserPassword,
+  findUserByGoogleId,
+  softDeleteUser,
+  isEmailTaken,
+} satisfies IAuthRepository);
