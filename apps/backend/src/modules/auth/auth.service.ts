@@ -18,13 +18,8 @@ import {
   verifyRefreshToken,
 } from "../../common/utils/jwt.util";
 import * as authRepo from "./auth.repository";
-import type {
-  AuthResponse,
-  GoogleOAuthDTO,
-  LoginDTO,
-  RefreshTokenDTO,
-  RegisterDTO,
-} from "./auth.types";
+import type { GoogleOAuthDTO, LoginDTO, RefreshTokenDTO, RegisterDTO } from "./auth.dto";
+import type { AuthResponse } from "./auth.types";
 
 /**
  * Register a new user

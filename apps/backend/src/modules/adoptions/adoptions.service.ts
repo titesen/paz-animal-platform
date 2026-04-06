@@ -6,7 +6,7 @@
 import { logger } from "../../config/logger";
 import { ForbiddenError, NotFoundError } from "../../common/types/errors";
 import * as adoptionsRepo from "./adoptions.repository";
-import type { CreateAdoptionApplicationDTO } from "./adoptions.types";
+import type { CreateAdoptionApplicationDTO } from "./adoptions.dto";
 
 export async function createAdoptionApplication(
   userId: string,

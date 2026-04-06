@@ -8,7 +8,7 @@ import { z } from "zod";
 import { validate } from "../../common/middlewares";
 import { authenticate, requireRole, requireVolunteerRole } from "../../common/middlewares/auth";
 import * as adoptionsController from "./adoptions.controller";
-import { adoptionIdSchema, createAdoptionApplicationSchema } from "./adoptions.types";
+import { adoptionIdSchema, createAdoptionApplicationSchema } from "./adoptions.dto";
 
 const router = Router();
 

@@ -1,6 +1,6 @@
 /**
- * @file Finance Module Types
- * @description Type definitions and DTOs for financial transactions and donations
+ * @file Finance Module - Domain Types
+ * @description Entity interfaces, external API types, and constants for financial management
  */
 
 export type TransactionStatus = "PENDING" | "APPROVED" | "REJECTED" | "REFUNDED" | "PROCESSING";
@@ -18,7 +18,10 @@ export type PaymentMethodType =
   | "TRANSFER"
   | "OTHER";
 
-// Database entity types
+// ===================
+// ENTITIES
+// ===================
+
 export interface Transaction {
   transactionId: string;
   userId: string | null;
@@ -58,22 +61,10 @@ export interface InKindDonation {
   receivedAt: Date;
 }
 
-// DTOs for creating donations
-export interface CreateMonetaryDonationDTO {
-  amount: number;
-  currency?: string;
-  isAnonymous?: boolean;
-  thankYouMessage?: string;
-}
+// ===================
+// EXTERNAL API TYPES
+// ===================
 
-export interface CreateInKindDonationDTO {
-  description: string;
-  estimatedValue?: number;
-  manualDonorName?: string;
-  manualDonorContact?: string;
-}
-
-// Mercado Pago types
 export interface MercadoPagoPreferenceResponse {
   id: string;
   init_point: string;
@@ -112,7 +103,10 @@ export interface MercadoPagoPaymentData {
   };
 }
 
-// Response types
+// ===================
+// RESPONSE TYPES
+// ===================
+
 export interface DonationWithTransaction extends MonetaryDonation {
   transaction?: Transaction;
 }
@@ -125,7 +119,10 @@ export interface FinancialSummary {
   currency: string;
 }
 
-// Validation constants
+// ===================
+// CONSTANTS
+// ===================
+
 export const TRANSACTION_STATUS_VALUES: TransactionStatus[] = [
   "PENDING",
   "APPROVED",

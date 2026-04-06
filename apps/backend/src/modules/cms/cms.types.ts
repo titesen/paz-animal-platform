@@ -1,11 +1,14 @@
 /**
- * @file CMS Module Types
- * @description Type definitions and DTOs for content management (news, resources)
+ * @file CMS Module - Domain Types
+ * @description Entity interfaces, type aliases, and constants for content management
  */
 
 export type PublicationStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
 
-// Database entity types
+// ===================
+// NEWS ENTITIES
+// ===================
+
 export interface News {
   newsId: string;
   authorId: string;
@@ -24,6 +27,20 @@ export interface NewsTranslation {
   metaTitle: string | null;
   metaDescription: string | null;
 }
+
+export interface NewsWithTranslations extends News {
+  translations: NewsTranslation[];
+  author?: {
+    userId: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+  };
+}
+
+// ===================
+// RESOURCES ENTITIES
+// ===================
 
 export interface Resource {
   resourceId: string;
@@ -45,72 +62,6 @@ export interface ResourceTranslation {
   metaDescription: string | null;
 }
 
-// DTOs for creating content
-export interface CreateNewsDTO {
-  status?: PublicationStatus;
-  publishedAt?: string;
-  translations: {
-    language: string;
-    title: string;
-    excerpt?: string;
-    content: string;
-    slug?: string;
-    metaTitle?: string;
-    metaDescription?: string;
-  }[];
-}
-
-export interface UpdateNewsDTO {
-  status?: PublicationStatus;
-  publishedAt?: string;
-}
-
-export interface UpdateNewsTranslationDTO {
-  title?: string;
-  excerpt?: string;
-  content?: string;
-  slug?: string;
-  metaTitle?: string;
-  metaDescription?: string;
-}
-
-export interface CreateResourceDTO {
-  status?: PublicationStatus;
-  sortOrder?: number;
-  translations: {
-    language: string;
-    title: string;
-    content: string;
-    slug?: string;
-    metaTitle?: string;
-    metaDescription?: string;
-  }[];
-}
-
-export interface UpdateResourceDTO {
-  status?: PublicationStatus;
-  sortOrder?: number;
-}
-
-export interface UpdateResourceTranslationDTO {
-  title?: string;
-  content?: string;
-  slug?: string;
-  metaTitle?: string;
-  metaDescription?: string;
-}
-
-// Response types
-export interface NewsWithTranslations extends News {
-  translations: NewsTranslation[];
-  author?: {
-    userId: string;
-    email: string;
-    firstName: string | null;
-    lastName: string | null;
-  };
-}
-
 export interface ResourceWithTranslations extends Resource {
   translations: ResourceTranslation[];
   author?: {
@@ -122,7 +73,7 @@ export interface ResourceWithTranslations extends Resource {
 }
 
 // ===================
-// SPONSORS TYPES
+// SPONSORS ENTITIES
 // ===================
 
 export interface Sponsor {
@@ -135,24 +86,6 @@ export interface Sponsor {
   sortOrder: number;
   createdAt: Date;
   deletedAt: Date | null;
-}
-
-export interface CreateSponsorDTO {
-  name: string;
-  websiteUrl?: string;
-  contactName?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  sortOrder?: number;
-}
-
-export interface UpdateSponsorDTO {
-  name?: string;
-  websiteUrl?: string;
-  contactName?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  sortOrder?: number;
 }
 
 // ===================
@@ -177,6 +110,7 @@ export type UISection =
   | "DONATIONS"
   | "CONTACT"
   | "ABOUT_US";
+
 export type LanguageCode = "es" | "en" | "pt";
 
 export interface UIFragment {
@@ -185,26 +119,15 @@ export interface UIFragment {
   description: string | null;
   type: UIComponentType;
   section: UISection;
-  content: Record<string, any>; // JSONB field
+  content: Record<string, any>;
   lastUpdatedAt: Date;
   updatedBy: string | null;
 }
 
-export interface CreateUIFragmentDTO {
-  fragmentKey: string;
-  language?: LanguageCode;
-  description?: string;
-  type: UIComponentType;
-  section: UISection;
-  content: Record<string, any>;
-}
+// ===================
+// CONSTANTS
+// ===================
 
-export interface UpdateUIFragmentDTO {
-  description?: string;
-  content?: Record<string, any>;
-}
-
-// Validation constants
 export const PUBLICATION_STATUS_VALUES: PublicationStatus[] = ["DRAFT", "PUBLISHED", "ARCHIVED"];
 
 export const LANGUAGE_CODE_VALUES: LanguageCode[] = ["es", "en", "pt"];

@@ -7,9 +7,8 @@ import { logger } from "../../config/logger";
 import * as mercadopago from "../../lib/mercadopago";
 import { NotFoundError, ValidationError } from "../../common/types/errors";
 import * as repository from "./finance.repository";
+import type { CreateInKindDonationDTO, CreateMonetaryDonationDTO } from "./finance.dto";
 import type {
-  CreateInKindDonationDTO,
-  CreateMonetaryDonationDTO,
   DonationWithTransaction,
   FinancialSummary,
   MercadoPagoWebhookPayload,

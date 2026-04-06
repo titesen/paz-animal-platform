@@ -1,13 +1,16 @@
 /**
- * @file Events Module Types
- * @description Type definitions and DTOs for events management
+ * @file Events Module - Domain Types
+ * @description Entity interfaces, type aliases, and constants for events management
  */
 
 export type EventModality = "VIRTUAL" | "IN_PERSON" | "HYBRID";
 export type EventPaymentOption = "FREE" | "ONLINE_PAYMENT" | "ON_SITE_CASH" | "IN_KIND_DONATION";
 export type RegistrationPaymentStatus = "NA" | "PENDING" | "PAID" | "VERIFIED_ON_SITE";
 
-// Database entity types
+// ===================
+// EVENTS ENTITIES
+// ===================
+
 export interface Event {
   eventId: string;
   creatorId: string;
@@ -51,57 +54,10 @@ export interface Attendance {
   notes: string | null;
 }
 
-// DTOs
-export interface CreateEventDTO {
-  eventDate: string; // ISO 8601
-  modality: EventModality;
-  virtualLink?: string;
-  isFree: boolean;
-  acceptsOnlinePayment?: boolean;
-  onlinePrice?: number;
-  acceptsOnSitePayment?: boolean;
-  onSitePrice?: number;
-  acceptsInKind?: boolean;
-  inKindDescription?: string;
-  translations: {
-    language: string;
-    title: string;
-    description?: string;
-  }[];
-}
+// ===================
+// RESPONSE TYPES
+// ===================
 
-export interface UpdateEventDTO {
-  eventDate?: string;
-  modality?: EventModality;
-  virtualLink?: string;
-  isFree?: boolean;
-  acceptsOnlinePayment?: boolean;
-  onlinePrice?: number;
-  acceptsOnSitePayment?: boolean;
-  onSitePrice?: number;
-  acceptsInKind?: boolean;
-  inKindDescription?: string;
-}
-
-export interface UpdateEventTranslationDTO {
-  title?: string;
-  description?: string;
-}
-
-export interface RegisterForEventDTO {
-  selectedPaymentOption: EventPaymentOption;
-}
-
-export interface UpdateRegistrationStatusDTO {
-  paymentStatus: RegistrationPaymentStatus;
-}
-
-export interface CheckInDTO {
-  userId: string;
-  notes?: string;
-}
-
-// Response types
 export interface EventWithTranslations extends Event {
   translations: EventTranslation[];
 }
@@ -124,7 +80,10 @@ export interface EventWithDetails extends EventWithTranslations {
   };
 }
 
-// Validation constants
+// ===================
+// CONSTANTS
+// ===================
+
 export const EVENT_MODALITY_VALUES: EventModality[] = ["VIRTUAL", "IN_PERSON", "HYBRID"];
 
 export const PAYMENT_OPTION_VALUES: EventPaymentOption[] = [

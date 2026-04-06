@@ -8,7 +8,7 @@ import { validate } from "../../common/middlewares";
 import { authenticate } from "../../common/middlewares/auth";
 import { authLimiter } from "../../common/middlewares/rateLimiter";
 import * as authController from "./auth.controller";
-import { googleOAuthSchema, loginSchema, refreshTokenSchema, registerSchema } from "./auth.types";
+import { googleOAuthSchema, loginSchema, refreshTokenSchema, registerSchema } from "./auth.dto";
 
 const router = Router();
 

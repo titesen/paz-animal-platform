@@ -8,12 +8,14 @@ import * as repository from "./events.repository";
 import type {
   CheckInDTO,
   CreateEventDTO,
-  EventRegistrationWithUser,
-  EventWithDetails,
-  EventWithTranslations,
   RegisterForEventDTO,
   UpdateEventDTO,
   UpdateEventTranslationDTO,
+} from "./events.dto";
+import type {
+  EventRegistrationWithUser,
+  EventWithDetails,
+  EventWithTranslations,
 } from "./events.types";
 
 // ===================

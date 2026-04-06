@@ -7,13 +7,13 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { ValidationError } from "../../common/types/errors";
 import * as repository from "./media.repository";
+import { type UploadFileDTO } from "./media.dto";
 import {
   ALL_ALLOWED_MIMES,
   ALLOWED_DOCUMENT_MIMES,
   ALLOWED_IMAGE_MIMES,
   ALLOWED_VIDEO_MIMES,
   MAX_FILE_SIZE,
-  type UploadFileDTO,
 } from "./media.types";
 
 // Upload directory (relative to project root)

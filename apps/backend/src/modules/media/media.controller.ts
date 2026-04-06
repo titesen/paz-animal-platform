@@ -7,7 +7,7 @@ import type { Response } from "express";
 import type { AuthenticatedRequest } from "../../common/types";
 import { asyncHandler } from "../../common/utils/asyncHandler";
 import * as service from "./media.service";
-import { uploadFileSchema } from "./media.types";
+import { uploadFileSchema } from "./media.dto";
 
 /**
  * Upload a file

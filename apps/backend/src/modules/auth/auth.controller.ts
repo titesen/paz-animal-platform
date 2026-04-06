@@ -10,7 +10,8 @@ import type { AuthenticatedRequest, JSendSuccess } from "../../common/types";
 import { blacklistToken } from "../../common/utils/tokenBlacklist";
 import { asyncHandler } from "../../common/utils";
 import * as authService from "./auth.service";
-import type { AuthResponse, LoginDTO, RefreshTokenDTO, RegisterDTO } from "./auth.types";
+import type { LoginDTO, RefreshTokenDTO, RegisterDTO } from "./auth.dto";
+import type { AuthResponse } from "./auth.types";
 
 /**
  * POST /api/auth/register

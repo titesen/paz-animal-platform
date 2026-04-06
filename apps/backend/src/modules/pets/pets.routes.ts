@@ -9,7 +9,7 @@ import { validate } from "../../common/middlewares";
 import { authenticate, requireRole } from "../../common/middlewares/auth";
 import { publicLimiter } from "../../common/middlewares/rateLimiter";
 import * as petsController from "./pets.controller";
-import { createPetSchema, petIdSchema, petQuerySchema, updatePetSchema } from "./pets.types";
+import { createPetSchema, petIdSchema, petQuerySchema, updatePetSchema } from "./pets.dto";
 
 const router = Router();
 

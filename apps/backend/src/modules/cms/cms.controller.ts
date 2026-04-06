@@ -12,13 +12,13 @@ import type {
   CreateResourceDTO,
   CreateSponsorDTO,
   CreateUIFragmentDTO,
-  UISection,
   UpdateNewsDTO,
   UpdateNewsTranslationDTO,
   UpdateResourceDTO,
   UpdateResourceTranslationDTO,
   UpdateSponsorDTO,
-} from "./cms.types";
+} from "./cms.dto";
+import type { UISection } from "./cms.types";
 
 // ===================
 // NEWS HANDLERS

@@ -8,11 +8,8 @@ import { logger } from "../../config/logger";
 import type { AuthenticatedRequest } from "../../common/types";
 import { asyncHandler } from "../../common/utils";
 import * as service from "./finance.service";
-import type {
-  CreateInKindDonationDTO,
-  CreateMonetaryDonationDTO,
-  MercadoPagoWebhookPayload,
-} from "./finance.types";
+import type { CreateInKindDonationDTO, CreateMonetaryDonationDTO } from "./finance.dto";
+import type { MercadoPagoWebhookPayload } from "./finance.types";
 
 // ===================
 // MONETARY DONATIONS

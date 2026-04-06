@@ -1,25 +1,13 @@
 /**
- * @file Media Module Types
- * @description DTOs and schemas for file upload and media management
+ * @file Media Module - Domain Types
+ * @description Constants and type definitions for media management
  */
-
-import { z } from "zod";
 
 // Supported media types
 export const MEDIA_TYPES = ["IMAGE", "VIDEO", "DOCUMENT"] as const;
 
 // Supported entity types for polymorphic relationship
 export const ENTITY_TYPES = ["pets", "news", "events", "users"] as const;
-
-// File upload validation schema
-export const uploadFileSchema = z.object({
-  entityType: z.enum(ENTITY_TYPES),
-  entityId: z.string().uuid(),
-  altText: z.string().max(255).optional(),
-  isMain: z.boolean().default(false),
-});
-
-export type UploadFileDTO = z.infer<typeof uploadFileSchema>;
 
 // Allowed file extensions and MIME types
 export const ALLOWED_IMAGE_MIMES = [

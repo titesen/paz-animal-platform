@@ -12,7 +12,7 @@ import type {
   CreateVolunteerDTO,
   UpdateApplicationStatusDTO,
   UpdateVolunteerDTO,
-} from "./volunteers.types";
+} from "./volunteers.dto";
 
 // ===== VOLUNTEER APPLICATIONS =====
 

@@ -7,7 +7,7 @@ import { logger } from "../../config/logger";
 import { ForbiddenError, NotFoundError } from "../../common/types/errors";
 import { calculateTotalPages, parsePagination } from "../../common/utils/formatter";
 import * as petsRepo from "./pets.repository";
-import type { CreatePetDTO, PetQueryParams, UpdatePetDTO } from "./pets.types";
+import type { CreatePetDTO, PetQueryParams, UpdatePetDTO } from "./pets.dto";
 
 /**
  * Get all pets with pagination

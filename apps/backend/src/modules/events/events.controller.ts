@@ -13,7 +13,7 @@ import type {
   RegisterForEventDTO,
   UpdateEventDTO,
   UpdateEventTranslationDTO,
-} from "./events.types";
+} from "./events.dto";
 
 // ===================
 // EVENTS MANAGEMENT

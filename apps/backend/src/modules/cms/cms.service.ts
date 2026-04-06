@@ -10,16 +10,18 @@ import type {
   CreateResourceDTO,
   CreateSponsorDTO,
   CreateUIFragmentDTO,
-  NewsWithTranslations,
-  ResourceWithTranslations,
-  Sponsor,
-  UIFragment,
-  UISection,
   UpdateNewsDTO,
   UpdateNewsTranslationDTO,
   UpdateResourceDTO,
   UpdateResourceTranslationDTO,
   UpdateSponsorDTO,
+} from "./cms.dto";
+import type {
+  NewsWithTranslations,
+  ResourceWithTranslations,
+  Sponsor,
+  UIFragment,
+  UISection,
 } from "./cms.types";
 
 /**

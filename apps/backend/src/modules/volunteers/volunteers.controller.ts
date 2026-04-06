@@ -13,7 +13,7 @@ import {
   createVolunteerSchema,
   updateApplicationStatusSchema,
   updateVolunteerSchema,
-} from "./volunteers.types";
+} from "./volunteers.dto";
 
 // ===== VOLUNTEER APPLICATIONS =====
 
