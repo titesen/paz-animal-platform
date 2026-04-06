@@ -1,108 +1,197 @@
 /**
  * @file CMS Module - Data Transfer Objects (DTOs)
- * @description Input DTOs for content management operations
+ * @description Zod schemas for content management request validation
  */
 
-import type { LanguageCode, PublicationStatus, UIComponentType, UISection } from "./cms.types";
+import { z } from "zod";
 
 // ===================
-// NEWS DTOs
+// COMMON SCHEMAS
 // ===================
 
-export interface CreateNewsDTO {
-  status?: PublicationStatus;
-  publishedAt?: string;
-  translations: {
-    language: string;
-    title: string;
-    excerpt?: string;
-    content: string;
-    slug?: string;
-    metaTitle?: string;
-    metaDescription?: string;
-  }[];
-}
+const publicationStatusSchema = z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]);
 
-export interface UpdateNewsDTO {
-  status?: PublicationStatus;
-  publishedAt?: string;
-}
+const uuidParamSchema = z.object({
+  newsId: z.string().uuid(),
+});
 
-export interface UpdateNewsTranslationDTO {
-  title?: string;
-  excerpt?: string;
-  content?: string;
-  slug?: string;
-  metaTitle?: string;
-  metaDescription?: string;
-}
+const resourceIdParamSchema = z.object({
+  resourceId: z.string().uuid(),
+});
+
+const sponsorIdParamSchema = z.object({
+  sponsorId: z.string().uuid(),
+});
+
+const languageParamSchema = z.object({
+  language: z.string().min(2).max(5),
+});
+
+const paginationQuerySchema = z.object({
+  page: z.string().optional().default("1"),
+  limit: z.string().optional().default("20"),
+});
 
 // ===================
-// RESOURCES DTOs
+// NEWS SCHEMAS
 // ===================
 
-export interface CreateResourceDTO {
-  status?: PublicationStatus;
-  sortOrder?: number;
-  translations: {
-    language: string;
-    title: string;
-    content: string;
-    slug?: string;
-    metaTitle?: string;
-    metaDescription?: string;
-  }[];
-}
+export const createNewsSchema = z.object({
+  status: publicationStatusSchema.optional(),
+  publishedAt: z.string().datetime().optional(),
+  translations: z
+    .array(
+      z.object({
+        language: z.string().min(2).max(5),
+        title: z.string().min(1).max(300),
+        excerpt: z.string().max(500).optional(),
+        content: z.string().min(1),
+        slug: z.string().max(300).optional(),
+        metaTitle: z.string().max(200).optional(),
+        metaDescription: z.string().max(500).optional(),
+      }),
+    )
+    .min(1),
+});
 
-export interface UpdateResourceDTO {
-  status?: PublicationStatus;
-  sortOrder?: number;
-}
+export type CreateNewsDTO = z.infer<typeof createNewsSchema>;
 
-export interface UpdateResourceTranslationDTO {
-  title?: string;
-  content?: string;
-  slug?: string;
-  metaTitle?: string;
-  metaDescription?: string;
-}
+export const updateNewsSchema = z.object({
+  status: publicationStatusSchema.optional(),
+  publishedAt: z.string().datetime().optional(),
+});
 
-// ===================
-// SPONSORS DTOs
-// ===================
+export type UpdateNewsDTO = z.infer<typeof updateNewsSchema>;
 
-export interface CreateSponsorDTO {
-  name: string;
-  websiteUrl?: string;
-  contactName?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  sortOrder?: number;
-}
+export const updateNewsTranslationSchema = z.object({
+  title: z.string().min(1).max(300).optional(),
+  excerpt: z.string().max(500).optional(),
+  content: z.string().min(1).optional(),
+  slug: z.string().max(300).optional(),
+  metaTitle: z.string().max(200).optional(),
+  metaDescription: z.string().max(500).optional(),
+});
 
-export interface UpdateSponsorDTO {
-  name?: string;
-  websiteUrl?: string;
-  contactName?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  sortOrder?: number;
-}
+export type UpdateNewsTranslationDTO = z.infer<typeof updateNewsTranslationSchema>;
 
 // ===================
-// UI FRAGMENTS DTOs
+// RESOURCES SCHEMAS
 // ===================
 
-export interface CreateUIFragmentDTO {
-  fragmentKey: string;
-  language?: LanguageCode;
-  description?: string;
-  type: UIComponentType;
-  section: UISection;
-  content: Record<string, any>;
-}
+export const createResourceSchema = z.object({
+  status: publicationStatusSchema.optional(),
+  sortOrder: z.number().int().nonnegative().optional(),
+  translations: z
+    .array(
+      z.object({
+        language: z.string().min(2).max(5),
+        title: z.string().min(1).max(300),
+        content: z.string().min(1),
+        slug: z.string().max(300).optional(),
+        metaTitle: z.string().max(200).optional(),
+        metaDescription: z.string().max(500).optional(),
+      }),
+    )
+    .min(1),
+});
 
-export interface UpdateUIFragmentDTO {
-  description?: string;
-  content?: Record<string, any>;
-}
+export type CreateResourceDTO = z.infer<typeof createResourceSchema>;
+
+export const updateResourceSchema = z.object({
+  status: publicationStatusSchema.optional(),
+  sortOrder: z.number().int().nonnegative().optional(),
+});
+
+export type UpdateResourceDTO = z.infer<typeof updateResourceSchema>;
+
+export const updateResourceTranslationSchema = z.object({
+  title: z.string().min(1).max(300).optional(),
+  content: z.string().min(1).optional(),
+  slug: z.string().max(300).optional(),
+  metaTitle: z.string().max(200).optional(),
+  metaDescription: z.string().max(500).optional(),
+});
+
+export type UpdateResourceTranslationDTO = z.infer<typeof updateResourceTranslationSchema>;
+
+// ===================
+// SPONSORS SCHEMAS
+// ===================
+
+export const createSponsorSchema = z.object({
+  name: z.string().min(1).max(200),
+  websiteUrl: z.string().url().optional(),
+  contactName: z.string().max(200).optional(),
+  contactEmail: z.string().email().optional(),
+  contactPhone: z.string().max(30).optional(),
+  sortOrder: z.number().int().nonnegative().optional(),
+});
+
+export type CreateSponsorDTO = z.infer<typeof createSponsorSchema>;
+
+export const updateSponsorSchema = createSponsorSchema.partial();
+
+export type UpdateSponsorDTO = z.infer<typeof updateSponsorSchema>;
+
+// ===================
+// UI FRAGMENTS SCHEMAS
+// ===================
+
+const uiComponentTypeSchema = z.enum([
+  "TEXT",
+  "RICH_TEXT",
+  "IMAGE_URL",
+  "CAROUSEL_LIST",
+  "CONFIG",
+  "LINK",
+]);
+
+const uiSectionSchema = z.enum([
+  "GLOBAL",
+  "HOME",
+  "FOOTER",
+  "NAVBAR",
+  "ADOPTIONS",
+  "VOLUNTEERS",
+  "DONATIONS",
+  "CONTACT",
+  "ABOUT_US",
+]);
+
+const languageCodeSchema = z.enum(["es", "en", "pt"]);
+
+export const createUIFragmentSchema = z.object({
+  fragmentKey: z.string().min(1).max(100),
+  language: languageCodeSchema.optional(),
+  description: z.string().max(500).optional(),
+  type: uiComponentTypeSchema,
+  section: uiSectionSchema,
+  content: z.record(z.string(), z.unknown()),
+});
+
+export type CreateUIFragmentDTO = z.infer<typeof createUIFragmentSchema>;
+
+export const updateUIFragmentSchema = z.object({
+  description: z.string().max(500).optional(),
+  content: z.record(z.string(), z.unknown()).optional(),
+});
+
+export type UpdateUIFragmentDTO = z.infer<typeof updateUIFragmentSchema>;
+
+// ===================
+// PARAM/QUERY SCHEMAS
+// ===================
+
+export const newsIdParamSchema = uuidParamSchema;
+export type NewsIdParams = z.infer<typeof newsIdParamSchema>;
+
+export const resourceIdSchema = resourceIdParamSchema;
+export type ResourceIdParams = z.infer<typeof resourceIdSchema>;
+
+export const sponsorIdSchema = sponsorIdParamSchema;
+export type SponsorIdParams = z.infer<typeof sponsorIdSchema>;
+
+export const languageSchema = languageParamSchema;
+
+export const paginationSchema = paginationQuerySchema;
+export type PaginationQuery = z.infer<typeof paginationSchema>;

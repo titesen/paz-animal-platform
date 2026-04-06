@@ -1,59 +1,102 @@
 /**
  * @file Events Module - Data Transfer Objects (DTOs)
- * @description Input DTOs for event management operations
+ * @description Zod schemas for event request validation
  */
 
-import type { EventModality, EventPaymentOption, RegistrationPaymentStatus } from "./events.types";
+import { z } from "zod";
 
 // ===================
-// EVENTS DTOs
+// COMMON SCHEMAS
 // ===================
 
-export interface CreateEventDTO {
-  eventDate: string; // ISO 8601
-  modality: EventModality;
-  virtualLink?: string;
-  isFree: boolean;
-  acceptsOnlinePayment?: boolean;
-  onlinePrice?: number;
-  acceptsOnSitePayment?: boolean;
-  onSitePrice?: number;
-  acceptsInKind?: boolean;
-  inKindDescription?: string;
-  translations: {
-    language: string;
-    title: string;
-    description?: string;
-  }[];
-}
+const eventModalitySchema = z.enum(["VIRTUAL", "IN_PERSON", "HYBRID"]);
+const paymentOptionSchema = z.enum(["FREE", "ONLINE_PAYMENT", "ON_SITE_CASH", "IN_KIND_DONATION"]);
+const paymentStatusSchema = z.enum(["NA", "PENDING", "PAID", "VERIFIED_ON_SITE"]);
 
-export interface UpdateEventDTO {
-  eventDate?: string;
-  modality?: EventModality;
-  virtualLink?: string;
-  isFree?: boolean;
-  acceptsOnlinePayment?: boolean;
-  onlinePrice?: number;
-  acceptsOnSitePayment?: boolean;
-  onSitePrice?: number;
-  acceptsInKind?: boolean;
-  inKindDescription?: string;
-}
+export const eventIdParamSchema = z.object({
+  eventId: z.string().uuid(),
+});
 
-export interface UpdateEventTranslationDTO {
-  title?: string;
-  description?: string;
-}
+export type EventIdParams = z.infer<typeof eventIdParamSchema>;
 
-export interface RegisterForEventDTO {
-  selectedPaymentOption: EventPaymentOption;
-}
+export const eventLanguageParamSchema = z.object({
+  eventId: z.string().uuid(),
+  language: z.string().min(2).max(5),
+});
 
-export interface UpdateRegistrationStatusDTO {
-  paymentStatus: RegistrationPaymentStatus;
-}
+// ===================
+// EVENTS SCHEMAS
+// ===================
 
-export interface CheckInDTO {
-  userId: string;
-  notes?: string;
-}
+export const createEventSchema = z.object({
+  eventDate: z.string().datetime(),
+  modality: eventModalitySchema,
+  virtualLink: z.string().url().optional(),
+  isFree: z.boolean(),
+  acceptsOnlinePayment: z.boolean().optional(),
+  onlinePrice: z.number().nonnegative().optional(),
+  acceptsOnSitePayment: z.boolean().optional(),
+  onSitePrice: z.number().nonnegative().optional(),
+  acceptsInKind: z.boolean().optional(),
+  inKindDescription: z.string().max(500).optional(),
+  translations: z
+    .array(
+      z.object({
+        language: z.string().min(2).max(5),
+        title: z.string().min(1).max(300),
+        description: z.string().max(2000).optional(),
+      }),
+    )
+    .min(1),
+});
+
+export type CreateEventDTO = z.infer<typeof createEventSchema>;
+
+export const updateEventSchema = z.object({
+  eventDate: z.string().datetime().optional(),
+  modality: eventModalitySchema.optional(),
+  virtualLink: z.string().url().optional(),
+  isFree: z.boolean().optional(),
+  acceptsOnlinePayment: z.boolean().optional(),
+  onlinePrice: z.number().nonnegative().optional(),
+  acceptsOnSitePayment: z.boolean().optional(),
+  onSitePrice: z.number().nonnegative().optional(),
+  acceptsInKind: z.boolean().optional(),
+  inKindDescription: z.string().max(500).optional(),
+});
+
+export type UpdateEventDTO = z.infer<typeof updateEventSchema>;
+
+export const updateEventTranslationSchema = z.object({
+  title: z.string().min(1).max(300).optional(),
+  description: z.string().max(2000).optional(),
+});
+
+export type UpdateEventTranslationDTO = z.infer<typeof updateEventTranslationSchema>;
+
+// ===================
+// REGISTRATION SCHEMAS
+// ===================
+
+export const registerForEventSchema = z.object({
+  selectedPaymentOption: paymentOptionSchema,
+});
+
+export type RegisterForEventDTO = z.infer<typeof registerForEventSchema>;
+
+export const updateRegistrationStatusSchema = z.object({
+  paymentStatus: paymentStatusSchema,
+});
+
+export type UpdateRegistrationStatusDTO = z.infer<typeof updateRegistrationStatusSchema>;
+
+// ===================
+// ATTENDANCE SCHEMAS
+// ===================
+
+export const checkInSchema = z.object({
+  userId: z.string().uuid(),
+  notes: z.string().max(500).optional(),
+});
+
+export type CheckInDTO = z.infer<typeof checkInSchema>;

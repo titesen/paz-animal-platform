@@ -17,6 +17,8 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from "../../common/utils/jwt.util";
+import { blacklistToken } from "../../common/utils/tokenBlacklist";
+import jwt from "jsonwebtoken";
 import * as authRepo from "./auth.repository";
 import type { GoogleOAuthDTO, LoginDTO, RefreshTokenDTO, RegisterDTO } from "./auth.dto";
 import type { AuthResponse } from "./auth.types";
@@ -226,6 +228,21 @@ export async function getCurrentUser(userId: string) {
     roles,
     createdAt: user.createdAt,
   };
+}
+
+// ===== LOGOUT =====
+
+/**
+ * Logout - revoke an access token via Redis blacklist
+ */
+export async function logout(token: string): Promise<void> {
+  const decoded = jwt.decode(token) as { exp?: number } | null;
+  if (decoded?.exp) {
+    const ttl = decoded.exp - Math.floor(Date.now() / 1000);
+    if (ttl > 0) {
+      await blacklistToken(token, ttl);
+    }
+  }
 }
 
 // ===== INTER-MODULE API =====

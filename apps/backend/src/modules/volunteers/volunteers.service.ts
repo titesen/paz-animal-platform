@@ -4,7 +4,7 @@
  */
 
 import { ConflictError, NotFoundError, ValidationError } from "../../common/types/errors";
-import * as authRepository from "../auth/auth.repository";
+import * as authService from "../auth/auth.service";
 import * as repository from "./volunteers.repository";
 import type {
   AssignTagDTO,
@@ -93,7 +93,7 @@ export async function promoteToVolunteer(applicationId: string, data: CreateVolu
   }
 
   // Check if user already exists with this email
-  const existingUser = await authRepository.findUserByEmail(application.email);
+  const existingUser = await authService.findUserByEmail(application.email);
 
   if (existingUser) {
     // Check if already a volunteer
@@ -103,7 +103,7 @@ export async function promoteToVolunteer(applicationId: string, data: CreateVolu
     }
 
     // Assign VOLUNTEER role to existing user
-    await authRepository.assignRoleToUser(existingUser.userId, "VOLUNTEER");
+    await authService.assignRoleToUser(existingUser.userId, "VOLUNTEER");
 
     // Create volunteer record
     return repository.createVolunteer({
@@ -114,7 +114,7 @@ export async function promoteToVolunteer(applicationId: string, data: CreateVolu
   }
 
   // Create new user account
-  const newUser = await authRepository.createUser({
+  const newUser = await authService.createUser({
     firstName: application.firstName,
     lastName: application.lastName,
     email: application.email,
@@ -124,7 +124,7 @@ export async function promoteToVolunteer(applicationId: string, data: CreateVolu
   });
 
   // Assign VOLUNTEER role
-  await authRepository.assignRoleToUser(newUser.userId, "VOLUNTEER");
+  await authService.assignRoleToUser(newUser.userId, "VOLUNTEER");
 
   // Create volunteer record
   return repository.createVolunteer({

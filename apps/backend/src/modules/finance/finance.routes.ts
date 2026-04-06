@@ -5,7 +5,9 @@
 
 import { Router } from "express";
 import { authenticate, requireRole } from "../../common/middlewares/auth";
+import { validate } from "../../common/middlewares/validate";
 import * as controller from "./finance.controller";
+import { createInKindDonationSchema, createMonetaryDonationSchema } from "./finance.dto";
 
 const router = Router();
 
@@ -35,7 +37,7 @@ router.post("/webhooks/mercadopago", controller.handleMercadoPagoWebhook);
  * POST /api/finance/donations
  * Can be authenticated or anonymous
  */
-router.post("/donations", controller.createDonation);
+router.post("/donations", validate(createMonetaryDonationSchema), controller.createDonation);
 
 // ===================
 // AUTHENTICATED ROUTES (required auth)
@@ -60,6 +62,7 @@ router.post(
   "/in-kind-donations",
   authenticate,
   requireRole("ADMIN", "VOLUNTEER"),
+  validate(createInKindDonationSchema),
   controller.createInKindDonation,
 );
 

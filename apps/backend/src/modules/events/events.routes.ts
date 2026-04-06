@@ -5,7 +5,17 @@
 
 import { Router } from "express";
 import { authenticate, requireVolunteerRole } from "../../common/middlewares/auth";
+import { validate } from "../../common/middlewares/validate";
 import * as controller from "./events.controller";
+import {
+  checkInSchema,
+  createEventSchema,
+  eventIdParamSchema,
+  eventLanguageParamSchema,
+  registerForEventSchema,
+  updateEventSchema,
+  updateEventTranslationSchema,
+} from "./events.dto";
 
 const router = Router();
 
@@ -23,7 +33,7 @@ router.get("/", controller.getAllEvents);
  * Get event by ID
  * GET /api/events/:eventId
  */
-router.get("/:eventId", controller.getEventById);
+router.get("/:eventId", validate(eventIdParamSchema, "params"), controller.getEventById);
 
 // ===================
 // AUTHENTICATED ROUTES
@@ -39,13 +49,24 @@ router.get("/my-registrations", authenticate, controller.getMyRegistrations);
  * Register for event
  * POST /api/events/:eventId/register
  */
-router.post("/:eventId/register", authenticate, controller.registerForEvent);
+router.post(
+  "/:eventId/register",
+  authenticate,
+  validate(eventIdParamSchema, "params"),
+  validate(registerForEventSchema),
+  controller.registerForEvent,
+);
 
 /**
  * Cancel registration
  * DELETE /api/events/:eventId/register
  */
-router.delete("/:eventId/register", authenticate, controller.cancelRegistration);
+router.delete(
+  "/:eventId/register",
+  authenticate,
+  validate(eventIdParamSchema, "params"),
+  controller.cancelRegistration,
+);
 
 // ===================
 // EVENT_ORGANIZER ROUTES
@@ -56,7 +77,13 @@ router.delete("/:eventId/register", authenticate, controller.cancelRegistration)
  * POST /api/events
  * Requires: EVENT_ORGANIZER role
  */
-router.post("/", authenticate, requireVolunteerRole("EVENT_ORGANIZER"), controller.createEvent);
+router.post(
+  "/",
+  authenticate,
+  requireVolunteerRole("EVENT_ORGANIZER"),
+  validate(createEventSchema),
+  controller.createEvent,
+);
 
 /**
  * Update event
@@ -67,6 +94,8 @@ router.patch(
   "/:eventId",
   authenticate,
   requireVolunteerRole("EVENT_ORGANIZER"),
+  validate(eventIdParamSchema, "params"),
+  validate(updateEventSchema),
   controller.updateEvent,
 );
 
@@ -79,6 +108,8 @@ router.patch(
   "/:eventId/translations/:language",
   authenticate,
   requireVolunteerRole("EVENT_ORGANIZER"),
+  validate(eventLanguageParamSchema, "params"),
+  validate(updateEventTranslationSchema),
   controller.updateEventTranslation,
 );
 
@@ -91,6 +122,7 @@ router.delete(
   "/:eventId",
   authenticate,
   requireVolunteerRole("EVENT_ORGANIZER"),
+  validate(eventIdParamSchema, "params"),
   controller.deleteEvent,
 );
 
@@ -103,6 +135,7 @@ router.get(
   "/:eventId/registrations",
   authenticate,
   requireVolunteerRole("EVENT_ORGANIZER"),
+  validate(eventIdParamSchema, "params"),
   controller.getEventRegistrations,
 );
 
@@ -115,6 +148,8 @@ router.post(
   "/:eventId/check-in",
   authenticate,
   requireVolunteerRole("EVENT_ORGANIZER"),
+  validate(eventIdParamSchema, "params"),
+  validate(checkInSchema),
   controller.checkInUser,
 );
 
@@ -127,6 +162,7 @@ router.get(
   "/:eventId/attendances",
   authenticate,
   requireVolunteerRole("EVENT_ORGANIZER"),
+  validate(eventIdParamSchema, "params"),
   controller.getEventAttendances,
 );
 

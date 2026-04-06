@@ -5,9 +5,7 @@
  */
 
 import type { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import type { AuthenticatedRequest, JSendSuccess } from "../../common/types";
-import { blacklistToken } from "../../common/utils/tokenBlacklist";
 import { asyncHandler } from "../../common/utils";
 import * as authService from "./auth.service";
 import type { LoginDTO, RefreshTokenDTO, RegisterDTO } from "./auth.dto";
@@ -106,14 +104,7 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
   const authHeader = req.headers.authorization;
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.substring(7);
-    // Decode without verification to read exp (already verified by authenticate middleware)
-    const decoded = jwt.decode(token) as { exp?: number } | null;
-    if (decoded?.exp) {
-      const ttl = decoded.exp - Math.floor(Date.now() / 1000);
-      if (ttl > 0) {
-        await blacklistToken(token, ttl);
-      }
-    }
+    await authService.logout(token);
   }
 
   const response: JSendSuccess = {
