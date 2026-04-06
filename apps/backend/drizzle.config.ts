@@ -13,10 +13,7 @@ export default defineConfig({
   out: "./src/db/migrations",
   dialect: "postgresql",
   dbCredentials: {
-    url:
-      process.env.DATABASE_MIGRATION_URL ||
-      process.env.DATABASE_URL ||
-      "postgresql://db_owner:migration_password@localhost:5432/paz_animal_local",
+    url: process.env.DATABASE_MIGRATION_URL || process.env.DATABASE_URL!,
   },
   verbose: true,
   strict: true,

@@ -176,7 +176,7 @@ export const updateMyPet = asyncHandler(
  * GET /api/pets/lost-alerts
  * Get all active lost pet alerts
  */
-export const getLostPetAlerts = asyncHandler(async (req, res: Response) => {
+export const getLostPetAlerts = asyncHandler(async (_req, res: Response) => {
   const result = await petsService.getLostPetAlerts();
 
   const response: JSendSuccess = {

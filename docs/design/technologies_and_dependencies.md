@@ -23,14 +23,14 @@
 * **Componentes:** **Shadcn/UI** (basado en Radix Primitives).  
 * **Gestión de Estado Servidor:** **TanStack Query (v5)**. (Reemplaza a useEffects manuales para fetch).  
 * **Formularios:** **React Hook Form** \+ **Zod Resolver**.  
-* **Enrutamiento:** **React Router DOM (v6)**.
+* **Enrutamiento:** **React Router DOM (v7+)**.
 
 ### **⚙️ Backend (apps/backend)**
 
 * **Runtime:** **Node.js (v20 LTS)** o superior (Hydrogen).  
-* **Framework Web:** **Express (v4)**.  
+* **Framework Web:** **Express (v5)**.  
   * *Seguridad:* helmet, cors, express-rate-limit.  
-* **Validación:** **Zod (v3)**. Fuente de verdad para validación de inputs y variables de entorno.  
+* **Validación:** **Zod (v4)**. Fuente de verdad para validación de inputs y variables de entorno.  
 * **Colas / Jobs:** **BullMQ** (requiere Redis).  
 * **Logging:** **Pino** o **Winston** (Salida JSON estructurada).
 

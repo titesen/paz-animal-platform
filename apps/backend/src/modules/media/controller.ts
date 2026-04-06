@@ -16,10 +16,11 @@ import { uploadFileSchema } from "./types";
 export const uploadFile = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     if (!req.file) {
-      return res.status(400).json({
+      res.status(400).json({
         status: "fail",
         data: { file: ["No file uploaded"] },
       });
+      return;
     }
 
     // Parse and validate request body

@@ -2,7 +2,7 @@ import { Calendar, Clock, Heart, Users } from 'lucide-react';
 import React from 'react';
 import { AboutUsSection } from '../components/sections';
 import { Button } from '../components/ui';
-import { TeamMember } from '../types';
+import type { TeamMember } from '../types';
 
 // Mock team data - En producción vendría de la API
 const teamMembers: TeamMember[] = [

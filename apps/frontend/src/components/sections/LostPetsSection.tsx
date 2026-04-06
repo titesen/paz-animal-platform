@@ -1,6 +1,6 @@
 import { AlertCircle, MapPin, Phone, Siren } from 'lucide-react';
 import React from 'react';
-import { Pet } from '../../types';
+import type { Pet } from '../../types';
 
 // Mock data for Lost Pets
 const lostPets: Pet[] = [

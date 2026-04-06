@@ -4,9 +4,7 @@ import { z } from "zod";
 const envSchema = z.object({
   // Server
   PORT: z.coerce.number().default(3000),
-  NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 
   // Database
   DATABASE_URL: z.string().url(),
@@ -17,6 +15,7 @@ const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(32).optional(),
   JWT_ACCESS_EXPIRATION: z.string().default("15m"),
   JWT_REFRESH_EXPIRATION: z.string().default("7d"),
+  BCRYPT_SALT_ROUNDS: z.coerce.number().int().min(8).max(15).default(10),
 
   // OAuth
   GOOGLE_CLIENT_ID: z.string().optional(),
@@ -58,8 +57,7 @@ const envSchema = z.object({
         return true;
       },
       {
-        message:
-          "ADMIN_DEFAULT_PASSWORD is required in production environment for security",
+        message: "ADMIN_DEFAULT_PASSWORD is required in production environment for security",
       },
     )
     .optional(),

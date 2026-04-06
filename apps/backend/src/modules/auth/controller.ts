@@ -4,8 +4,10 @@
  * @pattern Controller Layer - Handles HTTP concerns (req/res)
  */
 
-import type { Response } from "express";
+import type { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import type { AuthenticatedRequest, JSendSuccess } from "../../types";
+import { blacklistToken } from "../../shared/utils/tokenBlacklist";
 import { asyncHandler } from "../../utils";
 import * as authService from "./service";
 import type {
@@ -104,11 +106,21 @@ export const getCurrentUser = asyncHandler(
 
 /**
  * POST /api/auth/logout
- * Logout (client-side only - invalidate JWT on client)
+ * Logout - revokes the current access token via Redis blacklist
  */
-export const logout = asyncHandler(async (_req, res: Response) => {
-  // With JWT, logout is handled client-side by removing the token
-  // Optionally, implement token blacklisting with Redis here
+export const logout = asyncHandler(async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.substring(7);
+    // Decode without verification to read exp (already verified by authenticate middleware)
+    const decoded = jwt.decode(token) as { exp?: number } | null;
+    if (decoded?.exp) {
+      const ttl = decoded.exp - Math.floor(Date.now() / 1000);
+      if (ttl > 0) {
+        await blacklistToken(token, ttl);
+      }
+    }
+  }
 
   const response: JSendSuccess = {
     status: "success",
