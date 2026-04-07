@@ -3,6 +3,8 @@
  * @description Helper functions for formatting data (dates, currency, etc.)
  */
 
+import { PAGINATION } from "../constants";
+
 /**
  * Format a date to ISO 8601 string
  * @param date - Date object or ISO string
@@ -93,8 +95,11 @@ export function generateUniqueFilename(originalName: string): string {
  * @returns Parsed pagination object
  */
 export function parsePagination(page?: string, limit?: string) {
-  const parsedPage = Math.max(1, parseInt(page || "1", 10));
-  const parsedLimit = Math.min(100, Math.max(1, parseInt(limit || "10", 10))); // Max 100 items
+  const parsedPage = Math.max(1, parseInt(page || String(PAGINATION.DEFAULT_PAGE), 10));
+  const parsedLimit = Math.min(
+    PAGINATION.MAX_LIMIT,
+    Math.max(1, parseInt(limit || String(PAGINATION.DEFAULT_LIMIT), 10)),
+  );
   const offset = (parsedPage - 1) * parsedLimit;
 
   return {
