@@ -1,4 +1,5 @@
 import app from "./app";
+import { registerDomainEventListeners } from "./common/events/listeners";
 import { env } from "./config/env";
 import { logger } from "./config/logger";
 import { connectRedis, redis } from "./config/redis";
@@ -6,6 +7,9 @@ import { pool } from "./db";
 
 const PORT = env.PORT;
 const SHUTDOWN_TIMEOUT_MS = 30_000;
+
+// Register domain event listeners before accepting requests
+registerDomainEventListeners();
 
 // Connect to Redis (non-blocking — app works without it)
 connectRedis();

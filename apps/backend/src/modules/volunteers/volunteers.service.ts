@@ -3,6 +3,7 @@
  * @description Business logic for volunteer management
  */
 
+import { eventBus } from "../../common/events";
 import { ConflictError, NotFoundError, ValidationError } from "../../common/errors";
 import * as authService from "../auth/auth.service";
 import * as repository from "./volunteers.repository";
@@ -105,6 +106,11 @@ export async function promoteToVolunteer(applicationId: string, data: CreateVolu
     // Assign VOLUNTEER role to existing user
     await authService.assignRoleToUser(existingUser.userId, "VOLUNTEER");
 
+    eventBus.emit("volunteer.promoted", {
+      userId: existingUser.userId,
+      applicationId,
+    });
+
     // Create volunteer record
     return repository.createVolunteer({
       userId: existingUser.userId,
@@ -125,6 +131,11 @@ export async function promoteToVolunteer(applicationId: string, data: CreateVolu
 
   // Assign VOLUNTEER role
   await authService.assignRoleToUser(newUser.userId, "VOLUNTEER");
+
+  eventBus.emit("volunteer.promoted", {
+    userId: newUser.userId,
+    applicationId,
+  });
 
   // Create volunteer record
   return repository.createVolunteer({

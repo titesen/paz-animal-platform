@@ -4,6 +4,7 @@
  */
 
 import { logger } from "../../config/logger";
+import { eventBus } from "../../common/events";
 import * as mercadopago from "../../lib/mercadopago";
 import { NotFoundError, ValidationError } from "../../common/errors";
 import * as repository from "./finance.repository";
@@ -74,6 +75,13 @@ export async function createMonetaryDonation(
     },
     "Mercado Pago preference created",
   );
+
+  eventBus.emit("donation.created", {
+    donationId: donation.donationId,
+    userId: userId ?? null,
+    amount: data.amount.toString(),
+    currency,
+  });
 
   return {
     donation: {
@@ -258,6 +266,12 @@ export async function createInKindDonation(
     manualDonorContact: data.manualDonorContact,
     description: data.description,
     estimatedValue: data.estimatedValue?.toString() || "0",
+    receivedById,
+  });
+
+  eventBus.emit("donation.inKindCreated", {
+    donorName: data.manualDonorName || "Anonymous",
+    description: data.description,
     receivedById,
   });
 }
