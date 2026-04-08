@@ -4,8 +4,10 @@
  */
 
 import bcrypt from "bcrypt";
+import crypto from "crypto";
+import { env } from "../config/env";
 
-const SALT_ROUNDS = 12;
+const SALT_ROUNDS = env.BCRYPT_SALT_ROUNDS;
 
 /**
  * Hash a plain text password
@@ -22,10 +24,7 @@ export async function hashPassword(password: string): Promise<string> {
  * @param hashedPassword - Stored hashed password from database
  * @returns True if passwords match, false otherwise
  */
-export async function comparePassword(
-  password: string,
-  hashedPassword: string,
-): Promise<boolean> {
+export async function comparePassword(password: string, hashedPassword: string): Promise<boolean> {
   return bcrypt.compare(password, hashedPassword);
 }
 
@@ -36,6 +35,5 @@ export async function comparePassword(
  * @returns Hex-encoded random token
  */
 export function generateSecureToken(length: number = 32): string {
-  const crypto = require("crypto");
   return crypto.randomBytes(length).toString("hex");
 }
