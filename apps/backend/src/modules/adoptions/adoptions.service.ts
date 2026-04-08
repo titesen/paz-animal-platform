@@ -4,6 +4,7 @@
  */
 
 import { logger } from "../../config/logger";
+import { eventBus } from "../../common/events";
 import { ForbiddenError, NotFoundError, ValidationError } from "../../common/errors";
 import * as petsService from "../pets/pets.service";
 import * as adoptionsRepo from "./adoptions.repository";
@@ -36,6 +37,12 @@ export async function createAdoptionApplication(
     "Adoption application created",
   );
 
+  eventBus.emit("adoption.created", {
+    applicationId: application.applicationId,
+    clientId: userId,
+    petId: data.petId,
+  });
+
   return application;
 }
 
@@ -59,6 +66,12 @@ export async function updateAdoptionStatus(adoptionId: string, status: string) {
   const updated = await adoptionsRepo.updateAdoptionStatus(adoptionId, status);
 
   logger.info({ adoptionId, newStatus: status }, "Adoption status updated");
+
+  eventBus.emit("adoption.statusChanged", {
+    adoptionId,
+    previousStatus: adoption.status,
+    newStatus: status,
+  });
 
   return updated;
 }

@@ -34,6 +34,15 @@ Este esquema gestiona la autenticación y autorización de usuarios.
 | **`interviews`**            | Registro de entrevistas (**Polimórfico**: sirve para adopciones y voluntarios). |
 | **`adoption_followups`**    | Seguimientos obligatorios post-adopción.                                        |
 
+#### 👥 Módulo de Voluntarios
+
+| Tabla                                | Descripción                                                                     |
+| ------------------------------------ | ------------------------------------------------------------------------------- |
+| **`volunteer_applications`**         | Solicitudes de voluntariado (staging previo a la creación del perfil).           |
+| **`volunteer_roles`**                | Catálogo de roles operativos (Rescatista, Paseador, etc.).                      |
+| **`volunteers`**                     | Perfil operativo de voluntarios activos (1:1 con `users`).                      |
+| **`volunteers_volunteer_roles`**     | Tabla pivote N:M entre voluntarios y roles operativos.                          |
+
 #### 💰 Módulo de Finanzas (Transparencia)
 
 | Tabla                     | Descripción                                            |
@@ -61,7 +70,7 @@ Valores estrictos permitidos en el sistema para garantizar la integridad referen
 #### Estado de Mascota (`pet_status`)
 
 - `ADOPTION_AVAILABLE` (En adopción)
-- `ADOPTION_PROCESS` (En trámite/prueba)
+- `IN_PROCESS` (En trámite/prueba)
 - `OWNED` (Con dueño/Adoptado)
 - `LOST` (Perdido)
 - `DECEASED` (Fallecido)
@@ -75,10 +84,13 @@ Valores estrictos permitidos en el sistema para garantizar la integridad referen
 #### Estado de Adopción (`adoption_status`)
 
 - `REQUESTED` (Solicitada)
-- `INTERVIEW` (Entrevista pendiente)
-- `APPROVED` (Aprobada)
+- `UNDER_REVIEW` (En revisión)
+- `INTERVIEW_SCHEDULED` (Entrevista programada)
 - `REJECTED` (Rechazada)
-- `WITHDRAWN` (Cancelada por usuario)
+- `APPROVED` (Aprobada)
+- `PROBATION` (Período de prueba)
+- `COMPLETED` (Completada)
+- `REVOKED` (Revocada)
 
 #### Origen de Webhook (`webhook_source`)
 
@@ -156,4 +168,4 @@ Para el desarrollo local, el sistema se inicializa automáticamente con la sigui
 - **Usuario Admin Default:** `admin@pazanimal.org` (La contraseña se configura en el archivo `.env`).
 
 > **Nota Técnica:** Para ver la definición SQL exacta y los scripts de migración, consulta:
-> `apps/backend/src/db/schema.ts` o `database/init.sql`.
+> `apps/backend/src/db/schema/` (directorio con definiciones por dominio) o `database/init.sql`.

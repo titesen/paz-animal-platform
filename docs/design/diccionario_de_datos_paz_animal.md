@@ -171,8 +171,7 @@ Estructura de Campos (Atributos)
 | Nombre del Campo   | Tipo de Dato | Longitud (si aplica) | Nulabilidad (NULL/NOT NULL) | Restricciones Adicionales   | PK / FK | Descripción y Regla de Negocio                                                        |
 | :----------------- | :----------- | :------------------- | :-------------------------- | :-------------------------- | :------ | :------------------------------------------------------------------------------------ |
 | volunteer_id       | UUID         | N/A                  | NOT NULL                    | DEFAULT gen_random_uuid()   | PK      | Llave primaria de la tabla. Identificador único del perfil de voluntario.             |
-| user_id            | UUID         | N/A                  | NOT NULL                    | FK a auth.users             | FK      | Vinculación 1:1 con la identidad del usuario en el sistema.                           |
-| volunteer_role_id  | INT          | N/A                  | NULL                        | FK a public.volunteer_roles | FK      | Rol operativo específico del voluntario (ej. 'Paseador', 'Encargado de Redes').       |
+| user_id            | UUID         | N/A                  | NOT NULL                    | FK a auth.users, UNIQUE     | FK      | Vinculación 1:1 con la identidad del usuario en el sistema.                           |
 | bio                | TEXT         | N/A                  | NULL                        | N/A                         |         | Biografía o descripción corta del voluntario, visible en la sección "Sobre Nosotros". |
 | availability       | JSONB        | N/A                  | NOT NULL                    | DEFAULT '{}'                |         | Matriz de disponibilidad horaria del voluntario (días y turnos).                      |
 | qr_code            | UUID         | N/A                  | NULL                        | UNIQUE                      |         | Código QR único para la credencial física del voluntario.                             |
@@ -182,10 +181,32 @@ Estructura de Campos (Atributos)
 
 Relaciones y Políticas Referenciales
 
-| Entidad Relacionada (Referencia) | Campo FK en la Tabla Actual | Cardinalidad | Políticas Referenciales (ON DELETE/ON UPDATE) | Explicación                                                                                                                        |
-| :------------------------------- | :-------------------------- | :----------- | :-------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------- |
-| auth.users                       | user_id                     | 1:1          | CASCADE / CASCADE                             | Cada perfil de voluntario está vinculado a un único usuario. Si el usuario se elimina, el perfil de voluntario también se elimina. |
-| public.volunteer_roles           | volunteer_role_id           | N:1          | SET NULL / CASCADE                            | Un rol de voluntario puede estar asignado a muchos voluntarios. Si el rol se elimina, el campo se pone a NULL.                     |
+| Entidad Relacionada (Referencia)       | Campo FK en la Tabla Actual | Cardinalidad | Políticas Referenciales (ON DELETE/ON UPDATE) | Explicación                                                                                                                        |
+| :------------------------------------- | :-------------------------- | :----------- | :-------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------- |
+| auth.users                             | user_id                     | 1:1          | CASCADE / CASCADE                             | Cada perfil de voluntario está vinculado a un único usuario. Si el usuario se elimina, el perfil de voluntario también se elimina. |
+| public.volunteers_volunteer_roles      | volunteer_id                | 1:N          | CASCADE / CASCADE                             | Un voluntario puede tener múltiples roles operativos a través de la tabla de unión.                                                |
+
+#### **ENTIDAD: public.volunteers_volunteer_roles**
+
+| Propiedad                         | Valor                                                                                                                                                                               |
+| :-------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Nombre de la Entidad              | public.volunteers_volunteer_roles                                                                                                                                                   |
+| Función/Descripción de la Entidad | Tabla pivote que implementa la relación muchos-a-muchos (N:M) entre voluntarios y roles operativos, permitiendo que un voluntario desempeñe múltiples funciones simultáneamente. |
+
+Estructura de Campos (Atributos)
+
+| Nombre del Campo | Tipo de Dato | Longitud (si aplica) | Nulabilidad (NULL/NOT NULL) | Restricciones Adicionales    | PK / FK | Descripción y Regla de Negocio                                                   |
+| :--------------- | :----------- | :------------------- | :-------------------------- | :--------------------------- | :------ | :------------------------------------------------------------------------------- |
+| volunteer_id     | UUID         | N/A                  | NOT NULL                    | FK a public.volunteers       | FK      | Llave foránea que referencia al voluntario. Parte del índice compuesto.          |
+| role_id          | INT          | N/A                  | NOT NULL                    | FK a public.volunteer_roles  | FK      | Llave foránea que referencia al rol operativo. Parte del índice compuesto.       |
+| assigned_at      | TIMESTAMPTZ  | N/A                  | NOT NULL                    | DEFAULT NOW()                |         | Fecha y hora en que se asignó el rol al voluntario.                              |
+
+Relaciones y Políticas Referenciales
+
+| Entidad Relacionada (Referencia) | Campo FK en la Tabla Actual | Cardinalidad | Políticas Referenciales (ON DELETE/ON UPDATE) | Explicación                                                                                  |
+| :------------------------------- | :-------------------------- | :----------- | :-------------------------------------------- | :------------------------------------------------------------------------------------------- |
+| public.volunteers                | volunteer_id                | N:1          | CASCADE / CASCADE                             | Si un voluntario se elimina, todas sus asignaciones de roles se eliminan.                    |
+| public.volunteer_roles           | role_id                     | N:1          | CASCADE / CASCADE                             | Si un rol de voluntario se elimina, todas las asignaciones de ese rol se eliminan.           |
 
 #### **ENTIDAD: public.media**
 
@@ -533,9 +554,9 @@ Estructura de Campos (Atributos)
 
 Relaciones y Políticas Referenciales
 
-| Entidad Relacionada (Referencia) | Campo FK en la Tabla Actual | Cardinalidad | Políticas Referenciales (ON DELETE/ON UPDATE) | Explicación                                                                                                       |
-| :------------------------------- | :-------------------------- | :----------- | :-------------------------------------------- | :---------------------------------------------------------------------------------------------------------------- |
-| public.volunteers                | volunteer_role_id           | 1:N          | SET NULL / CASCADE                            | Un rol puede estar asignado a múltiples voluntarios. Si se elimina el rol, el campo en volunteers se pone a NULL. |
+| Entidad Relacionada (Referencia)       | Campo FK en la Tabla Actual | Cardinalidad | Políticas Referenciales (ON DELETE/ON UPDATE) | Explicación                                                                                                                          |
+| :------------------------------------- | :-------------------------- | :----------- | :-------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| public.volunteers_volunteer_roles      | role_id                     | 1:N          | CASCADE / CASCADE                             | Un rol puede estar asignado a múltiples voluntarios a través de la tabla de unión. Si se elimina el rol, las asignaciones se borran. |
 
 ### **ENTIDAD: public.interviews**
 

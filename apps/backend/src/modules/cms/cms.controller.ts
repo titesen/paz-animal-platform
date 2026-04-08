@@ -4,8 +4,9 @@
  */
 
 import type { Response } from "express";
+import { PAGINATION } from "../../common/constants";
 import type { AuthenticatedRequest } from "../../common/types";
-import { asyncHandler } from "../../common/utils";
+import { asyncHandler, calculateTotalPages } from "../../common/utils";
 import * as service from "./cms.service";
 import type {
   CreateNewsDTO,
@@ -29,15 +30,15 @@ import type { UISection } from "./cms.types";
  * Get all published news (public)
  */
 export const getAllPublishedNews = asyncHandler(async (req, res: Response) => {
-  const page = Number(req.query.page) || 1;
-  const limit = Math.min(Number(req.query.limit) || 20, 100);
+  const page = Number(req.query.page) || PAGINATION.DEFAULT_PAGE;
+  const limit = Math.min(Number(req.query.limit) || PAGINATION.DEFAULT_LIMIT, PAGINATION.MAX_LIMIT);
 
   const { items, total } = await service.getAllPublishedNews(page, limit);
   res.json({
     status: "success",
     data: {
       news: items,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page, limit, total, totalPages: calculateTotalPages(total, limit) },
     },
   });
 });

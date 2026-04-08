@@ -14,7 +14,7 @@ La fundación necesita digitalizar sus procesos manuales (actualmente en Excel/P
 
 ### Glosario Técnico
 
-- **DTO (Data Transfer Object):** Objeto Zod que define estrictamente qué datos entran y salen de la API.
+- **DTO (Data Transfer Object):** Esquema Zod definido en `{domain}.dto.ts` que valida estrictamente qué datos entran y salen de la API.
 
 - **V23:** Versión actual del esquema de base de datos Multi-Tenant.
 
@@ -87,10 +87,12 @@ graph TD
 
 Utilizamos un esquema **Multi-Schema** en Postgres para organizar lógicamente las tablas:
 
-- `auth`: `users`, `roles`, `permissions`, `sessions`.
+- `auth`: `users`, `roles`, `users_roles`.
 
-- `public`: `pets`, `adoptions`, `donations`, `media`.
+- `public`: `pets`, `adoptions`, `finance` (transactions, donations), `cms` (news, resources), `events`, `volunteers`, `media`, `interactions` (comments, likes, reports), `audit_logs`.
 
+> **Definiciones:** El esquema se define en `apps/backend/src/db/schema/` (directorio con archivos por dominio: `auth.ts`, `pets.ts`, `adoptions.ts`, `finance.ts`, `cms.ts`, `events.ts`, `volunteers.ts`, `enums.ts`, etc.).
+>
 > **Migraciones:** Gestionadas vía `drizzle-kit migrate`. Nunca se modifica la DB manualmente.
 
 ### Diseño de API (Estándar JSend)
@@ -151,17 +153,21 @@ router.post("/pets", requireRole("ADMIN"), createPet);
 
 ### Manejo de Errores
 
-- Uso de una clase `AppError` personalizada que extiende de `Error`.
+- Uso de una clase `AppError` personalizada que extiende de `Error`, con 9 subclases semánticas: `BadRequestError`, `UnauthorizedError`, `ForbiddenError`, `NotFoundError`, `ConflictError`, `ValidationError`, `RateLimitError`, `InternalError`, `ServiceUnavailableError` (ubicadas en `common/errors/`).
 
-- **Global Exception Filter:** Un middleware al final de `app.js` captura cualquier error no manejado, lo registra en logs JSON y devuelve un `500 Internal Server Error` genérico al usuario (evitando exponer _Stack Traces_).
+- **Global Exception Filter:** Un middleware al final de `app.ts` captura cualquier error no manejado, lo registra en logs JSON y devuelve un error genérico al usuario (evitando exponer _Stack Traces_).
 
 ### Observabilidad
 
-- **Logging:** Librería `pino`. Formato JSON estructurado.
+- **Logging:** Librería `pino`. Formato JSON estructurado con correlation IDs.
 
 - Niveles: `info` (producción), `debug` (desarrollo).
 
-- **Health Check:** Endpoint `/health` para monitoreo de uptime (útil para Railway/K8s).
+- **Health Check:** Endpoint `/health` para monitoreo de uptime (verifica DB, memoria, etc.).
+
+- **Event Bus:** Eventos de dominio tipados (`common/events/eventBus.ts`) emitidos por servicios y procesados por listeners registrados al inicio.
+
+- **Graceful Shutdown:** Señales SIGTERM/SIGINT cierran servidor, drenan pool de DB y desconectan Redis limpiamente.
 
 ### Estrategia de Pruebas
 
@@ -187,6 +193,21 @@ router.post("/pets", requireRole("ADMIN"), createPet);
 
 - **Semana 2:** Módulo de Mascotas (CRUD completo) e integración con R2 (Imágenes).
 
-- **Semana 3:** Módulo de Adopciones y Módulo de Donaciones (Integración Mercado Pago).
+- **Semana 3:** Módulo de Adopciones y Módulo de Finanzas (Integración Mercado Pago).
 
-- **Semana 4:** Testing de integración, QA y despliegue a entorno de Staging.
+- **Semana 4:** Módulos de CMS, Eventos, Voluntarios, Media.
+
+- **Semana 5:** Testing de integración, QA y despliegue a entorno de Staging.
+
+### Módulos Implementados (8)
+
+Cada módulo sigue la convención de archivos: `{domain}.controller.ts`, `{domain}.service.ts`, `{domain}.repository.ts`, `{domain}.repository.interface.ts`, `{domain}.routes.ts`, `{domain}.dto.ts`, `index.ts`. Opcionalmente incluye `{domain}.types.ts`, `{domain}.swagger.routes.ts` y `{domain}.swagger.schemas.ts`.
+
+1. **auth** — Autenticación (JWT, OAuth Google, registro, login, refresh, logout).
+2. **pets** — Gestión de mascotas (CRUD, filtros, búsqueda).
+3. **adoptions** — Flujo de adopción (solicitudes, entrevistas, seguimiento).
+4. **finance** — Donaciones monetarias, en especie y transacciones.
+5. **cms** — Noticias, recursos, sponsors, fragmentos UI.
+6. **events** — Eventos solidarios, inscripciones, asistencias.
+7. **volunteers** — Solicitudes de voluntariado, perfiles, promoción.
+8. **media** — Subida y gestión de archivos multimedia (polimórfica).

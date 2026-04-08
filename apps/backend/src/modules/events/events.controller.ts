@@ -4,8 +4,9 @@
  */
 
 import type { Response } from "express";
+import { PAGINATION } from "../../common/constants";
 import type { AuthenticatedRequest } from "../../common/types";
-import { asyncHandler } from "../../common/utils";
+import { asyncHandler, calculateTotalPages } from "../../common/utils";
 import * as service from "./events.service";
 import type {
   CheckInDTO,
@@ -42,8 +43,8 @@ export const createEvent = asyncHandler(async (req: AuthenticatedRequest, res: R
  * Public endpoint
  */
 export const getAllEvents = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const page = Number(req.query.page) || 1;
-  const limit = Math.min(Number(req.query.limit) || 20, 100);
+  const page = Number(req.query.page) || PAGINATION.DEFAULT_PAGE;
+  const limit = Math.min(Number(req.query.limit) || PAGINATION.DEFAULT_LIMIT, PAGINATION.MAX_LIMIT);
 
   const { items, total } = await service.getAllUpcomingEvents(page, limit);
 
@@ -51,7 +52,7 @@ export const getAllEvents = asyncHandler(async (req: AuthenticatedRequest, res: 
     status: "success",
     data: {
       events: items,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page, limit, total, totalPages: calculateTotalPages(total, limit) },
     },
   });
 });

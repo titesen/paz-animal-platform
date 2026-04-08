@@ -5,6 +5,7 @@
  */
 
 import { logger } from "../../config/logger";
+import { eventBus } from "../../common/events";
 import {
   BadRequestError,
   ConflictError,
@@ -68,6 +69,13 @@ export async function register(data: RegisterDTO): Promise<AuthResponse> {
   });
 
   logger.info({ userId: newUser.userId, email: newUser.email }, "User registered successfully");
+
+  eventBus.emit("user.registered", {
+    userId: newUser.userId,
+    email: newUser.email,
+    firstName: newUser.firstName,
+    lastName: newUser.lastName,
+  });
 
   return {
     user: {
