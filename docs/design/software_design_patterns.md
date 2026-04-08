@@ -65,19 +65,34 @@ _Cómo se comunican los objetos._
 
 ### ⛓️ Chain of Responsibility (Cadena de Responsabilidad)
 
-- **Contexto:** Express Middlewares (`apps/backend/src/main.ts`).
+- **Contexto:** Express Middlewares (`apps/backend/src/app.ts`).
 - **Implementación:**
   Cada request pasa por una cadena de procesadores:
-  `Helmet (Seguridad)` → `Cors` → `JSON Parser` → `Auth Middleware` → `Controller`.
+  `Helmet (Seguridad)` → `Cors` → `JSON Parser` → `Cookie Parser` → `Pino HTTP` → `Auth Middleware` → `validate()` → `Controller`.
   Si uno falla (o no llama a `next()`), la cadena se corta.
 - **Justificación:** Permite añadir validaciones transversales (como autenticación) sin modificar el código de los endpoints.
 
-### 📡 Observer (Observador)
+### 📡 Observer (Observador) — Backend
 
-- **Contexto:** Gestión de Estado Frontend (`apps/frontend/src/features/*/hooks`).
+- **Contexto:** Event Bus de dominio (`apps/backend/src/common/events/eventBus.ts`).
+- **Implementación:**
+  Clase `DomainEventBus` tipada que envuelve el `EventEmitter` nativo de Node.js. Los servicios de negocio emiten eventos de dominio (`user.registered`, `adoption.created`, `adoption.statusChanged`, `donation.created`, `donation.inKindCreated`, `volunteer.promoted`) y los listeners suscritos reaccionan de forma desacoplada.
+- **Referencia:** `eventBus.emit('adoption.created', payload)` en `adoptions.service.ts`.
+- **Justificación:** Permite añadir side-effects (emails, notificaciones, auditoría) sin ensuciar la lógica de negocio principal.
+
+### 📡 Observer (Observador) — Frontend
+
+- **Contexto:** Gestión de Estado Frontend (`apps/frontend`).
 - **Implementación:**
   Utilizamos **TanStack Query**. Los componentes de UI se "suscriben" a una query (ej. `['pets', id]`). Si la data cambia o se invalida en cualquier parte de la app, todos los componentes observadores se re-renderizan automáticamente.
 - **Justificación:** Mantiene la UI sincronizada con el servidor sin necesidad de _prop drilling_ o manejo manual de eventos.
+
+### 🛡️ Graceful Shutdown
+
+- **Contexto:** Ciclo de vida del servidor (`apps/backend/src/server.ts`).
+- **Implementación:**
+  El servidor captura señales SIGTERM y SIGINT para un apagado ordenado: (1) cierra el servidor HTTP para dejar de aceptar nuevas conexiones, (2) drena el pool de PostgreSQL con `pool.end()`, (3) desconecta Redis con `redis.quit()`, (4) ejecuta `process.exit(0)`. Un timeout de 30 segundos fuerza `process.exit(1)` si el apagado se estanca.
+- **Justificación:** Evita corrupción de datos y conexiones huérfanas en despliegues y reinicios.
 
 ---
 

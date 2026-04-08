@@ -59,45 +59,64 @@ Seguimos el patrón de **Módulos de Dominio**.
 ```text
 src/
 ├── config/                  # Configuración global
-│   └── env.ts               # Validación Zod de variables
+│   ├── env.ts               # Validación Zod de variables
+│   ├── logger.ts            # Configuración de Pino
+│   ├── redis.ts             # Configuración de ioredis
+│   └── swagger.config.ts    # Configuración de Swagger/OpenAPI
 ├── db/                      # Capa de Persistencia
-│   └── schema.ts            # Definición Drizzle
-├── modules/                 # Dominios de Negocio
+│   ├── schema/              # Definiciones Drizzle (directorio por dominio)
+│   │   ├── enums.ts         # Enumerados de PostgreSQL
+│   │   └── ...              # auth.ts, pets.ts, adoptions.ts, etc.
+│   ├── migrations/          # Migraciones (drizzle-kit)
+│   └── seeds/               # Datos iniciales de desarrollo
+├── modules/                 # Dominios de Negocio (8 módulos)
 │   └── {domain-name}/       # (kebab-case)
-│       ├── {domain}.controller.ts  # Manejo HTTP
-│       ├── {domain}.service.ts     # Lógica de Negocio
-│       ├── {domain}.repository.ts  # Consultas DB
-│       ├── {domain}.routes.ts      # Router Express
-│       └── {domain}.schema.ts      # Validación Zod (DTOs)
-└── shared/                  # Código compartido
-    ├── utils/               # Helpers puros
-    └── middlewares/         # Middlewares globales
-
+│       ├── {domain}.controller.ts          # Manejo HTTP
+│       ├── {domain}.service.ts             # Lógica de Negocio
+│       ├── {domain}.repository.ts          # Consultas DB
+│       ├── {domain}.repository.interface.ts # Contrato del repositorio (DIP)
+│       ├── {domain}.routes.ts              # Router Express + validate()
+│       ├── {domain}.dto.ts                 # Validación Zod (DTOs)
+│       ├── {domain}.types.ts               # Tipos de dominio (opcional)
+│       ├── {domain}.swagger.routes.ts      # Documentación Swagger (opcional)
+│       ├── {domain}.swagger.schemas.ts     # Esquemas Swagger (opcional)
+│       └── index.ts                        # Barrel export
+├── common/                  # Código compartido transversal
+│   ├── constants/           # Constantes del sistema (paginación, etc.)
+│   ├── errors/              # Clases de error personalizadas (AppError, etc.)
+│   ├── events/              # Event Bus de dominio (Observer pattern)
+│   ├── middlewares/         # Middlewares globales (auth, errorHandler, validate, rateLimiter)
+│   ├── types/               # Tipos compartidos
+│   └── utils/               # Helpers puros (asyncHandler, formatter, jwt, password, response)
+├── integrations/            # Clientes de servicios externos
+│   ├── cloudflare-r2/       # Object Storage (S3-compatible)
+│   ├── email/               # Servicio de email
+│   ├── google-oauth/        # OAuth con Google
+│   └── mercadopago/         # Pasarela de pagos
+├── app.ts                   # Configuración de Express
+└── server.ts                # Bootstrap + graceful shutdown
 ```
 
 ---
 
 ## 4. Estructura Detallada del Frontend (`apps/frontend`)
 
-Seguimos el patrón **Feature-Based**.
+Seguimos un patrón basado en **Componentes y Secciones**.
 
 ```text
 src/
 ├── components/
-│   └── ui/                  # Componentes Base (Shadcn - Atomic Design)
-│       ├── Button.tsx
-│       └── Dialog.tsx
-├── features/                # Módulos Funcionales
-│   └── {feature-name}/      # (kebab-case)
-│       ├── components/      # UI específica de la feature
-│       ├── hooks/           # Lógica de estado (useFeature.ts)
-│       ├── services/        # Llamadas API específicas
-│       └── types/           # Tipos TypeScript locales
+│   ├── ui/                  # Componentes reutilizables (Button, Header, Footer)
+│   └── sections/            # Secciones de negocio (Hero, FeaturedPets, DonationModule, etc.)
+├── hooks/                   # Hooks globales (useDarkMode)
 ├── pages/                   # Rutas / Vistas
-│   └── HomePage.tsx
-└── lib/                     # Utilidades y Configuración
-    └── utils.ts
-
+│   └── AboutPage.tsx
+├── lib/                     # Utilidades y Configuración
+│   └── utils.ts
+├── styles/                  # CSS Global y directivas de Tailwind
+├── types/                   # Tipos TypeScript compartidos
+├── App.tsx                  # Router, Providers y rutas inline
+└── main.tsx                 # Punto de entrada
 ```
 
 ---
