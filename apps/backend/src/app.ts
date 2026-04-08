@@ -6,7 +6,7 @@ import pinoHttp from "pino-http";
 import swaggerUi from "swagger-ui-express";
 import { env } from "./config/env";
 import { logger } from "./config/logger";
-import { swaggerSpec } from "./config/swagger.config";
+import { generateOpenAPIDocument } from "./config/openapi";
 import { pool } from "./db";
 import { apiLimiter, errorHandler, notFoundHandler } from "./middlewares";
 
@@ -91,8 +91,7 @@ app.get("/health", async (_req, res) => {
       usage: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
       total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
       percentage: Math.round(
-        (process.memoryUsage().heapUsed / process.memoryUsage().heapTotal) *
-          100,
+        (process.memoryUsage().heapUsed / process.memoryUsage().heapTotal) * 100,
       ),
     },
   };
@@ -136,10 +135,12 @@ app.get("/version", (_req, res) => {
 
 // API Documentation (Swagger UI) - disabled in production
 if (env.NODE_ENV !== "production") {
+  const openApiSpec = generateOpenAPIDocument();
+
   app.use(
     "/api-docs",
     swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec, {
+    swaggerUi.setup(openApiSpec, {
       customSiteTitle: "Paz Animal API Documentation",
       customCss: ".swagger-ui .topbar { display: none }",
       swaggerOptions: {
@@ -154,7 +155,7 @@ if (env.NODE_ENV !== "production") {
   // Swagger JSON endpoint
   app.get("/api-docs.json", (_req, res) => {
     res.setHeader("Content-Type", "application/json");
-    res.send(swaggerSpec);
+    res.send(openApiSpec);
   });
 }
 
