@@ -17,7 +17,7 @@ export const registerSchema = z.object({
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/\d/, "Password must contain at least one number")
     .regex(
-      /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/,
+      /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/,
       "Password must contain at least one special character",
     ),
   firstName: z.string().min(1, "First name is required").max(100),
@@ -63,9 +63,7 @@ export const requestPasswordResetSchema = z.object({
   email: z.string().email("Invalid email format"),
 });
 
-export type RequestPasswordResetDTO = z.infer<
-  typeof requestPasswordResetSchema
->;
+export type RequestPasswordResetDTO = z.infer<typeof requestPasswordResetSchema>;
 
 /**
  * Password Reset Confirmation Schema
@@ -83,7 +81,7 @@ export const resetPasswordSchema = z.object({
 export type ResetPasswordDTO = z.infer<typeof resetPasswordSchema>;
 
 /**
- * Auth Response Schema
+ * Internal Auth Response (used by service layer, includes refresh token)
  */
 export interface AuthResponse {
   user: {
@@ -96,5 +94,22 @@ export interface AuthResponse {
   tokens: {
     accessToken: string;
     refreshToken: string;
+  };
+}
+
+/**
+ * Client Auth Response (sent in HTTP response body, refresh token excluded)
+ * The refresh token is delivered via httpOnly cookie instead.
+ */
+export interface AuthClientResponse {
+  user: {
+    userId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    roles: string[];
+  };
+  tokens: {
+    accessToken: string;
   };
 }

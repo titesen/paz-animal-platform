@@ -12,19 +12,9 @@ import {
   UnauthorizedError,
 } from "../../types/errors";
 import { comparePassword, hashPassword } from "../../utils/encryption";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  verifyToken,
-} from "../../utils/jwt";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwt";
 import * as authRepo from "./repository";
-import type {
-  AuthResponse,
-  GoogleOAuthDTO,
-  LoginDTO,
-  RefreshTokenDTO,
-  RegisterDTO,
-} from "./types";
+import type { AuthResponse, GoogleOAuthDTO, LoginDTO, RegisterDTO } from "./types";
 
 /**
  * Register a new user
@@ -69,10 +59,7 @@ export async function register(data: RegisterDTO): Promise<AuthResponse> {
     roles,
   });
 
-  logger.info(
-    { userId: newUser.userId, email: newUser.email },
-    "User registered successfully",
-  );
+  logger.info({ userId: newUser.userId, email: newUser.email }, "User registered successfully");
 
   return {
     user: {
@@ -101,10 +88,7 @@ export async function login(data: LoginDTO): Promise<AuthResponse> {
   }
 
   // Verify password
-  const isPasswordValid = await comparePassword(
-    data.password,
-    user.passwordHash,
-  );
+  const isPasswordValid = await comparePassword(data.password, user.passwordHash);
 
   if (!isPasswordValid) {
     throw new UnauthorizedError("Invalid credentials", "INVALID_CREDENTIALS");
@@ -112,10 +96,7 @@ export async function login(data: LoginDTO): Promise<AuthResponse> {
 
   // Check if user is soft-deleted
   if (user.deletedAt) {
-    throw new UnauthorizedError(
-      "Account has been deactivated",
-      "ACCOUNT_DEACTIVATED",
-    );
+    throw new UnauthorizedError("Account has been deactivated", "ACCOUNT_DEACTIVATED");
   }
 
   // Get user roles
@@ -134,10 +115,7 @@ export async function login(data: LoginDTO): Promise<AuthResponse> {
     roles,
   });
 
-  logger.info(
-    { userId: user.userId, email: user.email },
-    "User logged in successfully",
-  );
+  logger.info({ userId: user.userId, email: user.email }, "User logged in successfully");
 
   return {
     user: {
@@ -156,13 +134,12 @@ export async function login(data: LoginDTO): Promise<AuthResponse> {
 
 /**
  * Refresh access token using refresh token
+ * @param token - Raw refresh token string (extracted from httpOnly cookie)
  */
-export async function refreshAccessToken(
-  data: RefreshTokenDTO,
-): Promise<AuthResponse> {
+export async function refreshAccessToken(token: string): Promise<AuthResponse> {
   try {
-    // Verify refresh token
-    const decoded = verifyToken(data.refreshToken);
+    // Verify refresh token with dedicated refresh secret
+    const decoded = verifyRefreshToken(token);
 
     // Find user
     const user = await authRepo.findUserById(decoded.userId);
@@ -172,10 +149,7 @@ export async function refreshAccessToken(
     }
 
     if (user.deletedAt) {
-      throw new UnauthorizedError(
-        "Account has been deactivated",
-        "ACCOUNT_DEACTIVATED",
-      );
+      throw new UnauthorizedError("Account has been deactivated", "ACCOUNT_DEACTIVATED");
     }
 
     // Get fresh roles (in case they changed)
@@ -207,26 +181,18 @@ export async function refreshAccessToken(
         refreshToken,
       },
     };
-  } catch (error) {
-    throw new UnauthorizedError(
-      "Invalid or expired refresh token",
-      "INVALID_REFRESH_TOKEN",
-    );
+  } catch {
+    throw new UnauthorizedError("Invalid or expired refresh token", "INVALID_REFRESH_TOKEN");
   }
 }
 
 /**
  * Login with Google OAuth
  */
-export async function loginWithGoogle(
-  _data: GoogleOAuthDTO,
-): Promise<AuthResponse> {
+export async function loginWithGoogle(_data: GoogleOAuthDTO): Promise<AuthResponse> {
   // TODO: Verify Google ID token and extract user info
   // This requires integration with Google OAuth client
-  throw new BadRequestError(
-    "Google OAuth not yet implemented",
-    "NOT_IMPLEMENTED",
-  );
+  throw new BadRequestError("Google OAuth not yet implemented", "NOT_IMPLEMENTED");
 }
 
 /**
@@ -240,10 +206,7 @@ export async function getCurrentUser(userId: string) {
   }
 
   if (user.deletedAt) {
-    throw new UnauthorizedError(
-      "Account has been deactivated",
-      "ACCOUNT_DEACTIVATED",
-    );
+    throw new UnauthorizedError("Account has been deactivated", "ACCOUNT_DEACTIVATED");
   }
 
   const roles = await authRepo.getUserRoles(user.userId);
