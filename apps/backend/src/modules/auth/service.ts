@@ -84,6 +84,7 @@ export async function login(data: LoginDTO): Promise<AuthResponse> {
   const user = await authRepo.findUserByEmail(data.email);
 
   if (!user || !user.passwordHash) {
+    logger.warn({ email: data.email }, "Login failed: invalid credentials");
     throw new UnauthorizedError("Invalid credentials", "INVALID_CREDENTIALS");
   }
 
@@ -91,6 +92,7 @@ export async function login(data: LoginDTO): Promise<AuthResponse> {
   const isPasswordValid = await comparePassword(data.password, user.passwordHash);
 
   if (!isPasswordValid) {
+    logger.warn({ userId: user.userId }, "Login failed: invalid credentials");
     throw new UnauthorizedError("Invalid credentials", "INVALID_CREDENTIALS");
   }
 
@@ -182,6 +184,7 @@ export async function refreshAccessToken(token: string): Promise<AuthResponse> {
       },
     };
   } catch {
+    logger.warn("Token refresh failed: invalid or expired refresh token");
     throw new UnauthorizedError("Invalid or expired refresh token", "INVALID_REFRESH_TOKEN");
   }
 }
