@@ -8,12 +8,7 @@ import { validate } from "../../middlewares";
 import { authenticate } from "../../middlewares/auth";
 import { authLimiter } from "../../middlewares/rateLimiter";
 import * as authController from "./controller";
-import {
-  googleOAuthSchema,
-  loginSchema,
-  refreshTokenSchema,
-  registerSchema,
-} from "./types";
+import { googleOAuthSchema, loginSchema, registerSchema } from "./types";
 
 const router = Router();
 
@@ -22,12 +17,7 @@ const router = Router();
  * @desc    Register a new user
  * @access  Public
  */
-router.post(
-  "/register",
-  authLimiter,
-  validate(registerSchema),
-  authController.register,
-);
+router.post("/register", authLimiter, validate(registerSchema), authController.register);
 
 /**
  * @route   POST /api/auth/login
@@ -38,26 +28,17 @@ router.post("/login", authLimiter, validate(loginSchema), authController.login);
 
 /**
  * @route   POST /api/auth/refresh
- * @desc    Refresh access token
- * @access  Public
+ * @desc    Refresh access token via httpOnly cookie
+ * @access  Public (cookie-based)
  */
-router.post(
-  "/refresh",
-  validate(refreshTokenSchema),
-  authController.refreshToken,
-);
+router.post("/refresh", authController.refreshToken);
 
 /**
  * @route   POST /api/auth/google
  * @desc    Login with Google OAuth
  * @access  Public
  */
-router.post(
-  "/google",
-  authLimiter,
-  validate(googleOAuthSchema),
-  authController.googleAuth,
-);
+router.post("/google", authLimiter, validate(googleOAuthSchema), authController.googleAuth);
 
 /**
  * @route   GET /api/auth/me
