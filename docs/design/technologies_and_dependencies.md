@@ -20,7 +20,7 @@
   * *Paradigma:* Hooks y Componentes Funcionales exclusivamente. (Prohibido Class Components).  
 * **Estilos:** **Tailwind CSS (v3+)**.  
   * *Utilidad:* clsx y tailwind-merge para clases condicionales.  
-* **Componentes:** **Shadcn/UI** (basado en Radix Primitives).  
+* **Componentes:** **Shadcn/UI** (basado en Radix Primitives) — _pendiente de instalación; actualmente se usan componentes propios en `components/ui/`_.  
 * **Gestión de Estado Servidor:** **TanStack Query (v5)**. (Reemplaza a useEffects manuales para fetch).  
 * **Formularios:** **React Hook Form** \+ **Zod Resolver**.  
 * **Enrutamiento:** **React Router DOM (v7+)**.
@@ -32,7 +32,7 @@
   * *Seguridad:* helmet, cors, express-rate-limit.  
 * **Validación:** **Zod (v4)**. Fuente de verdad para validación de inputs y variables de entorno.  
 * **Colas / Jobs:** **BullMQ** (requiere Redis).  
-* **Logging:** **Pino** o **Winston** (Salida JSON estructurada).
+* **Logging:** **Pino** (Salida JSON estructurada, integrado con `pino-http`).
 
 ---
 

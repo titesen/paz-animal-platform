@@ -63,10 +63,10 @@ graph TD
 ### Patrones Arquitectónicos
 
 - **Componentización:** _Atomic Design_ pragmático.
-- _Atoms/Molecules:_ `src/components/ui` (Botones, Inputs).
-- _Organisms/Templates:_ `src/features/*` (Formularios complejos, Cards de mascotas).
+- _Atoms/Molecules:_ `src/components/ui` (Button, Header, Footer).
+- _Organisms/Templates:_ `src/components/sections/*` (Hero, FeaturedPets, DonationModule, Events, etc.).
 
-- **Feature-First:** El código se agrupa por funcionalidad (`features/adoptions`), no por tipo técnico.
+- **Sections-Based:** El código se agrupa por secciones de negocio (`components/sections/`), con componentes UI genéricos en `components/ui/`.
 
 ### Tecnologías Clave
 
@@ -93,19 +93,28 @@ Evitamos el uso de stores globales complejos (Redux) a menos que sea estrictamen
 
 ```text
 src/
-├── components/ui/       # Botones, Dialogs (Genéricos)
-├── features/
-│   ├── auth/            # Login, Registro
-│   ├── pets/            # Catálogo, Filtros, Card
-│   │   ├── components/  # PetCard.tsx, PetFilters.tsx
-│   │   ├── hooks/       # usePets.ts (Query)
-│   │   └── types/       # Interfaces locales
-│   └── donations/       # Pasarela de pago
-├── layouts/             # MainLayout (Header+Footer), AuthLayout
-├── pages/               # Rutas que instancian features
-└── lib/                 # Configuración (axios, queryClient)
-
+├── components/
+│   ├── ui/              # Button, Header, Footer (Genéricos)
+│   └── sections/        # Secciones de negocio
+│       ├── Hero.tsx         # Banner principal
+│       ├── FeaturedPets.tsx # Catálogo destacado
+│       ├── DonationModule.tsx # Pasarela de donación
+│       ├── Events.tsx       # Eventos solidarios
+│       ├── Services.tsx     # Servicios de la fundación
+│       ├── LostPetsSection.tsx # Mascotas perdidas
+│       ├── Sponsors.tsx     # Patrocinadores
+│       └── AboutUsSection.tsx # Sobre nosotros
+├── hooks/               # Hooks globales (useDarkMode)
+├── pages/               # Rutas que componen secciones
+│   └── AboutPage.tsx
+├── lib/                 # Configuración y utilidades (utils.ts)
+├── styles/              # CSS Global (Tailwind directives)
+├── types/               # Tipos TypeScript compartidos
+├── App.tsx              # Router, Providers, rutas inline
+└── main.tsx             # Punto de entrada
 ```
+
+> **Nota sobre arquitectura futura:** Cuando la complejidad lo requiera, se podrá migrar a una estructura Feature-Sliced Design con `features/{domain}/components/hooks/services/types/`.
 
 ### Interacción con API y Datos
 
@@ -114,15 +123,17 @@ src/
 - _Request:_ Inyecta el Token JWT en el header `Authorization`.
 - _Response:_ Detecta `401 Unauthorized` para redirigir al login o refrescar token.
 
-- **Tipado:** Los tipos de respuesta se comparten desde el backend (`packages/shared-types`) o se infieren con Zod.
+- **Tipado:** Los tipos de respuesta se definen localmente en `src/types/` o se infieren con Zod.
 
 ### Enrutamiento
 
 - **Librería:** `react-router-dom` v7.
 - **Estrategia:**
-- _Rutas Públicas:_ `/`, `/adoptar`, `/donar`.
-- _Rutas Protegidas:_ `/admin/*`, `/mi-perfil` (Usando un componente `<ProtectedRoute>`).
-- _Lazy Loading:_ Las rutas pesadas (Admin) se cargan bajo demanda (`React.lazy`).
+- _Rutas Públicas:_ `/`, `/nosotros`. (Planificadas: `/adoptar`, `/donar`).
+- _Rutas Protegidas:_ Planificadas: `/admin/*`, `/mi-perfil` (Usando un componente `<ProtectedRoute>`).
+- _Lazy Loading:_ Las rutas pesadas (Admin) se cargarán bajo demanda (`React.lazy`).
+
+> **Estado actual:** Las rutas se definen inline en `App.tsx`. Solo `/` y `/nosotros` están implementadas. Las demás están comentadas como "listas para implementar".
 
 ### Manejo de Errores
 

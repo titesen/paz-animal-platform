@@ -3,9 +3,12 @@
  * @description Client for Mercado Pago payment gateway
  */
 
+import crypto from "node:crypto";
+
+import { env } from "../../config/env";
 import { logger } from "../../config/logger";
-import type { MercadoPagoPreference } from "../../types";
-import { ServiceUnavailableError } from "../../types/errors";
+import type { MercadoPagoPreference } from "../../common/types";
+import { ServiceUnavailableError } from "../../common/errors";
 
 /**
  * Create a payment preference in Mercado Pago
@@ -57,16 +60,40 @@ export async function createPaymentPreference(data: {
  * Implement proper HMAC-SHA256 signature verification using MP secret.
  * See: https://www.mercadopago.com/developers/en/docs/your-integrations/notifications/webhooks
  */
+/**
+ * Verify Mercado Pago webhook signature using HMAC-SHA256.
+ * @see https://www.mercadopago.com/developers/en/docs/your-integrations/notifications/webhooks
+ */
 export function verifyWebhookSignature(
-  _payload: string,
-  _signature: string,
+  dataId: string,
+  xRequestId: string,
+  xSignature: string,
 ): boolean {
-  // TODO: Implement signature verification
-  // This is critical for security to prevent fake payment notifications
+  if (!env.MP_WEBHOOK_SECRET) {
+    logger.warn("MP_WEBHOOK_SECRET not configured — rejecting webhook");
+    return false;
+  }
 
-  logger.warn(
-    "⚠️  Mercado Pago webhook signature verification STUB - DO NOT USE IN PRODUCTION",
+  const parts = Object.fromEntries(
+    xSignature.split(",").map((part) => {
+      const [key, ...rest] = part.trim().split("=");
+      return [key, rest.join("=")];
+    }),
   );
 
-  return true; // ⚠️ PLACEHOLDER - SECURITY RISK - NEVER use in production without verification
+  const ts = parts["ts"];
+  const receivedHash = parts["v1"];
+
+  if (!ts || !receivedHash) {
+    return false;
+  }
+
+  const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+
+  const expectedHash = crypto
+    .createHmac("sha256", env.MP_WEBHOOK_SECRET)
+    .update(manifest)
+    .digest("hex");
+
+  return crypto.timingSafeEqual(Buffer.from(receivedHash, "hex"), Buffer.from(expectedHash, "hex"));
 }

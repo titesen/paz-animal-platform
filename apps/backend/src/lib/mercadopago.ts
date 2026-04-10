@@ -3,11 +3,13 @@
  * @description Wrapper for Mercado Pago API interactions
  */
 
+import crypto from "node:crypto";
+
 import { env } from "../config/env";
 import type {
   MercadoPagoPaymentData,
   MercadoPagoPreferenceResponse,
-} from "../modules/finance/types";
+} from "../modules/finance/finance.types";
 
 const MP_BASE_URL = "https://api.mercadopago.com";
 
@@ -61,9 +63,7 @@ export async function createPaymentPreference(data: {
 /**
  * Get payment details from Mercado Pago
  */
-export async function getPaymentData(
-  paymentId: string,
-): Promise<MercadoPagoPaymentData> {
+export async function getPaymentData(paymentId: string): Promise<MercadoPagoPaymentData> {
   const response = await fetch(`${MP_BASE_URL}/v1/payments/${paymentId}`, {
     method: "GET",
     headers: {
@@ -80,19 +80,49 @@ export async function getPaymentData(
 }
 
 /**
- * Validate webhook signature (if configured)
- * Note: Mercado Pago uses x-signature header for webhook validation
+ * Validate Mercado Pago webhook signature using HMAC-SHA256.
+ * @see https://www.mercadopago.com/developers/en/docs/your-integrations/notifications/webhooks
  *
- * ⚠️ CRITICAL SECURITY WARNING ⚠️
- * TODO: MUST IMPLEMENT BEFORE PRODUCTION
- * This is a placeholder that doesn't perform real cryptographic validation.
- * Implement HMAC-SHA256 verification using Mercado Pago webhook secret.
+ * The x-signature header format: `id:<data.id>;request-id:<x-request-id>;ts:<ts>;`
+ * The manifest is signed with the webhook secret key using HMAC-SHA256.
+ *
+ * @param dataId - The `data.id` from the webhook payload
+ * @param xRequestId - The `x-request-id` header value
+ * @param xSignature - The `x-signature` header value (contains ts=...,v1=...)
+ * @returns true if signature is valid, false otherwise
  */
 export function validateWebhookSignature(
-  _payload: string,
-  signature: string,
+  dataId: string,
+  xRequestId: string,
+  xSignature: string,
 ): boolean {
-  // For now, return true if signature exists
-  // ⚠️ In production, implement proper HMAC validation to prevent fake payment notifications
-  return !!signature;
+  if (!env.MP_WEBHOOK_SECRET) {
+    return false;
+  }
+
+  // Parse x-signature header: "ts=<timestamp>,v1=<hash>"
+  const parts = Object.fromEntries(
+    xSignature.split(",").map((part) => {
+      const [key, ...rest] = part.trim().split("=");
+      return [key, rest.join("=")];
+    }),
+  );
+
+  const ts = parts["ts"];
+  const receivedHash = parts["v1"];
+
+  if (!ts || !receivedHash) {
+    return false;
+  }
+
+  // Build the manifest string per MP docs
+  const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+
+  // Compute HMAC-SHA256
+  const expectedHash = crypto
+    .createHmac("sha256", env.MP_WEBHOOK_SECRET)
+    .update(manifest)
+    .digest("hex");
+
+  return crypto.timingSafeEqual(Buffer.from(receivedHash, "hex"), Buffer.from(expectedHash, "hex"));
 }
