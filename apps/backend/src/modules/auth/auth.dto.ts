@@ -17,8 +17,7 @@ export const registerSchema = z.object({
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/\d/, "Password must contain at least one number")
     .regex(
-      // eslint-disable-next-line no-useless-escape
-      /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/,
+      /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/,
       "Password must contain at least one special character",
     ),
   firstName: z.string().min(1, "First name is required").max(100),
@@ -80,3 +79,37 @@ export const resetPasswordSchema = z.object({
 });
 
 export type ResetPasswordDTO = z.infer<typeof resetPasswordSchema>;
+
+/**
+ * Internal Auth Response (used by service layer, includes refresh token)
+ */
+export interface AuthResponse {
+  user: {
+    userId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    roles: string[];
+  };
+  tokens: {
+    accessToken: string;
+    refreshToken: string;
+  };
+}
+
+/**
+ * Client Auth Response (sent in HTTP response body, refresh token excluded)
+ * The refresh token is delivered via httpOnly cookie instead.
+ */
+export interface AuthClientResponse {
+  user: {
+    userId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    roles: string[];
+  };
+  tokens: {
+    accessToken: string;
+  };
+}

@@ -5,11 +5,34 @@
  */
 
 import type { Request, Response } from "express";
-import type { AuthenticatedRequest, JSendSuccess } from "../../common/types";
-import { asyncHandler } from "../../common/utils";
-import * as authService from "./auth.service";
-import type { LoginDTO, RefreshTokenDTO, RegisterDTO } from "./auth.dto";
-import type { AuthResponse } from "./auth.types";
+import jwt from "jsonwebtoken";
+import { REFRESH_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_OPTIONS } from "../../config/cookies";
+import { blacklistToken } from "../../shared/utils/tokenBlacklist";
+import type { AuthenticatedRequest, JSendSuccess } from "../../types";
+import { asyncHandler } from "../../utils";
+import * as authService from "./service";
+import type { AuthClientResponse, LoginDTO, RegisterDTO } from "./types";
+
+/**
+ * Sets the refresh token as an httpOnly cookie and returns the access token in the response body.
+ */
+function sendAuthResponse(
+  res: Response,
+  result: { accessToken: string; refreshToken: string; user: AuthClientResponse["user"] },
+  statusCode: number,
+): void {
+  res.cookie(REFRESH_TOKEN_COOKIE_NAME, result.refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
+
+  const response: JSendSuccess<AuthClientResponse> = {
+    status: "success",
+    data: {
+      user: result.user,
+      tokens: { accessToken: result.accessToken },
+    },
+  };
+
+  res.status(statusCode).json(response);
+}
 
 /**
  * POST /api/auth/register
@@ -20,12 +43,15 @@ export const register = asyncHandler(async (req, res: Response) => {
 
   const result = await authService.register(data);
 
-  const response: JSendSuccess<AuthResponse> = {
-    status: "success",
-    data: result,
-  };
-
-  res.status(201).json(response);
+  sendAuthResponse(
+    res,
+    {
+      accessToken: result.tokens.accessToken,
+      refreshToken: result.tokens.refreshToken,
+      user: result.user,
+    },
+    201,
+  );
 });
 
 /**
@@ -37,29 +63,54 @@ export const login = asyncHandler(async (req, res: Response) => {
 
   const result = await authService.login(data);
 
-  const response: JSendSuccess<AuthResponse> = {
-    status: "success",
-    data: result,
-  };
-
-  res.status(200).json(response);
+  sendAuthResponse(
+    res,
+    {
+      accessToken: result.tokens.accessToken,
+      refreshToken: result.tokens.refreshToken,
+      user: result.user,
+    },
+    200,
+  );
 });
 
 /**
  * POST /api/auth/refresh
- * Refresh access token
+ * Refresh access token using httpOnly cookie
  */
 export const refreshToken = asyncHandler(async (req, res: Response) => {
-  const data: RefreshTokenDTO = req.body;
+  // eslint-disable-next-line security/detect-object-injection
+  const oldRefreshToken: string | undefined = req.cookies[REFRESH_TOKEN_COOKIE_NAME];
 
-  const result = await authService.refreshAccessToken(data);
+  if (!oldRefreshToken) {
+    res.status(401).json({
+      status: "error",
+      message: "Missing refresh token",
+      code: "MISSING_REFRESH_TOKEN",
+    });
+    return;
+  }
 
-  const response: JSendSuccess<AuthResponse> = {
-    status: "success",
-    data: result,
-  };
+  const result = await authService.refreshAccessToken(oldRefreshToken);
 
-  res.status(200).json(response);
+  // Blacklist the old refresh token to prevent reuse (token rotation)
+  const decoded = jwt.decode(oldRefreshToken) as { exp?: number } | null;
+  if (decoded?.exp) {
+    const ttl = decoded.exp - Math.floor(Date.now() / 1000);
+    if (ttl > 0) {
+      await blacklistToken(oldRefreshToken, ttl);
+    }
+  }
+
+  sendAuthResponse(
+    res,
+    {
+      accessToken: result.tokens.accessToken,
+      refreshToken: result.tokens.refreshToken,
+      user: result.user,
+    },
+    200,
+  );
 });
 
 /**
@@ -71,12 +122,15 @@ export const googleAuth = asyncHandler(async (req, res: Response) => {
 
   const result = await authService.loginWithGoogle(data);
 
-  const response: JSendSuccess<AuthResponse> = {
-    status: "success",
-    data: result,
-  };
-
-  res.status(200).json(response);
+  sendAuthResponse(
+    res,
+    {
+      accessToken: result.tokens.accessToken,
+      refreshToken: result.tokens.refreshToken,
+      user: result.user,
+    },
+    200,
+  );
 });
 
 /**
@@ -98,14 +152,37 @@ export const getCurrentUser = asyncHandler(async (req: AuthenticatedRequest, res
 
 /**
  * POST /api/auth/logout
- * Logout - revokes the current access token via Redis blacklist
+ * Logout - revokes access token and refresh token, clears cookie
  */
 export const logout = asyncHandler(async (req: Request, res: Response) => {
+  // Blacklist access token
   const authHeader = req.headers.authorization;
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.substring(7);
-    await authService.logout(token);
+    const decoded = jwt.decode(token) as { exp?: number } | null;
+    if (decoded?.exp) {
+      const ttl = decoded.exp - Math.floor(Date.now() / 1000);
+      if (ttl > 0) {
+        await blacklistToken(token, ttl);
+      }
+    }
   }
+
+  // Blacklist refresh token from cookie
+  // eslint-disable-next-line security/detect-object-injection
+  const refreshCookie: string | undefined = req.cookies[REFRESH_TOKEN_COOKIE_NAME];
+  if (refreshCookie) {
+    const decoded = jwt.decode(refreshCookie) as { exp?: number } | null;
+    if (decoded?.exp) {
+      const ttl = decoded.exp - Math.floor(Date.now() / 1000);
+      if (ttl > 0) {
+        await blacklistToken(refreshCookie, ttl);
+      }
+    }
+  }
+
+  // Clear the refresh token cookie
+  res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_OPTIONS);
 
   const response: JSendSuccess = {
     status: "success",

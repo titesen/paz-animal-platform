@@ -1,7 +1,9 @@
 // Password hashing utilities using bcrypt
 import bcrypt from "bcrypt";
-import crypto from "node:crypto";
-import { env } from "../../config/env";
+import crypto from "crypto";
+import { env } from "../config/env";
+
+const SALT_ROUNDS = env.BCRYPT_SALT_ROUNDS;
 
 /**
  * Hash a plain text password

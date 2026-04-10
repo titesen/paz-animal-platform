@@ -11,19 +11,11 @@ import {
   ConflictError,
   NotFoundError,
   UnauthorizedError,
-} from "../../common/errors";
-import { comparePassword, hashPassword } from "../../common/utils/password.util";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  verifyRefreshToken,
-} from "../../common/utils/jwt.util";
-import { blacklistToken } from "../../common/utils/tokenBlacklist";
-import jwt from "jsonwebtoken";
-import * as authRepo from "./auth.repository";
-import type { GoogleOAuthDTO, LoginDTO, RefreshTokenDTO, RegisterDTO } from "./auth.dto";
-import type { AuthResponse } from "./auth.types";
-import type { NewUser } from "../../common/types";
+} from "../../types/errors";
+import { comparePassword, hashPassword } from "../../utils/encryption";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwt";
+import * as authRepo from "./repository";
+import type { AuthResponse, GoogleOAuthDTO, LoginDTO, RegisterDTO } from "./types";
 
 /**
  * Register a new user
@@ -70,13 +62,6 @@ export async function register(data: RegisterDTO): Promise<AuthResponse> {
 
   logger.info({ userId: newUser.userId, email: newUser.email }, "User registered successfully");
 
-  eventBus.emit("user.registered", {
-    userId: newUser.userId,
-    email: newUser.email,
-    firstName: newUser.firstName,
-    lastName: newUser.lastName,
-  });
-
   return {
     user: {
       userId: newUser.userId,
@@ -100,6 +85,7 @@ export async function login(data: LoginDTO): Promise<AuthResponse> {
   const user = await authRepo.findUserByEmail(data.email);
 
   if (!user || !user.passwordHash) {
+    logger.warn({ email: data.email }, "Login failed: invalid credentials");
     throw new UnauthorizedError("Invalid credentials", "INVALID_CREDENTIALS");
   }
 
@@ -107,6 +93,7 @@ export async function login(data: LoginDTO): Promise<AuthResponse> {
   const isPasswordValid = await comparePassword(data.password, user.passwordHash);
 
   if (!isPasswordValid) {
+    logger.warn({ userId: user.userId }, "Login failed: invalid credentials");
     throw new UnauthorizedError("Invalid credentials", "INVALID_CREDENTIALS");
   }
 
@@ -150,11 +137,12 @@ export async function login(data: LoginDTO): Promise<AuthResponse> {
 
 /**
  * Refresh access token using refresh token
+ * @param token - Raw refresh token string (extracted from httpOnly cookie)
  */
-export async function refreshAccessToken(data: RefreshTokenDTO): Promise<AuthResponse> {
+export async function refreshAccessToken(token: string): Promise<AuthResponse> {
   try {
-    // Verify refresh token
-    const decoded = verifyRefreshToken(data.refreshToken);
+    // Verify refresh token with dedicated refresh secret
+    const decoded = verifyRefreshToken(token);
 
     // Find user
     const user = await authRepo.findUserById(decoded.userId);
@@ -197,6 +185,7 @@ export async function refreshAccessToken(data: RefreshTokenDTO): Promise<AuthRes
       },
     };
   } catch {
+    logger.warn("Token refresh failed: invalid or expired refresh token");
     throw new UnauthorizedError("Invalid or expired refresh token", "INVALID_REFRESH_TOKEN");
   }
 }

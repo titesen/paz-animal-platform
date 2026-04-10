@@ -6,7 +6,7 @@ import pinoHttp from "pino-http";
 import swaggerUi from "swagger-ui-express";
 import { env } from "./config/env";
 import { logger } from "./config/logger";
-import { swaggerSpec } from "./config/swagger.config";
+import { generateOpenAPIDocument } from "./config/openapi";
 import { pool } from "./db";
 import { apiLimiter, errorHandler, notFoundHandler } from "./common/middlewares";
 
@@ -135,10 +135,12 @@ app.get("/version", (_req, res) => {
 
 // API Documentation (Swagger UI) - disabled in production
 if (env.NODE_ENV !== "production") {
+  const openApiSpec = generateOpenAPIDocument();
+
   app.use(
     "/api-docs",
     swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec, {
+    swaggerUi.setup(openApiSpec, {
       customSiteTitle: "Paz Animal API Documentation",
       customCss: ".swagger-ui .topbar { display: none }",
       swaggerOptions: {
@@ -153,7 +155,7 @@ if (env.NODE_ENV !== "production") {
   // Swagger JSON endpoint
   app.get("/api-docs.json", (_req, res) => {
     res.setHeader("Content-Type", "application/json");
-    res.send(swaggerSpec);
+    res.send(openApiSpec);
   });
 }
 

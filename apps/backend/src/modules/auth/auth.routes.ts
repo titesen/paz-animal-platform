@@ -4,11 +4,11 @@
  */
 
 import { Router } from "express";
-import { validate } from "../../common/middlewares";
-import { authenticate } from "../../common/middlewares/auth";
-import { authLimiter } from "../../common/middlewares/rateLimiter";
-import * as authController from "./auth.controller";
-import { googleOAuthSchema, loginSchema, refreshTokenSchema, registerSchema } from "./auth.dto";
+import { validate } from "../../middlewares";
+import { authenticate } from "../../middlewares/auth";
+import { authLimiter } from "../../middlewares/rateLimiter";
+import * as authController from "./controller";
+import { googleOAuthSchema, loginSchema, registerSchema } from "./types";
 
 const router = Router();
 
@@ -28,10 +28,10 @@ router.post("/login", authLimiter, validate(loginSchema), authController.login);
 
 /**
  * @route   POST /api/auth/refresh
- * @desc    Refresh access token
- * @access  Public
+ * @desc    Refresh access token via httpOnly cookie
+ * @access  Public (cookie-based)
  */
-router.post("/refresh", validate(refreshTokenSchema), authController.refreshToken);
+router.post("/refresh", authController.refreshToken);
 
 /**
  * @route   POST /api/auth/google
