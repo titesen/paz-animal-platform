@@ -15,4 +15,6 @@ export interface IAuthRepository {
   findUserByGoogleId(googleId: string): Promise<User | null>;
   softDeleteUser(userId: string): Promise<void>;
   isEmailTaken(email: string): Promise<boolean>;
+  updateUserProfile(userId: string, data: Partial<User>): Promise<User | null>;
+  update2FASecret(userId: string, secret: string | null, enabled: boolean): Promise<void>;
 }

@@ -18,6 +18,7 @@ import eventsRoutes from "./modules/events/events.routes";
 import financeRoutes from "./modules/finance/finance.routes";
 import mediaRoutes from "./modules/media/media.routes";
 import petsRoutes from "./modules/pets/pets.routes";
+import usersRoutes from "./modules/users/users.routes";
 import volunteersRoutes from "./modules/volunteers/volunteers.routes";
 
 const app = express();
@@ -171,6 +172,7 @@ app.use(
 // API routes with rate limiting
 app.use("/api", apiLimiter);
 app.use("/api/auth", authRoutes);
+app.use("/api/users", usersRoutes);
 app.use("/api/pets", petsRoutes);
 app.use("/api/adoptions", adoptionsRoutes);
 app.use("/api/volunteers", volunteersRoutes);

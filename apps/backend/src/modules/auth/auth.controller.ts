@@ -7,11 +7,11 @@
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { REFRESH_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_OPTIONS } from "../../config/cookies";
-import { blacklistToken } from "../../shared/utils/tokenBlacklist";
-import type { AuthenticatedRequest, JSendSuccess } from "../../types";
-import { asyncHandler } from "../../utils";
-import * as authService from "./service";
-import type { AuthClientResponse, LoginDTO, RegisterDTO } from "./types";
+import { blacklistToken } from "../../common/utils/tokenBlacklist";
+import type { AuthenticatedRequest, JSendSuccess } from "../../common/types";
+import { asyncHandler } from "../../common/utils";
+import * as authService from "./auth.service";
+import type { AuthClientResponse, LoginDTO, RegisterDTO } from "./auth.dto";
 
 /**
  * Sets the refresh token as an httpOnly cookie and returns the access token in the response body.
@@ -189,6 +189,122 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
     data: {
       message: "Logged out successfully",
     },
+  };
+
+  res.status(200).json(response);
+});
+
+// ===================
+// PROFILE MANAGEMENT
+// ===================
+
+/**
+ * PATCH /api/auth/profile
+ * Update current user's profile
+ */
+export const updateProfile = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user.userId;
+  const data = req.body;
+
+  const result = await authService.updateProfile(userId, data);
+
+  const response: JSendSuccess = {
+    status: "success",
+    data: result,
+  };
+
+  res.status(200).json(response);
+});
+
+/**
+ * PATCH /api/auth/password
+ * Change current user's password
+ */
+export const changePassword = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user.userId;
+  const data = req.body;
+
+  await authService.changePassword(userId, data);
+
+  const response: JSendSuccess = {
+    status: "success",
+    data: { message: "Password changed successfully" },
+  };
+
+  res.status(200).json(response);
+});
+
+/**
+ * DELETE /api/auth/account
+ * Soft-delete current user's account
+ */
+export const deleteAccount = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user.userId;
+  const { password } = req.body;
+
+  await authService.deleteAccount(userId, password);
+
+  res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_OPTIONS);
+
+  const response: JSendSuccess = {
+    status: "success",
+    data: { message: "Account deleted successfully" },
+  };
+
+  res.status(200).json(response);
+});
+
+// ===================
+// TWO-FACTOR AUTH
+// ===================
+
+/**
+ * POST /api/auth/2fa/setup
+ * Generate 2FA secret and QR URI
+ */
+export const setup2FA = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user.userId;
+
+  const result = await authService.setup2FA(userId);
+
+  const response: JSendSuccess = {
+    status: "success",
+    data: result,
+  };
+
+  res.status(200).json(response);
+});
+
+/**
+ * POST /api/auth/2fa/verify
+ * Verify 2FA code and enable it
+ */
+export const verify2FA = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user.userId;
+  const data = req.body;
+
+  await authService.verify2FA(userId, data);
+
+  const response: JSendSuccess = {
+    status: "success",
+    data: { message: "2FA enabled successfully" },
+  };
+
+  res.status(200).json(response);
+});
+
+/**
+ * POST /api/auth/2fa/disable
+ * Disable 2FA (not allowed for admins)
+ */
+export const disable2FA = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user.userId;
+
+  await authService.disable2FA(userId);
+
+  const response: JSendSuccess = {
+    status: "success",
+    data: { message: "2FA disabled successfully" },
   };
 
   res.status(200).json(response);

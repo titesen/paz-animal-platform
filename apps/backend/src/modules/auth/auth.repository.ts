@@ -127,6 +127,39 @@ export async function isEmailTaken(email: string): Promise<boolean> {
   return existing.length > 0;
 }
 
+/**
+ * Update user profile fields
+ */
+export async function updateUserProfile(
+  userId: string,
+  data: Partial<typeof schema.users.$inferInsert>,
+) {
+  const result = await db
+    .update(schema.users)
+    .set(data)
+    .where(eq(schema.users.userId, userId))
+    .returning();
+
+  return result[0] || null;
+}
+
+/**
+ * Update 2FA secret and enabled status
+ */
+export async function update2FASecret(
+  userId: string,
+  secret: string | null,
+  enabled: boolean,
+): Promise<void> {
+  await db
+    .update(schema.users)
+    .set({
+      tfaSecret: secret,
+      tfaEnabled: enabled,
+    })
+    .where(eq(schema.users.userId, userId));
+}
+
 // Compile-time contract verification
 void ({
   findUserByEmail,
@@ -138,4 +171,6 @@ void ({
   findUserByGoogleId,
   softDeleteUser,
   isEmailTaken,
+  updateUserProfile,
+  update2FASecret,
 } satisfies IAuthRepository);
