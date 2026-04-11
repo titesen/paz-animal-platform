@@ -22,3 +22,12 @@ export async function logAction(data: {
 }) {
   return auditLogsRepo.createAuditLog(data);
 }
+
+export async function getJobHistory(filters?: {
+  jobName?: string;
+  status?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  return auditLogsRepo.findJobHistory(filters);
+}

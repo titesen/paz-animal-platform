@@ -10,3 +10,12 @@ export const auditLogQuerySchema = z.object({
 });
 
 export type AuditLogQueryDTO = z.infer<typeof auditLogQuerySchema>;
+
+export const jobHistoryQuerySchema = z.object({
+  jobName: z.string().max(100).optional(),
+  status: z.string().max(50).optional(),
+  limit: z.string().regex(/^\d+$/).optional(),
+  offset: z.string().regex(/^\d+$/).optional(),
+});
+
+export type JobHistoryQueryDTO = z.infer<typeof jobHistoryQuerySchema>;

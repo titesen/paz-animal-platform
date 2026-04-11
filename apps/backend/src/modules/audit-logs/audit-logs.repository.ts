@@ -48,3 +48,27 @@ export async function findAuditLogs(filters?: {
 
   return query;
 }
+
+export async function findJobHistory(filters?: {
+  jobName?: string;
+  status?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const conditions = [];
+
+  if (filters?.jobName) {
+    conditions.push(eq(schema.jobHistory.jobName, filters.jobName));
+  }
+  if (filters?.status) {
+    conditions.push(eq(schema.jobHistory.status, filters.status));
+  }
+
+  return db
+    .select()
+    .from(schema.jobHistory)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .orderBy(sql`${schema.jobHistory.startedAt} DESC`)
+    .limit(filters?.limit || 50)
+    .offset(filters?.offset || 0);
+}
