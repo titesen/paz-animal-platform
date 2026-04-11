@@ -16,6 +16,7 @@ export const createAdoptionApplicationSchema = z.object({
   reasonForAdoption: z.string().min(10).max(2000),
   canAffordVetCare: z.boolean(),
   willingToFollowUp: z.boolean(),
+  evidenceUrls: z.array(z.string().url()).max(10).optional(),
 });
 
 export type CreateAdoptionApplicationDTO = z.infer<typeof createAdoptionApplicationSchema>;
@@ -73,4 +74,20 @@ export type UpdateFollowupDTO = z.infer<typeof updateFollowupSchema>;
 
 export const followupIdSchema = z.object({
   followupId: z.string().uuid(),
+});
+
+// ===== STATUS UPDATE SCHEMA =====
+
+export const updateAdoptionStatusSchema = z.object({
+  status: z.enum([
+    "REQUESTED",
+    "UNDER_REVIEW",
+    "INTERVIEW_SCHEDULED",
+    "REJECTED",
+    "APPROVED",
+    "PROBATION",
+    "COMPLETED",
+    "REVOKED",
+  ]),
+  adminNotes: z.string().max(2000).optional(),
 });

@@ -68,9 +68,9 @@ export const getAllAdoptions = asyncHandler(async (_req: AuthenticatedRequest, r
 
 export const updateAdoptionStatus = asyncHandler(async (req, res: Response) => {
   const { adoptionId } = req.params;
-  const { status } = req.body;
+  const { status, adminNotes } = req.body;
 
-  const result = await adoptionsService.updateAdoptionStatus(adoptionId, status);
+  const result = await adoptionsService.updateAdoptionStatus(adoptionId, status, adminNotes);
 
   const response: JSendSuccess = {
     status: "success",

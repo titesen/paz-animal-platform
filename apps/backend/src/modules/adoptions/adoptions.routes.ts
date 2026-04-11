@@ -4,7 +4,6 @@
  */
 
 import { Router } from "express";
-import { z } from "zod";
 import { validate } from "../../common/middlewares";
 import { authenticate, requireRole, requireVolunteerRole } from "../../common/middlewares/auth";
 import * as adoptionsController from "./adoptions.controller";
@@ -15,6 +14,7 @@ import {
   createInterviewSchema,
   followupIdSchema,
   interviewIdSchema,
+  updateAdoptionStatusSchema,
   updateFollowupSchema,
   updateInterviewSchema,
 } from "./adoptions.dto";
@@ -69,7 +69,7 @@ router.patch(
   authenticate,
   requireVolunteerRole("ADOPTION_COORD"),
   validate(adoptionIdSchema, "params"),
-  validate(z.object({ status: z.string() })),
+  validate(updateAdoptionStatusSchema),
   adoptionsController.updateAdoptionStatus,
 );
 

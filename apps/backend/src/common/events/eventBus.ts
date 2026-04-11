@@ -56,6 +56,10 @@ export interface DomainEventMap {
   "adoption.created": AdoptionCreatedEvent;
   "adoption.statusChanged": AdoptionStatusChangedEvent;
   "adoption.interviewScheduled": { interviewId: string; adoptionId: string };
+  "adoption.approved": { applicationId: string; petId: string; clientId: string };
+  "adoption.completed": { applicationId: string; petId: string; clientId: string };
+  "adoption.rejected": { applicationId: string; petId: string; reason: string };
+  "adoption.autoRejected": { petId: string; approvedApplicationId: string; rejectedCount: number };
   "donation.created": DonationCreatedEvent;
   "donation.inKindCreated": InKindDonationCreatedEvent;
   "volunteer.promoted": VolunteerPromotedEvent;

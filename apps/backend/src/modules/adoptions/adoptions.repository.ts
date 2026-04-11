@@ -3,7 +3,7 @@
  * @description Data access layer for adoption applications
  */
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, ne } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 import type { NewAdoptionApplication } from "../../common/types";
@@ -153,6 +153,55 @@ export async function updateFollowup(
     .update(schema.adoptionFollowups)
     .set(data)
     .where(eq(schema.adoptionFollowups.followupId, followupId))
+    .returning();
+  return result || null;
+}
+
+// ===== TRANSACTIONAL / BULK OPERATIONS =====
+
+export async function rejectOtherPendingApplications(petId: string, excludeApplicationId: string) {
+  const pendingStatuses = ["REQUESTED", "UNDER_REVIEW", "INTERVIEW_SCHEDULED", "APPROVED"] as const;
+
+  return db
+    .update(schema.adoptionApplications)
+    .set({
+      status: "REJECTED" as any,
+      decidedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(schema.adoptionApplications.petId, petId),
+        inArray(schema.adoptionApplications.status, [...pendingStatuses] as any),
+        ne(schema.adoptionApplications.applicationId, excludeApplicationId),
+      ),
+    );
+}
+
+export async function getCompletedFollowupMonths(applicationId: string) {
+  const rows = await db
+    .select({ monthNumber: schema.adoptionFollowups.monthNumber })
+    .from(schema.adoptionFollowups)
+    .where(
+      and(
+        eq(schema.adoptionFollowups.applicationId, applicationId),
+        isNotNull(schema.adoptionFollowups.performedAt),
+      ),
+    );
+  return rows.map((r) => r.monthNumber);
+}
+
+export async function updateAdoptionFields(
+  adoptionId: string,
+  data: Partial<{
+    status: string;
+    decidedAt: Date;
+    adminNotes: string;
+  }>,
+) {
+  const [result] = await db
+    .update(schema.adoptionApplications)
+    .set(data as any)
+    .where(eq(schema.adoptionApplications.applicationId, adoptionId))
     .returning();
   return result || null;
 }

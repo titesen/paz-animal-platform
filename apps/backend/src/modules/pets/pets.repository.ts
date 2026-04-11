@@ -378,3 +378,18 @@ void ({
   createLostPetAlert,
   resolveLostPetAlert,
 } satisfies IPetsRepository);
+
+// ===== TRANSACTIONAL HELPERS =====
+
+export async function updatePetStatusAndOwner(
+  petId: string,
+  status: string,
+  ownerId: string | null,
+) {
+  const [result] = await db
+    .update(schema.pets)
+    .set({ status: status as any, ownerId })
+    .where(eq(schema.pets.petId, petId))
+    .returning();
+  return result || null;
+}
