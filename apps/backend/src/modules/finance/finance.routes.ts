@@ -7,7 +7,15 @@ import { Router } from "express";
 import { authenticate, requireRole } from "../../common/middlewares/auth";
 import { validate } from "../../common/middlewares/validate";
 import * as controller from "./finance.controller";
-import { createInKindDonationSchema, createMonetaryDonationSchema } from "./finance.dto";
+import {
+  collectionIdSchema,
+  createInKindDonationSchema,
+  createMonetaryDonationSchema,
+  createOnSiteCollectionSchema,
+  createPaymentMethodSchema,
+  methodIdSchema,
+  updatePaymentMethodSchema,
+} from "./finance.dto";
 
 const router = Router();
 
@@ -88,5 +96,60 @@ router.get(
  * Requires: ADMIN role
  */
 router.get("/summary", authenticate, requireRole("ADMIN"), controller.getFinancialSummary);
+
+// ===================
+// ON-SITE COLLECTIONS
+// ===================
+
+router.post(
+  "/on-site-collections",
+  authenticate,
+  requireRole("ADMIN", "VOLUNTEER"),
+  validate(createOnSiteCollectionSchema),
+  controller.createOnSiteCollection,
+);
+
+router.get(
+  "/on-site-collections",
+  authenticate,
+  requireRole("ADMIN"),
+  controller.getAllOnSiteCollections,
+);
+
+router.get(
+  "/on-site-collections/:collectionId",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(collectionIdSchema, "params"),
+  controller.getOnSiteCollectionById,
+);
+
+// ===================
+// PAYMENT METHODS
+// ===================
+
+router.get("/payment-methods", authenticate, controller.getMyPaymentMethods);
+
+router.post(
+  "/payment-methods",
+  authenticate,
+  validate(createPaymentMethodSchema),
+  controller.createPaymentMethod,
+);
+
+router.patch(
+  "/payment-methods/:methodId",
+  authenticate,
+  validate(methodIdSchema, "params"),
+  validate(updatePaymentMethodSchema),
+  controller.updatePaymentMethod,
+);
+
+router.delete(
+  "/payment-methods/:methodId",
+  authenticate,
+  validate(methodIdSchema, "params"),
+  controller.deletePaymentMethod,
+);
 
 export default router;

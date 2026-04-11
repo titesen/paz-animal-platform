@@ -6,9 +6,15 @@
 import { logger } from "../../config/logger";
 import { eventBus } from "../../common/events";
 import * as mercadopago from "../../lib/mercadopago";
-import { NotFoundError, ValidationError } from "../../common/errors";
+import { ForbiddenError, NotFoundError, ValidationError } from "../../common/errors";
 import * as repository from "./finance.repository";
-import type { CreateInKindDonationDTO, CreateMonetaryDonationDTO } from "./finance.dto";
+import type {
+  CreateInKindDonationDTO,
+  CreateMonetaryDonationDTO,
+  CreateOnSiteCollectionDTO,
+  CreatePaymentMethodDTO,
+  UpdatePaymentMethodDTO,
+} from "./finance.dto";
 import type {
   DonationWithTransaction,
   FinancialSummary,
@@ -281,4 +287,106 @@ export async function createInKindDonation(
  */
 export async function getAllInKindDonations() {
   return await repository.findAllInKindDonations();
+}
+
+// ===================
+// ON-SITE COLLECTIONS
+// ===================
+
+export async function createOnSiteCollection(
+  receivedById: string,
+  data: CreateOnSiteCollectionDTO,
+) {
+  const collection = await repository.createOnSiteCollection({
+    userId: receivedById,
+    entityType: data.entityType,
+    entityId: data.entityId,
+    type: data.type,
+    description: data.description,
+    estimatedValue: data.estimatedValue?.toString(),
+    currency: data.currency,
+    receivedById,
+  });
+
+  logger.info(
+    { collectionId: collection.collectionId, type: data.type },
+    "On-site collection recorded",
+  );
+
+  return collection;
+}
+
+export async function getOnSiteCollectionById(collectionId: string) {
+  const collection = await repository.findOnSiteCollectionById(collectionId);
+  if (!collection) {
+    throw new NotFoundError("On-site collection not found", "COLLECTION_NOT_FOUND");
+  }
+  return collection;
+}
+
+export async function getAllOnSiteCollections() {
+  return repository.findAllOnSiteCollections();
+}
+
+// ===================
+// PAYMENT METHODS
+// ===================
+
+export async function createPaymentMethod(userId: string, data: CreatePaymentMethodDTO) {
+  // If setting as default, clear other defaults first
+  if (data.isDefault) {
+    await repository.clearDefaultPaymentMethods(userId);
+  }
+
+  const method = await repository.createPaymentMethod({
+    userId,
+    provider: data.provider,
+    externalToken: data.externalToken,
+    cardBrand: data.cardBrand,
+    lastFour: data.lastFour,
+    description: data.description,
+    isDefault: data.isDefault,
+  });
+
+  logger.info({ methodId: method.methodId, userId }, "Payment method created");
+
+  return method;
+}
+
+export async function getMyPaymentMethods(userId: string) {
+  return repository.findPaymentMethodsByUser(userId);
+}
+
+export async function updatePaymentMethod(
+  userId: string,
+  methodId: string,
+  data: UpdatePaymentMethodDTO,
+) {
+  const method = await repository.findPaymentMethodById(methodId);
+  if (!method) {
+    throw new NotFoundError("Payment method not found", "METHOD_NOT_FOUND");
+  }
+  if (method.userId !== userId) {
+    throw new ForbiddenError("You can only update your own payment methods");
+  }
+
+  // If setting as default, clear other defaults first
+  if (data.isDefault) {
+    await repository.clearDefaultPaymentMethods(userId);
+  }
+
+  return repository.updatePaymentMethod(methodId, data);
+}
+
+export async function deletePaymentMethod(userId: string, methodId: string) {
+  const method = await repository.findPaymentMethodById(methodId);
+  if (!method) {
+    throw new NotFoundError("Payment method not found", "METHOD_NOT_FOUND");
+  }
+  if (method.userId !== userId) {
+    throw new ForbiddenError("You can only delete your own payment methods");
+  }
+
+  await repository.deletePaymentMethod(methodId);
+  logger.info({ methodId, userId }, "Payment method deleted");
 }

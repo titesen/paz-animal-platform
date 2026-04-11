@@ -259,3 +259,103 @@ void ({
   findInKindDonationById,
   findAllInKindDonations,
 } satisfies IFinanceRepository);
+
+// ===================
+// ON-SITE COLLECTIONS
+// ===================
+
+export async function createOnSiteCollection(data: {
+  userId: string;
+  entityType: string;
+  entityId: string;
+  type: string;
+  description: string;
+  estimatedValue?: string;
+  currency?: string;
+  receivedById: string;
+}) {
+  const [result] = await db
+    .insert(schema.onSiteCollections)
+    .values(data as any)
+    .returning();
+  return result;
+}
+
+export async function findOnSiteCollectionById(collectionId: string) {
+  const [result] = await db
+    .select()
+    .from(schema.onSiteCollections)
+    .where(eq(schema.onSiteCollections.collectionId, collectionId))
+    .limit(1);
+  return result || null;
+}
+
+export async function findAllOnSiteCollections() {
+  return db
+    .select()
+    .from(schema.onSiteCollections)
+    .orderBy(desc(schema.onSiteCollections.receivedAt));
+}
+
+// ===================
+// PAYMENT METHODS
+// ===================
+
+export async function createPaymentMethod(data: {
+  userId: string;
+  provider: string;
+  externalToken: string;
+  cardBrand?: string;
+  lastFour?: string;
+  description?: string;
+  isDefault?: boolean;
+}) {
+  const [result] = await db
+    .insert(schema.paymentMethods)
+    .values(data as any)
+    .returning();
+  return result;
+}
+
+export async function findPaymentMethodsByUser(userId: string) {
+  return db
+    .select()
+    .from(schema.paymentMethods)
+    .where(eq(schema.paymentMethods.userId, userId))
+    .orderBy(desc(schema.paymentMethods.createdAt));
+}
+
+export async function findPaymentMethodById(methodId: string) {
+  const [result] = await db
+    .select()
+    .from(schema.paymentMethods)
+    .where(eq(schema.paymentMethods.methodId, methodId))
+    .limit(1);
+  return result || null;
+}
+
+export async function updatePaymentMethod(
+  methodId: string,
+  data: Partial<{
+    description: string;
+    isDefault: boolean;
+  }>,
+) {
+  const [result] = await db
+    .update(schema.paymentMethods)
+    .set(data)
+    .where(eq(schema.paymentMethods.methodId, methodId))
+    .returning();
+  return result || null;
+}
+
+export async function deletePaymentMethod(methodId: string): Promise<void> {
+  await db.delete(schema.paymentMethods).where(eq(schema.paymentMethods.methodId, methodId));
+}
+
+export async function clearDefaultPaymentMethods(userId: string): Promise<void> {
+  await db
+    .update(schema.paymentMethods)
+    .set({ isDefault: false })
+    .where(eq(schema.paymentMethods.userId, userId));
+}

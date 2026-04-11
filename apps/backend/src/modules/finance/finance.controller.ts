@@ -172,3 +172,75 @@ export const handleMercadoPagoWebhook = asyncHandler(async (req: Request, res: R
     message: "Webhook received",
   });
 });
+
+// ===================
+// ON-SITE COLLECTIONS
+// ===================
+
+export const createOnSiteCollection = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const receivedById = req.user!.userId;
+    const result = await service.createOnSiteCollection(receivedById, req.body);
+
+    res.status(201).json({ status: "success", data: result });
+  },
+);
+
+export const getOnSiteCollectionById = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { collectionId } = req.params;
+    const result = await service.getOnSiteCollectionById(collectionId);
+
+    res.json({ status: "success", data: result });
+  },
+);
+
+export const getAllOnSiteCollections = asyncHandler(
+  async (_req: AuthenticatedRequest, res: Response) => {
+    const result = await service.getAllOnSiteCollections();
+
+    res.json({ status: "success", data: result });
+  },
+);
+
+// ===================
+// PAYMENT METHODS
+// ===================
+
+export const createPaymentMethod = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user!.userId;
+    const result = await service.createPaymentMethod(userId, req.body);
+
+    res.status(201).json({ status: "success", data: result });
+  },
+);
+
+export const getMyPaymentMethods = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user!.userId;
+    const result = await service.getMyPaymentMethods(userId);
+
+    res.json({ status: "success", data: result });
+  },
+);
+
+export const updatePaymentMethod = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user!.userId;
+    const { methodId } = req.params;
+    const result = await service.updatePaymentMethod(userId, methodId, req.body);
+
+    res.json({ status: "success", data: result });
+  },
+);
+
+export const deletePaymentMethod = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user!.userId;
+    const { methodId } = req.params;
+    await service.deletePaymentMethod(userId, methodId);
+
+    res.json({ status: "success", data: null });
+  },
+);
