@@ -64,6 +64,11 @@ export interface DomainEventMap {
   "donation.inKindCreated": InKindDonationCreatedEvent;
   "volunteer.promoted": VolunteerPromotedEvent;
   "volunteer.interviewScheduled": { interviewId: string; applicationId: string };
+  "report.thresholdReached": {
+    entityType: string;
+    entityId: string;
+    unresolvedCount: number;
+  };
 }
 
 export type DomainEventName = keyof DomainEventMap;

@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 
@@ -40,4 +40,21 @@ export async function resolveReport(reportId: string, isResolved: boolean) {
     .where(eq(schema.reports.reportId, reportId))
     .returning();
   return result || null;
+}
+
+export async function countUnresolvedReports(
+  entityType: string,
+  entityId: string,
+): Promise<number> {
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(schema.reports)
+    .where(
+      and(
+        eq(schema.reports.entityType, entityType),
+        eq(schema.reports.entityId, entityId),
+        eq(schema.reports.isResolved, false),
+      ),
+    );
+  return row?.count ?? 0;
 }

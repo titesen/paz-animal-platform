@@ -1,15 +1,30 @@
 import { NotFoundError } from "../../common/errors";
+import { eventBus } from "../../common/events/eventBus";
 import * as reportsRepo from "./reports.repository";
 import type { CreateReportDTO, ResolveReportDTO } from "./reports.dto";
 
+const AUTO_MODERATION_THRESHOLD = 5;
+
 export async function createReport(userId: string, data: CreateReportDTO) {
-  return reportsRepo.createReport({
+  const report = await reportsRepo.createReport({
     reporterId: userId,
     entityType: data.entityType,
     entityId: data.entityId,
     reason: data.reason,
     description: data.description,
   });
+
+  const unresolvedCount = await reportsRepo.countUnresolvedReports(data.entityType, data.entityId);
+
+  if (unresolvedCount >= AUTO_MODERATION_THRESHOLD) {
+    eventBus.emit("report.thresholdReached", {
+      entityType: data.entityType,
+      entityId: data.entityId,
+      unresolvedCount,
+    });
+  }
+
+  return report;
 }
 
 export async function getAllReports(filters?: { isResolved?: boolean }) {
