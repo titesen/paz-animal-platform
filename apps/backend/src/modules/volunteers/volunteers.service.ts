@@ -4,6 +4,7 @@
  */
 
 import { eventBus } from "../../common/events";
+import { logger } from "../../config/logger";
 import { ConflictError, NotFoundError, ValidationError } from "../../common/errors";
 import * as authService from "../auth/auth.service";
 import * as repository from "./volunteers.repository";
@@ -11,8 +12,10 @@ import type {
   AssignTagDTO,
   CreateVolunteerApplicationDTO,
   CreateVolunteerDTO,
+  CreateVolunteerInterviewDTO,
   UpdateApplicationStatusDTO,
   UpdateVolunteerDTO,
+  UpdateVolunteerInterviewDTO,
 } from "./volunteers.dto";
 
 // ===== VOLUNTEER APPLICATIONS =====
@@ -247,4 +250,68 @@ export async function removeTag(volunteerId: string, roleId: number) {
  */
 export async function getAllRoles() {
   return repository.findAllVolunteerRoles();
+}
+
+// ===== INTERVIEWS =====
+
+export async function scheduleApplicationInterview(
+  applicationId: string,
+  interviewerId: string,
+  data: CreateVolunteerInterviewDTO,
+) {
+  const application = await repository.findVolunteerApplicationById(applicationId);
+  if (!application) {
+    throw new NotFoundError("Application not found", "APPLICATION_NOT_FOUND");
+  }
+
+  const interview = await repository.createInterview({
+    entityType: "VOLUNTEER_APPLICATION",
+    entityId: applicationId,
+    interviewerId,
+    scheduledAt: new Date(data.scheduledAt),
+    modality: data.modality,
+    durationMinutes: data.durationMinutes,
+    locationDetails: data.locationDetails,
+  });
+
+  logger.info(
+    { interviewId: interview.interviewId, applicationId },
+    "Volunteer application interview scheduled",
+  );
+
+  eventBus.emit("volunteer.interviewScheduled", {
+    interviewId: interview.interviewId,
+    applicationId,
+  });
+
+  return interview;
+}
+
+export async function getInterviewsByApplication(applicationId: string) {
+  const application = await repository.findVolunteerApplicationById(applicationId);
+  if (!application) {
+    throw new NotFoundError("Application not found", "APPLICATION_NOT_FOUND");
+  }
+  return repository.findInterviewsByEntity("VOLUNTEER_APPLICATION", applicationId);
+}
+
+export async function updateApplicationInterview(
+  interviewId: string,
+  data: UpdateVolunteerInterviewDTO,
+) {
+  const interview = await repository.findInterviewById(interviewId);
+  if (!interview) {
+    throw new NotFoundError("Interview not found", "INTERVIEW_NOT_FOUND");
+  }
+
+  const updateData: Record<string, unknown> = {};
+  if (data.scheduledAt) updateData.scheduledAt = new Date(data.scheduledAt);
+  if (data.modality) updateData.modality = data.modality;
+  if (data.durationMinutes !== undefined) updateData.durationMinutes = data.durationMinutes;
+  if (data.locationDetails !== undefined) updateData.locationDetails = data.locationDetails;
+  if (data.result) updateData.result = data.result;
+  if (data.observations !== undefined) updateData.observations = data.observations;
+  if (data.occurredAt) updateData.occurredAt = new Date(data.occurredAt);
+
+  return repository.updateInterview(interviewId, updateData as any);
 }

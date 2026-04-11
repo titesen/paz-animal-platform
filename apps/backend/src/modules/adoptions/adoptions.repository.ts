@@ -3,7 +3,7 @@
  * @description Data access layer for adoption applications
  */
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 import type { NewAdoptionApplication } from "../../common/types";
@@ -56,3 +56,103 @@ void ({
   findAdoptionsByUser,
   findAllAdoptions,
 } satisfies IAdoptionsRepository);
+
+// ===== INTERVIEWS =====
+
+export async function createInterview(data: {
+  entityType: string;
+  entityId: string;
+  interviewerId: string;
+  scheduledAt: Date;
+  modality: "IN_PERSON" | "VIRTUAL" | "PHONE";
+  durationMinutes?: number;
+  locationDetails?: string;
+}) {
+  const [result] = await db.insert(schema.interviews).values(data).returning();
+  return result;
+}
+
+export async function findInterviewsByEntity(entityType: string, entityId: string) {
+  return db
+    .select()
+    .from(schema.interviews)
+    .where(
+      and(eq(schema.interviews.entityType, entityType), eq(schema.interviews.entityId, entityId)),
+    )
+    .orderBy(schema.interviews.scheduledAt);
+}
+
+export async function findInterviewById(interviewId: string) {
+  const [result] = await db
+    .select()
+    .from(schema.interviews)
+    .where(eq(schema.interviews.interviewId, interviewId))
+    .limit(1);
+  return result || null;
+}
+
+export async function updateInterview(
+  interviewId: string,
+  data: Partial<{
+    scheduledAt: Date;
+    modality: "IN_PERSON" | "VIRTUAL" | "PHONE";
+    durationMinutes: number;
+    locationDetails: string;
+    result: "PENDING" | "POSITIVE" | "NEGATIVE" | "ABSENT" | "RESCHEDULED";
+    observations: string;
+    occurredAt: Date;
+  }>,
+) {
+  const [result] = await db
+    .update(schema.interviews)
+    .set(data)
+    .where(eq(schema.interviews.interviewId, interviewId))
+    .returning();
+  return result || null;
+}
+
+// ===== FOLLOWUPS =====
+
+export async function createFollowup(data: {
+  applicationId: string;
+  adminId: string;
+  scheduledDate: string;
+  monthNumber: number;
+  notes: string;
+}) {
+  const [result] = await db.insert(schema.adoptionFollowups).values(data).returning();
+  return result;
+}
+
+export async function findFollowupsByApplication(applicationId: string) {
+  return db
+    .select()
+    .from(schema.adoptionFollowups)
+    .where(eq(schema.adoptionFollowups.applicationId, applicationId))
+    .orderBy(schema.adoptionFollowups.monthNumber);
+}
+
+export async function findFollowupById(followupId: string) {
+  const [result] = await db
+    .select()
+    .from(schema.adoptionFollowups)
+    .where(eq(schema.adoptionFollowups.followupId, followupId))
+    .limit(1);
+  return result || null;
+}
+
+export async function updateFollowup(
+  followupId: string,
+  data: Partial<{
+    scheduledDate: string;
+    notes: string;
+    performedAt: Date;
+  }>,
+) {
+  const [result] = await db
+    .update(schema.adoptionFollowups)
+    .set(data)
+    .where(eq(schema.adoptionFollowups.followupId, followupId))
+    .returning();
+  return result || null;
+}

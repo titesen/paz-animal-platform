@@ -11,8 +11,11 @@ import {
   applicationIdParamSchema,
   assignTagSchema,
   createVolunteerApplicationSchema,
+  createVolunteerInterviewSchema,
   createVolunteerSchema,
+  interviewIdParamSchema,
   updateApplicationStatusSchema,
+  updateVolunteerInterviewSchema,
   updateVolunteerSchema,
   volunteerIdParamSchema,
   volunteerTagParamSchema,
@@ -79,6 +82,49 @@ router.post(
   validate(applicationIdParamSchema, "params"),
   validate(createVolunteerSchema),
   controller.promoteToVolunteer,
+);
+
+// ===== APPLICATION INTERVIEWS =====
+
+/**
+ * Schedule interview for volunteer application
+ * POST /api/volunteers/applications/:applicationId/interviews
+ * Auth: ADMIN only
+ */
+router.post(
+  "/applications/:applicationId/interviews",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(applicationIdParamSchema, "params"),
+  validate(createVolunteerInterviewSchema),
+  controller.scheduleApplicationInterview,
+);
+
+/**
+ * Get interviews for volunteer application
+ * GET /api/volunteers/applications/:applicationId/interviews
+ * Auth: ADMIN only
+ */
+router.get(
+  "/applications/:applicationId/interviews",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(applicationIdParamSchema, "params"),
+  controller.getApplicationInterviews,
+);
+
+/**
+ * Update a volunteer application interview
+ * PATCH /api/volunteers/interviews/:interviewId
+ * Auth: ADMIN only
+ */
+router.patch(
+  "/interviews/:interviewId",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(interviewIdParamSchema, "params"),
+  validate(updateVolunteerInterviewSchema),
+  controller.updateApplicationInterview,
 );
 
 // ===== VOLUNTEER ROLES =====

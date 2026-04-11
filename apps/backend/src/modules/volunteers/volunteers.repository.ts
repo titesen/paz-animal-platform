@@ -3,7 +3,7 @@
  * @description Data access layer for volunteers and their role assignments
  */
 
-import { eq, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 import type { IVolunteersRepository } from "./volunteers.repository.interface";
@@ -269,3 +269,57 @@ void ({
   updateVolunteer,
   deleteVolunteer,
 } satisfies IVolunteersRepository);
+
+// ===== INTERVIEWS =====
+
+export async function createInterview(data: {
+  entityType: string;
+  entityId: string;
+  interviewerId: string;
+  scheduledAt: Date;
+  modality: "IN_PERSON" | "VIRTUAL" | "PHONE";
+  durationMinutes?: number;
+  locationDetails?: string;
+}) {
+  const [result] = await db.insert(schema.interviews).values(data).returning();
+  return result;
+}
+
+export async function findInterviewsByEntity(entityType: string, entityId: string) {
+  return db
+    .select()
+    .from(schema.interviews)
+    .where(
+      and(eq(schema.interviews.entityType, entityType), eq(schema.interviews.entityId, entityId)),
+    )
+    .orderBy(schema.interviews.scheduledAt);
+}
+
+export async function findInterviewById(interviewId: string) {
+  const [result] = await db
+    .select()
+    .from(schema.interviews)
+    .where(eq(schema.interviews.interviewId, interviewId))
+    .limit(1);
+  return result || null;
+}
+
+export async function updateInterview(
+  interviewId: string,
+  data: Partial<{
+    scheduledAt: Date;
+    modality: "IN_PERSON" | "VIRTUAL" | "PHONE";
+    durationMinutes: number;
+    locationDetails: string;
+    result: "PENDING" | "POSITIVE" | "NEGATIVE" | "ABSENT" | "RESCHEDULED";
+    observations: string;
+    occurredAt: Date;
+  }>,
+) {
+  const [result] = await db
+    .update(schema.interviews)
+    .set(data)
+    .where(eq(schema.interviews.interviewId, interviewId))
+    .returning();
+  return result || null;
+}

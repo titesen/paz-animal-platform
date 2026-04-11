@@ -79,3 +79,87 @@ export const updateAdoptionStatus = asyncHandler(async (req, res: Response) => {
 
   res.status(200).json(response);
 });
+
+// ===== INTERVIEWS =====
+
+export const scheduleInterview = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const { adoptionId } = req.params;
+  const interviewerId = req.user.userId;
+
+  const result = await adoptionsService.scheduleInterview(adoptionId, interviewerId, req.body);
+
+  const response: JSendSuccess = {
+    status: "success",
+    data: result,
+  };
+
+  res.status(201).json(response);
+});
+
+export const getInterviews = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const { adoptionId } = req.params;
+
+  const result = await adoptionsService.getInterviewsByAdoption(adoptionId);
+
+  const response: JSendSuccess = {
+    status: "success",
+    data: result,
+  };
+
+  res.status(200).json(response);
+});
+
+export const updateInterview = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const { interviewId } = req.params;
+
+  const result = await adoptionsService.updateInterview(interviewId, req.body);
+
+  const response: JSendSuccess = {
+    status: "success",
+    data: result,
+  };
+
+  res.status(200).json(response);
+});
+
+// ===== FOLLOWUPS =====
+
+export const createFollowup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const { adoptionId } = req.params;
+  const adminId = req.user.userId;
+
+  const result = await adoptionsService.createFollowup(adoptionId, adminId, req.body);
+
+  const response: JSendSuccess = {
+    status: "success",
+    data: result,
+  };
+
+  res.status(201).json(response);
+});
+
+export const getFollowups = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const { adoptionId } = req.params;
+
+  const result = await adoptionsService.getFollowupsByAdoption(adoptionId);
+
+  const response: JSendSuccess = {
+    status: "success",
+    data: result,
+  };
+
+  res.status(200).json(response);
+});
+
+export const updateFollowup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const { followupId } = req.params;
+
+  const result = await adoptionsService.updateFollowup(followupId, req.body);
+
+  const response: JSendSuccess = {
+    status: "success",
+    data: result,
+  };
+
+  res.status(200).json(response);
+});

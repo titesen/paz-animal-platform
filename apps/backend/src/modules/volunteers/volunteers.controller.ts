@@ -210,3 +210,49 @@ export const getAllRoles = asyncHandler(async (_req: AuthenticatedRequest, res: 
     data: { roles },
   });
 });
+
+// ===== INTERVIEWS =====
+
+export const scheduleApplicationInterview = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { applicationId } = req.params;
+    const interviewerId = req.user.userId;
+
+    const result = await service.scheduleApplicationInterview(
+      applicationId,
+      interviewerId,
+      req.body,
+    );
+
+    res.status(201).json({
+      status: "success",
+      data: { interview: result },
+    });
+  },
+);
+
+export const getApplicationInterviews = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { applicationId } = req.params;
+
+    const interviews = await service.getInterviewsByApplication(applicationId);
+
+    res.json({
+      status: "success",
+      data: { interviews },
+    });
+  },
+);
+
+export const updateApplicationInterview = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { interviewId } = req.params;
+
+    const result = await service.updateApplicationInterview(interviewId, req.body);
+
+    res.json({
+      status: "success",
+      data: { interview: result },
+    });
+  },
+);

@@ -88,3 +88,30 @@ export const volunteerTagParamSchema = z.object({
   volunteerId: z.string().uuid(),
   roleId: z.string().regex(/^\d+$/),
 });
+
+// ===== INTERVIEW SCHEMAS =====
+
+export const createVolunteerInterviewSchema = z.object({
+  scheduledAt: z.string().datetime(),
+  modality: z.enum(["IN_PERSON", "VIRTUAL", "PHONE"]),
+  durationMinutes: z.number().int().min(10).max(180).optional(),
+  locationDetails: z.string().max(255).optional(),
+});
+
+export type CreateVolunteerInterviewDTO = z.infer<typeof createVolunteerInterviewSchema>;
+
+export const updateVolunteerInterviewSchema = z.object({
+  scheduledAt: z.string().datetime().optional(),
+  modality: z.enum(["IN_PERSON", "VIRTUAL", "PHONE"]).optional(),
+  durationMinutes: z.number().int().min(10).max(180).optional(),
+  locationDetails: z.string().max(255).optional(),
+  result: z.enum(["PENDING", "POSITIVE", "NEGATIVE", "ABSENT", "RESCHEDULED"]).optional(),
+  observations: z.string().max(2000).optional(),
+  occurredAt: z.string().datetime().optional(),
+});
+
+export type UpdateVolunteerInterviewDTO = z.infer<typeof updateVolunteerInterviewSchema>;
+
+export const interviewIdParamSchema = z.object({
+  interviewId: z.string().uuid(),
+});

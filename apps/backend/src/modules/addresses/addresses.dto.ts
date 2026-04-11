@@ -11,6 +11,7 @@ export const createAddressSchema = z.object({
   alias: z.string().max(100).optional().default("Main"),
   coordinates: z.tuple([z.number(), z.number()]).optional().nullable(),
 });
+
 export type CreateAddressDTO = z.infer<typeof createAddressSchema>;
 
 export const updateAddressSchema = createAddressSchema

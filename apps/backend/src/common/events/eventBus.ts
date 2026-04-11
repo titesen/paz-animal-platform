@@ -55,9 +55,11 @@ export interface DomainEventMap {
   "user.registered": UserRegisteredEvent;
   "adoption.created": AdoptionCreatedEvent;
   "adoption.statusChanged": AdoptionStatusChangedEvent;
+  "adoption.interviewScheduled": { interviewId: string; adoptionId: string };
   "donation.created": DonationCreatedEvent;
   "donation.inKindCreated": InKindDonationCreatedEvent;
   "volunteer.promoted": VolunteerPromotedEvent;
+  "volunteer.interviewScheduled": { interviewId: string; applicationId: string };
 }
 
 export type DomainEventName = keyof DomainEventMap;

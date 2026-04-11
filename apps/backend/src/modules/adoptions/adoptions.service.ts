@@ -8,7 +8,13 @@ import { eventBus } from "../../common/events";
 import { ForbiddenError, NotFoundError, ValidationError } from "../../common/errors";
 import * as petsService from "../pets/pets.service";
 import * as adoptionsRepo from "./adoptions.repository";
-import type { CreateAdoptionApplicationDTO } from "./adoptions.dto";
+import type {
+  CreateAdoptionApplicationDTO,
+  CreateFollowupDTO,
+  CreateInterviewDTO,
+  UpdateFollowupDTO,
+  UpdateInterviewDTO,
+} from "./adoptions.dto";
 
 export async function createAdoptionApplication(
   userId: string,
@@ -110,4 +116,113 @@ export async function checkAdoptionAccess(
   if (adoption.clientId !== userId) {
     throw new ForbiddenError("You can only view your own adoption applications");
   }
+}
+
+// ===== INTERVIEWS =====
+
+export async function scheduleInterview(
+  adoptionId: string,
+  interviewerId: string,
+  data: CreateInterviewDTO,
+) {
+  const adoption = await adoptionsRepo.findAdoptionById(adoptionId);
+  if (!adoption) {
+    throw new NotFoundError("Adoption application not found", "ADOPTION_NOT_FOUND");
+  }
+
+  const interview = await adoptionsRepo.createInterview({
+    entityType: "ADOPTION",
+    entityId: adoptionId,
+    interviewerId,
+    scheduledAt: new Date(data.scheduledAt),
+    modality: data.modality,
+    durationMinutes: data.durationMinutes,
+    locationDetails: data.locationDetails,
+  });
+
+  logger.info({ interviewId: interview.interviewId, adoptionId }, "Adoption interview scheduled");
+
+  eventBus.emit("adoption.interviewScheduled", {
+    interviewId: interview.interviewId,
+    adoptionId,
+  });
+
+  return interview;
+}
+
+export async function getInterviewsByAdoption(adoptionId: string) {
+  const adoption = await adoptionsRepo.findAdoptionById(adoptionId);
+  if (!adoption) {
+    throw new NotFoundError("Adoption application not found", "ADOPTION_NOT_FOUND");
+  }
+  return adoptionsRepo.findInterviewsByEntity("ADOPTION", adoptionId);
+}
+
+export async function updateInterview(interviewId: string, data: UpdateInterviewDTO) {
+  const interview = await adoptionsRepo.findInterviewById(interviewId);
+  if (!interview) {
+    throw new NotFoundError("Interview not found", "INTERVIEW_NOT_FOUND");
+  }
+
+  const updateData: Record<string, unknown> = {};
+  if (data.scheduledAt) updateData.scheduledAt = new Date(data.scheduledAt);
+  if (data.modality) updateData.modality = data.modality;
+  if (data.durationMinutes !== undefined) updateData.durationMinutes = data.durationMinutes;
+  if (data.locationDetails !== undefined) updateData.locationDetails = data.locationDetails;
+  if (data.result) updateData.result = data.result;
+  if (data.observations !== undefined) updateData.observations = data.observations;
+  if (data.occurredAt) updateData.occurredAt = new Date(data.occurredAt);
+
+  return adoptionsRepo.updateInterview(interviewId, updateData as any);
+}
+
+// ===== FOLLOWUPS =====
+
+export async function createFollowup(adoptionId: string, adminId: string, data: CreateFollowupDTO) {
+  const adoption = await adoptionsRepo.findAdoptionById(adoptionId);
+  if (!adoption) {
+    throw new NotFoundError("Adoption application not found", "ADOPTION_NOT_FOUND");
+  }
+
+  if (adoption.status !== "PROBATION" && adoption.status !== "COMPLETED") {
+    throw new ValidationError(
+      "Followups can only be created for adoptions in PROBATION or COMPLETED status",
+      "INVALID_STATUS",
+      { status: [`Current status: ${adoption.status}`] },
+    );
+  }
+
+  const followup = await adoptionsRepo.createFollowup({
+    applicationId: adoptionId,
+    adminId,
+    scheduledDate: data.scheduledDate,
+    monthNumber: data.monthNumber,
+    notes: data.notes,
+  });
+
+  logger.info({ followupId: followup.followupId, adoptionId }, "Adoption followup created");
+
+  return followup;
+}
+
+export async function getFollowupsByAdoption(adoptionId: string) {
+  const adoption = await adoptionsRepo.findAdoptionById(adoptionId);
+  if (!adoption) {
+    throw new NotFoundError("Adoption application not found", "ADOPTION_NOT_FOUND");
+  }
+  return adoptionsRepo.findFollowupsByApplication(adoptionId);
+}
+
+export async function updateFollowup(followupId: string, data: UpdateFollowupDTO) {
+  const followup = await adoptionsRepo.findFollowupById(followupId);
+  if (!followup) {
+    throw new NotFoundError("Followup not found", "FOLLOWUP_NOT_FOUND");
+  }
+
+  const updateData: Record<string, unknown> = {};
+  if (data.scheduledDate) updateData.scheduledDate = data.scheduledDate;
+  if (data.notes) updateData.notes = data.notes;
+  if (data.performedAt) updateData.performedAt = new Date(data.performedAt);
+
+  return adoptionsRepo.updateFollowup(followupId, updateData as any);
 }
