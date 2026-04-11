@@ -18,6 +18,20 @@ export async function findPetById(petId: string) {
   return result[0] || null;
 }
 
+export async function findPetByQrCode(qrCode: string) {
+  const result = await db.select().from(schema.pets).where(eq(schema.pets.qrCode, qrCode)).limit(1);
+  return result[0] || null;
+}
+
+export async function findActiveLostAlertForPet(petId: string) {
+  const result = await db
+    .select()
+    .from(schema.lostPetAlerts)
+    .where(and(eq(schema.lostPetAlerts.petId, petId), eq(schema.lostPetAlerts.isActive, true)))
+    .limit(1);
+  return result[0] || null;
+}
+
 /**
  * Get all pets with pagination and filters
  */

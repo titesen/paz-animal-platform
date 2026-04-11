@@ -12,6 +12,7 @@ import { apiLimiter, errorHandler, notFoundHandler } from "./common/middlewares"
 
 // Import module routes
 import adoptionsRoutes from "./modules/adoptions/adoptions.routes";
+import addressesRoutes from "./modules/addresses/addresses.routes";
 import authRoutes from "./modules/auth/auth.routes";
 import cmsRoutes from "./modules/cms/cms.routes";
 import eventsRoutes from "./modules/events/events.routes";
@@ -177,6 +178,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/pets", petsRoutes);
 app.use("/api/adoptions", adoptionsRoutes);
+app.use("/api/addresses", addressesRoutes);
 app.use("/api/volunteers", volunteersRoutes);
 app.use("/api/events", eventsRoutes);
 app.use("/api/finance", financeRoutes);

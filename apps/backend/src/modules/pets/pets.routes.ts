@@ -27,6 +27,13 @@ import {
 const router = Router();
 
 /**
+ * @route   GET /api/pets/qr/:qrCode
+ * @desc    Smart QR code resolution
+ * @access  Public
+ */
+router.get("/qr/:qrCode", publicLimiter, petsController.resolveQrCode);
+
+/**
  * @route   GET /api/pets
  * @desc    Get all pets with pagination
  * @access  Public

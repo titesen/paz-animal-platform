@@ -18,6 +18,53 @@ import type {
 } from "./pets.dto";
 
 /**
+ * QR Code Smart Resolution
+ * Returns different data based on pet status
+ */
+export async function resolveQrCode(qrCode: string) {
+  const pet = await petsRepo.findPetByQrCode(qrCode);
+
+  if (!pet) {
+    throw new NotFoundError("Pet not found for this QR code", "QR_PET_NOT_FOUND");
+  }
+
+  if (pet.status === "DECEASED") {
+    throw new NotFoundError("This pet profile is no longer available", "PET_DECEASED");
+  }
+
+  if (pet.status === "ADOPTION_AVAILABLE" || pet.status === "IN_PROCESS") {
+    return {
+      view: "adoption_profile" as const,
+      pet: {
+        petId: pet.petId,
+        name: pet.name,
+        status: pet.status,
+        sex: pet.sex,
+        breedId: pet.breedId,
+        birthDateApprox: pet.birthDateApprox,
+      },
+    };
+  }
+
+  // OWNED or LOST — emergency contact view
+  if (pet.status === "LOST") {
+    const alert = await petsRepo.findActiveLostAlertForPet(pet.petId);
+    return {
+      view: "emergency_contact" as const,
+      pet: { petId: pet.petId, name: pet.name, status: pet.status },
+      contact: alert ? { phone: alert.contactPhone, message: alert.message } : null,
+    };
+  }
+
+  // OWNED
+  return {
+    view: "emergency_contact" as const,
+    pet: { petId: pet.petId, name: pet.name, status: pet.status },
+    contact: null,
+  };
+}
+
+/**
  * Get all pets with pagination
  */
 export async function getAllPets(queryParams: PetQueryParams) {

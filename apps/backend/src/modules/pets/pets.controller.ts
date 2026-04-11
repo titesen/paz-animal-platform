@@ -9,6 +9,17 @@ import { asyncHandler } from "../../common/utils";
 import * as petsService from "./pets.service";
 
 /**
+ * GET /api/pets/qr/:qrCode
+ * Smart QR code resolution
+ */
+export const resolveQrCode = asyncHandler(async (req, res: Response) => {
+  const { qrCode } = req.params;
+  const result = await petsService.resolveQrCode(qrCode);
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(200).json(response);
+});
+
+/**
  * GET /api/pets
  * Get all pets with pagination
  */
