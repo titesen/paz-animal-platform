@@ -7,6 +7,9 @@ import { createCitySchema, createProvinceSchema, provinceIdSchema } from "./loca
 
 const router = Router();
 
+router.get("/countries", publicLimiter, locationsController.getAllCountries);
+router.get("/currencies", publicLimiter, locationsController.getAllCurrencies);
+
 router.get("/provinces", publicLimiter, locationsController.getAllProvinces);
 
 router.post(

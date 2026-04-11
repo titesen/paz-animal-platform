@@ -2,6 +2,14 @@ import { NotFoundError } from "../../common/errors";
 import * as locationsRepo from "./locations.repository";
 import type { CreateCityDTO, CreateProvinceDTO } from "./locations.dto";
 
+export async function getAllCountries(isActive?: boolean) {
+  return locationsRepo.findAllCountries(isActive);
+}
+
+export async function getAllCurrencies() {
+  return locationsRepo.findAllCurrencies();
+}
+
 export async function getAllProvinces() {
   return locationsRepo.findAllProvinces();
 }

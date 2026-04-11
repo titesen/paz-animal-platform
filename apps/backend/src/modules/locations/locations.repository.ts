@@ -2,6 +2,22 @@ import { asc, eq } from "drizzle-orm";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 
+// ===== COUNTRIES & CURRENCIES =====
+
+export async function findAllCountries(isActive?: boolean) {
+  const query = db.select().from(schema.countries).orderBy(asc(schema.countries.name));
+  if (isActive !== undefined) {
+    return query.where(eq(schema.countries.isActive, isActive));
+  }
+  return query;
+}
+
+export async function findAllCurrencies() {
+  return db.select().from(schema.currencies).orderBy(asc(schema.currencies.name));
+}
+
+// ===== PROVINCES & CITIES =====
+
 export async function findAllProvinces() {
   return db.select().from(schema.provinces).orderBy(asc(schema.provinces.name));
 }

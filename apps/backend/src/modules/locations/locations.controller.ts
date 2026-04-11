@@ -3,6 +3,20 @@ import type { JSendSuccess } from "../../common/types";
 import { asyncHandler } from "../../common/utils";
 import * as locationsService from "./locations.service";
 
+export const getAllCountries = asyncHandler(async (req, res: Response) => {
+  const isActive =
+    req.query.isActive === "true" ? true : req.query.isActive === "false" ? false : undefined;
+  const result = await locationsService.getAllCountries(isActive);
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(200).json(response);
+});
+
+export const getAllCurrencies = asyncHandler(async (_req, res: Response) => {
+  const result = await locationsService.getAllCurrencies();
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(200).json(response);
+});
+
 export const getAllProvinces = asyncHandler(async (_req, res: Response) => {
   const result = await locationsService.getAllProvinces();
   const response: JSendSuccess = { status: "success", data: result };
