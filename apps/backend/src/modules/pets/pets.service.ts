@@ -4,7 +4,7 @@
  */
 
 import { logger } from "../../config/logger";
-import { ConflictError, ForbiddenError, NotFoundError } from "../../common/errors";
+import { ConflictError, ForbiddenError, NotFoundError, ValidationError } from "../../common/errors";
 import { calculateTotalPages, parsePagination } from "../../common/utils/formatter";
 import * as petsRepo from "./pets.repository";
 import type {
@@ -16,6 +16,35 @@ import type {
   UpdateBreedDTO,
   UpdatePetDTO,
 } from "./pets.dto";
+
+// ===== OWNERSHIP CONSTRAINT HELPERS =====
+
+const NO_OWNER_STATUSES = ["ADOPTION_AVAILABLE", "IN_PROCESS"];
+const REQUIRES_OWNER_STATUSES = ["OWNED", "LOST"];
+
+function validateOwnershipConstraint(status: string, ownerId: string | null | undefined): void {
+  if (NO_OWNER_STATUSES.includes(status) && ownerId) {
+    throw new ValidationError(
+      `Pets with status ${status} cannot have an owner`,
+      "INVALID_OWNERSHIP_STATE",
+      { ownerId: [`Remove ownerId for status ${status}`] },
+    );
+  }
+  if (REQUIRES_OWNER_STATUSES.includes(status) && !ownerId) {
+    throw new ValidationError(
+      `Pets with status ${status} must have an owner`,
+      "INVALID_OWNERSHIP_STATE",
+      { ownerId: [`Provide ownerId for status ${status}`] },
+    );
+  }
+}
+
+async function validateBreedExists(breedId: number): Promise<void> {
+  const breed = await petsRepo.findBreedById(breedId);
+  if (!breed) {
+    throw new NotFoundError("Breed not found", "BREED_NOT_FOUND");
+  }
+}
 
 /**
  * QR Code Smart Resolution
@@ -109,6 +138,9 @@ export async function getPetById(petId: string) {
  * Create a new pet
  */
 export async function createPet(data: CreatePetDTO) {
+  await validateBreedExists(data.breedId);
+  validateOwnershipConstraint(data.status, null);
+
   const newPet = await petsRepo.createPet({
     ...data,
     birthDateApprox: data.birthDate,
@@ -128,6 +160,15 @@ export async function updatePet(petId: string, data: UpdatePetDTO) {
   if (!existingPet) {
     throw new NotFoundError("Pet not found", "PET_NOT_FOUND");
   }
+
+  if (data.breedId) {
+    await validateBreedExists(data.breedId);
+  }
+
+  // Validate ownership constraint with effective values
+  const effectiveStatus = data.status || existingPet.status;
+  const effectiveOwner = existingPet.ownerId;
+  validateOwnershipConstraint(effectiveStatus, effectiveOwner);
 
   const updateData = {
     ...data,
@@ -170,6 +211,9 @@ export async function updatePetStatus(petId: string, status: string): Promise<vo
   if (pet.status === "DECEASED" && status !== "DECEASED") {
     throw new ForbiddenError("Cannot change status of deceased pet", "INVALID_STATUS_TRANSITION");
   }
+
+  // Validate ownership constraint
+  validateOwnershipConstraint(status, pet.ownerId);
 
   await petsRepo.updatePetStatus(petId, status);
 
