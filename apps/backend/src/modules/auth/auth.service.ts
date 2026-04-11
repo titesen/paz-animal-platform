@@ -44,6 +44,15 @@ export async function register(data: RegisterDTO): Promise<AuthResponse> {
     throw new ConflictError("Email already registered", "EMAIL_ALREADY_EXISTS");
   }
 
+  // Check if docNumber already exists
+  if (data.docNumber) {
+    const docType = data.docType || "DNI";
+    const existingDoc = await authRepo.findUserByDocNumber(docType, data.docNumber);
+    if (existingDoc) {
+      throw new ConflictError("Document number already registered", "DOC_NUMBER_ALREADY_EXISTS");
+    }
+  }
+
   // Hash password
   const passwordHash = await hashPassword(data.password);
 
@@ -54,7 +63,10 @@ export async function register(data: RegisterDTO): Promise<AuthResponse> {
     firstName: data.firstName,
     lastName: data.lastName,
     phone: data.phoneNumber,
+    docType: (data.docType || "DNI") as any,
     docNumber: data.docNumber,
+    nationalityIso: data.nationalityIso,
+    birthDate: data.birthDate,
   });
 
   // Assign CLIENT role by default
@@ -348,7 +360,7 @@ export async function updateProfile(userId: string, data: UpdateProfileDTO) {
     throw new UnauthorizedError("Account has been deactivated", "ACCOUNT_DEACTIVATED");
   }
 
-  const updatedUser = await authRepo.updateUserProfile(userId, data);
+  const updatedUser = await authRepo.updateUserProfile(userId, data as any as any);
 
   logger.info({ userId, updates: Object.keys(data) }, "User profile updated");
 

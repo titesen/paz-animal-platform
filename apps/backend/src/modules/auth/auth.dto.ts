@@ -23,7 +23,10 @@ export const registerSchema = z.object({
   firstName: z.string().min(1, "First name is required").max(100),
   lastName: z.string().min(1, "Last name is required").max(100),
   phoneNumber: z.string().regex(/^\+?\d{8,15}$/, "Invalid phone number format"),
+  docType: z.enum(["DNI", "PASSPORT", "MERCOSUR_ID", "TAX_ID", "OTHER"]).default("DNI"),
   docNumber: z.string().min(1, "Document number is required").max(50),
+  nationalityIso: z.string().length(2, "Must be a 2-letter ISO country code").optional(),
+  birthDate: z.string().date("Invalid date format (YYYY-MM-DD)").optional(),
 });
 
 export type RegisterDTO = z.infer<typeof registerSchema>;
@@ -130,6 +133,8 @@ export const updateProfileSchema = z.object({
     .optional()
     .nullable(),
   birthDate: z.string().date("Invalid date format (YYYY-MM-DD)").optional().nullable(),
+  nationalityIso: z.string().length(2, "Must be a 2-letter ISO country code").optional().nullable(),
+  docType: z.enum(["DNI", "PASSPORT", "MERCOSUR_ID", "TAX_ID", "OTHER"]).optional(),
   secondaryEmail: z.string().email("Invalid email format").optional().nullable(),
   notificationPreferences: z
     .object({

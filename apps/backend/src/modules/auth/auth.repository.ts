@@ -174,3 +174,12 @@ void ({
   updateUserProfile,
   update2FASecret,
 } satisfies IAuthRepository);
+
+export async function findUserByDocNumber(docType: string, docNumber: string) {
+  const result = await db
+    .select()
+    .from(schema.users)
+    .where(and(eq(schema.users.docType, docType as any), eq(schema.users.docNumber, docNumber)))
+    .limit(1);
+  return result[0] || null;
+}
