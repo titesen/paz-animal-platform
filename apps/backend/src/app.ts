@@ -13,6 +13,7 @@ import { apiLimiter, errorHandler, notFoundHandler } from "./common/middlewares"
 // Import module routes
 import adoptionsRoutes from "./modules/adoptions/adoptions.routes";
 import addressesRoutes from "./modules/addresses/addresses.routes";
+import auditLogsRoutes from "./modules/audit-logs/audit-logs.routes";
 import authRoutes from "./modules/auth/auth.routes";
 import cmsRoutes from "./modules/cms/cms.routes";
 import commentsRoutes from "./modules/comments/comments.routes";
@@ -21,11 +22,13 @@ import financeRoutes from "./modules/finance/finance.routes";
 import likesRoutes from "./modules/likes/likes.routes";
 import locationsRoutes from "./modules/locations/locations.routes";
 import mediaRoutes from "./modules/media/media.routes";
+import notificationsRoutes from "./modules/notifications/notifications.routes";
 import petsRoutes from "./modules/pets/pets.routes";
 import reportsRoutes from "./modules/reports/reports.routes";
 import tagsRoutes from "./modules/tags/tags.routes";
 import usersRoutes from "./modules/users/users.routes";
 import volunteersRoutes from "./modules/volunteers/volunteers.routes";
+import webhooksRoutes from "./modules/webhooks/webhooks.routes";
 
 const app = express();
 
@@ -192,6 +195,9 @@ app.use("/api/tags", tagsRoutes);
 app.use("/api/comments", commentsRoutes);
 app.use("/api/likes", likesRoutes);
 app.use("/api/reports", reportsRoutes);
+app.use("/api/notifications", notificationsRoutes);
+app.use("/api/audit-logs", auditLogsRoutes);
+app.use("/api/webhooks", webhooksRoutes);
 
 // 404 handler (must be after all routes)
 app.use(notFoundHandler);
