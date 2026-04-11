@@ -218,3 +218,121 @@ export const resolveLostPetAlert = asyncHandler(
     res.status(200).json(response);
   },
 );
+
+// ===================
+// SPECIES
+// ===================
+
+export const getAllSpecies = asyncHandler(async (_req, res: Response) => {
+  const result = await petsService.getAllSpecies();
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(200).json(response);
+});
+
+export const createSpecies = asyncHandler(async (req, res: Response) => {
+  const result = await petsService.createSpecies(req.body);
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(201).json(response);
+});
+
+export const updateSpecies = asyncHandler(async (req, res: Response) => {
+  const speciesId = Number(req.params.speciesId);
+  const result = await petsService.updateSpecies(speciesId, req.body);
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(200).json(response);
+});
+
+export const deleteSpecies = asyncHandler(async (req, res: Response) => {
+  const speciesId = Number(req.params.speciesId);
+  await petsService.deleteSpecies(speciesId);
+  const response: JSendSuccess = { status: "success", data: { message: "Species deleted" } };
+  res.status(200).json(response);
+});
+
+// ===================
+// BREEDS
+// ===================
+
+export const getBreedsBySpecies = asyncHandler(async (req, res: Response) => {
+  const speciesId = Number(req.params.speciesId);
+  const result = await petsService.getBreedsBySpecies(speciesId);
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(200).json(response);
+});
+
+export const createBreed = asyncHandler(async (req, res: Response) => {
+  const result = await petsService.createBreed(req.body);
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(201).json(response);
+});
+
+export const updateBreed = asyncHandler(async (req, res: Response) => {
+  const breedId = Number(req.params.breedId);
+  const result = await petsService.updateBreed(breedId, req.body);
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(200).json(response);
+});
+
+export const deleteBreed = asyncHandler(async (req, res: Response) => {
+  const breedId = Number(req.params.breedId);
+  await petsService.deleteBreed(breedId);
+  const response: JSendSuccess = { status: "success", data: { message: "Breed deleted" } };
+  res.status(200).json(response);
+});
+
+// ===================
+// VACCINES CATALOG
+// ===================
+
+export const getAllVaccines = asyncHandler(async (_req, res: Response) => {
+  const result = await petsService.getAllVaccines();
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(200).json(response);
+});
+
+export const createVaccine = asyncHandler(async (req, res: Response) => {
+  const result = await petsService.createVaccine(req.body);
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(201).json(response);
+});
+
+export const updateVaccine = asyncHandler(async (req, res: Response) => {
+  const vaccineId = Number(req.params.vaccineId);
+  const result = await petsService.updateVaccine(vaccineId, req.body);
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(200).json(response);
+});
+
+export const deleteVaccine = asyncHandler(async (req, res: Response) => {
+  const vaccineId = Number(req.params.vaccineId);
+  await petsService.deleteVaccine(vaccineId);
+  const response: JSendSuccess = { status: "success", data: { message: "Vaccine deleted" } };
+  res.status(200).json(response);
+});
+
+// ===================
+// PET VACCINES
+// ===================
+
+export const getPetVaccines = asyncHandler(async (req, res: Response) => {
+  const { petId } = req.params;
+  const result = await petsService.getPetVaccines(petId);
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(200).json(response);
+});
+
+export const applyVaccineToPet = asyncHandler(async (req, res: Response) => {
+  const { petId } = req.params;
+  const result = await petsService.applyVaccineToPet(petId, req.body);
+  const response: JSendSuccess = { status: "success", data: result };
+  res.status(201).json(response);
+});
+
+export const removePetVaccine = asyncHandler(async (req, res: Response) => {
+  const { petId } = req.params;
+  const vaccineId = Number(req.params.vaccineId);
+  const { appliedAt } = req.params;
+  await petsService.removePetVaccine(petId, vaccineId, appliedAt);
+  const response: JSendSuccess = { status: "success", data: { message: "Vaccine record removed" } };
+  res.status(200).json(response);
+});

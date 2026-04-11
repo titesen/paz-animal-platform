@@ -9,7 +9,20 @@ import { validate } from "../../common/middlewares";
 import { authenticate, requireRole } from "../../common/middlewares/auth";
 import { publicLimiter } from "../../common/middlewares/rateLimiter";
 import * as petsController from "./pets.controller";
-import { createPetSchema, petIdSchema, petQuerySchema, updatePetSchema } from "./pets.dto";
+import {
+  applyVaccineSchema,
+  breedIdSchema,
+  createBreedSchema,
+  createPetSchema,
+  createSpeciesSchema,
+  createVaccineSchema,
+  petIdSchema,
+  petQuerySchema,
+  speciesIdSchema,
+  updateBreedSchema,
+  updatePetSchema,
+  vaccineIdSchema,
+} from "./pets.dto";
 
 const router = Router();
 
@@ -156,6 +169,132 @@ router.patch(
   validate(petIdSchema, "params"),
   validate(z.object({ status: z.string() })),
   petsController.updatePetStatus,
+);
+
+// ===================
+// SPECIES
+// ===================
+
+router.get("/species", publicLimiter, petsController.getAllSpecies);
+
+router.post(
+  "/species",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(createSpeciesSchema),
+  petsController.createSpecies,
+);
+
+router.patch(
+  "/species/:speciesId",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(speciesIdSchema, "params"),
+  validate(createSpeciesSchema),
+  petsController.updateSpecies,
+);
+
+router.delete(
+  "/species/:speciesId",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(speciesIdSchema, "params"),
+  petsController.deleteSpecies,
+);
+
+// ===================
+// BREEDS
+// ===================
+
+router.get(
+  "/species/:speciesId/breeds",
+  publicLimiter,
+  validate(speciesIdSchema, "params"),
+  petsController.getBreedsBySpecies,
+);
+
+router.post(
+  "/breeds",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(createBreedSchema),
+  petsController.createBreed,
+);
+
+router.patch(
+  "/breeds/:breedId",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(breedIdSchema, "params"),
+  validate(updateBreedSchema),
+  petsController.updateBreed,
+);
+
+router.delete(
+  "/breeds/:breedId",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(breedIdSchema, "params"),
+  petsController.deleteBreed,
+);
+
+// ===================
+// VACCINES CATALOG
+// ===================
+
+router.get("/vaccines", publicLimiter, petsController.getAllVaccines);
+
+router.post(
+  "/vaccines",
+  authenticate,
+  requireRole("ADMIN", "VOLUNTEER"),
+  validate(createVaccineSchema),
+  petsController.createVaccine,
+);
+
+router.patch(
+  "/vaccines/:vaccineId",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(vaccineIdSchema, "params"),
+  validate(createVaccineSchema),
+  petsController.updateVaccine,
+);
+
+router.delete(
+  "/vaccines/:vaccineId",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(vaccineIdSchema, "params"),
+  petsController.deleteVaccine,
+);
+
+// ===================
+// PET VACCINES
+// ===================
+
+router.get(
+  "/:petId/vaccines",
+  publicLimiter,
+  validate(petIdSchema, "params"),
+  petsController.getPetVaccines,
+);
+
+router.post(
+  "/:petId/vaccines",
+  authenticate,
+  requireRole("ADMIN", "VOLUNTEER"),
+  validate(petIdSchema, "params"),
+  validate(applyVaccineSchema),
+  petsController.applyVaccineToPet,
+);
+
+router.delete(
+  "/:petId/vaccines/:vaccineId/:appliedAt",
+  authenticate,
+  requireRole("ADMIN"),
+  validate(petIdSchema, "params"),
+  petsController.removePetVaccine,
 );
 
 export default router;

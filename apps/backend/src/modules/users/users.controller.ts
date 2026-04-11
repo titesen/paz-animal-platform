@@ -2,9 +2,10 @@ import type { Response } from "express";
 import type { AuthenticatedRequest, JSendSuccess } from "../../common/types";
 import { asyncHandler } from "../../common/utils";
 import * as usersService from "./users.service";
+import type { UsersQueryParams } from "./users.dto";
 
 export const listUsers = asyncHandler(async (req, res: Response) => {
-  const result = await usersService.listUsers(req.query as Record<string, string>);
+  const result = await usersService.listUsers(req.query as unknown as UsersQueryParams);
 
   const response: JSendSuccess = { status: "success", data: result };
   res.status(200).json(response);

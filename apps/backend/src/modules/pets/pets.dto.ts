@@ -49,3 +49,53 @@ export const petQuerySchema = z.object({
 });
 
 export type PetQueryParams = z.infer<typeof petQuerySchema>;
+
+// ===================
+// SPECIES & BREEDS
+// ===================
+
+export const createSpeciesSchema = z.object({
+  name: z.string().min(1).max(50),
+});
+export type CreateSpeciesDTO = z.infer<typeof createSpeciesSchema>;
+
+export const speciesIdSchema = z.object({
+  speciesId: z.coerce.number().int().positive(),
+});
+export type SpeciesIdParams = z.infer<typeof speciesIdSchema>;
+
+export const createBreedSchema = z.object({
+  name: z.string().min(1).max(100),
+  speciesId: z.number().int().positive(),
+});
+export type CreateBreedDTO = z.infer<typeof createBreedSchema>;
+
+export const breedIdSchema = z.object({
+  breedId: z.coerce.number().int().positive(),
+});
+export type BreedIdParams = z.infer<typeof breedIdSchema>;
+
+export const updateBreedSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+});
+export type UpdateBreedDTO = z.infer<typeof updateBreedSchema>;
+
+// ===================
+// VACCINES
+// ===================
+
+export const createVaccineSchema = z.object({
+  name: z.string().min(1).max(100),
+});
+export type CreateVaccineDTO = z.infer<typeof createVaccineSchema>;
+
+export const vaccineIdSchema = z.object({
+  vaccineId: z.coerce.number().int().positive(),
+});
+export type VaccineIdParams = z.infer<typeof vaccineIdSchema>;
+
+export const applyVaccineSchema = z.object({
+  vaccineId: z.number().int().positive(),
+  appliedAt: z.string().date().optional(),
+});
+export type ApplyVaccineDTO = z.infer<typeof applyVaccineSchema>;

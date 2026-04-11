@@ -16,8 +16,10 @@ import authRoutes from "./modules/auth/auth.routes";
 import cmsRoutes from "./modules/cms/cms.routes";
 import eventsRoutes from "./modules/events/events.routes";
 import financeRoutes from "./modules/finance/finance.routes";
+import locationsRoutes from "./modules/locations/locations.routes";
 import mediaRoutes from "./modules/media/media.routes";
 import petsRoutes from "./modules/pets/pets.routes";
+import tagsRoutes from "./modules/tags/tags.routes";
 import usersRoutes from "./modules/users/users.routes";
 import volunteersRoutes from "./modules/volunteers/volunteers.routes";
 
@@ -180,6 +182,8 @@ app.use("/api/events", eventsRoutes);
 app.use("/api/finance", financeRoutes);
 app.use("/api/cms", cmsRoutes);
 app.use("/api/media", mediaRoutes);
+app.use("/api/locations", locationsRoutes);
+app.use("/api/tags", tagsRoutes);
 
 // 404 handler (must be after all routes)
 app.use(notFoundHandler);

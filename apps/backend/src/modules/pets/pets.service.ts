@@ -4,10 +4,18 @@
  */
 
 import { logger } from "../../config/logger";
-import { ForbiddenError, NotFoundError } from "../../common/errors";
+import { ConflictError, ForbiddenError, NotFoundError } from "../../common/errors";
 import { calculateTotalPages, parsePagination } from "../../common/utils/formatter";
 import * as petsRepo from "./pets.repository";
-import type { CreatePetDTO, PetQueryParams, UpdatePetDTO } from "./pets.dto";
+import type {
+  ApplyVaccineDTO,
+  CreateBreedDTO,
+  CreatePetDTO,
+  CreateSpeciesDTO,
+  PetQueryParams,
+  UpdateBreedDTO,
+  UpdatePetDTO,
+} from "./pets.dto";
 
 /**
  * Get all pets with pagination
@@ -248,4 +256,160 @@ export async function resolveLostPetAlert(userId: string, alertId: string) {
   await petsRepo.updatePetStatus(alert.petId, "OWNED");
 
   logger.info({ alertId, petId: alert.petId, ownerId: userId }, "Lost pet alert resolved");
+}
+
+// ===================
+// SPECIES
+// ===================
+
+export async function getAllSpecies() {
+  return petsRepo.findAllSpecies();
+}
+
+export async function createSpecies(data: CreateSpeciesDTO) {
+  return petsRepo.createSpecies(data.name);
+}
+
+export async function updateSpecies(speciesId: number, data: CreateSpeciesDTO) {
+  const species = await petsRepo.findSpeciesById(speciesId);
+  if (!species) {
+    throw new NotFoundError("Species not found", "SPECIES_NOT_FOUND");
+  }
+  return petsRepo.updateSpecies(speciesId, data.name);
+}
+
+export async function deleteSpecies(speciesId: number) {
+  const species = await petsRepo.findSpeciesById(speciesId);
+  if (!species) {
+    throw new NotFoundError("Species not found", "SPECIES_NOT_FOUND");
+  }
+
+  const breedCount = await petsRepo.countBreedsForSpecies(speciesId);
+  if (breedCount > 0) {
+    throw new ConflictError("Cannot delete species with existing breeds", "SPECIES_HAS_BREEDS");
+  }
+
+  const petCount = await petsRepo.countPetsForSpecies(speciesId);
+  if (petCount > 0) {
+    throw new ConflictError("Cannot delete species with existing pets", "SPECIES_HAS_PETS");
+  }
+
+  await petsRepo.deleteSpecies(speciesId);
+  logger.info({ speciesId }, "Species deleted");
+}
+
+// ===================
+// BREEDS
+// ===================
+
+export async function getBreedsBySpecies(speciesId: number) {
+  const species = await petsRepo.findSpeciesById(speciesId);
+  if (!species) {
+    throw new NotFoundError("Species not found", "SPECIES_NOT_FOUND");
+  }
+  return petsRepo.findBreedsBySpecies(speciesId);
+}
+
+export async function createBreed(data: CreateBreedDTO) {
+  const species = await petsRepo.findSpeciesById(data.speciesId);
+  if (!species) {
+    throw new NotFoundError("Species not found", "SPECIES_NOT_FOUND");
+  }
+  return petsRepo.createBreed(data);
+}
+
+export async function updateBreed(breedId: number, data: UpdateBreedDTO) {
+  const breed = await petsRepo.findBreedById(breedId);
+  if (!breed) {
+    throw new NotFoundError("Breed not found", "BREED_NOT_FOUND");
+  }
+  return petsRepo.updateBreed(breedId, data);
+}
+
+export async function deleteBreed(breedId: number) {
+  const breed = await petsRepo.findBreedById(breedId);
+  if (!breed) {
+    throw new NotFoundError("Breed not found", "BREED_NOT_FOUND");
+  }
+
+  const petCount = await petsRepo.countPetsForBreed(breedId);
+  if (petCount > 0) {
+    throw new ConflictError("Cannot delete breed with existing pets", "BREED_HAS_PETS");
+  }
+
+  await petsRepo.deleteBreed(breedId);
+  logger.info({ breedId }, "Breed deleted");
+}
+
+// ===================
+// VACCINES CATALOG
+// ===================
+
+export async function getAllVaccines() {
+  return petsRepo.findAllVaccines();
+}
+
+export async function createVaccine(data: { name: string }) {
+  return petsRepo.createVaccine(data.name);
+}
+
+export async function updateVaccine(vaccineId: number, data: { name: string }) {
+  const vaccine = await petsRepo.findVaccineById(vaccineId);
+  if (!vaccine) {
+    throw new NotFoundError("Vaccine not found", "VACCINE_NOT_FOUND");
+  }
+  return petsRepo.updateVaccine(vaccineId, data.name);
+}
+
+export async function deleteVaccine(vaccineId: number) {
+  const vaccine = await petsRepo.findVaccineById(vaccineId);
+  if (!vaccine) {
+    throw new NotFoundError("Vaccine not found", "VACCINE_NOT_FOUND");
+  }
+
+  const usageCount = await petsRepo.countPetsForVaccine(vaccineId);
+  if (usageCount > 0) {
+    throw new ConflictError("Cannot delete vaccine in use", "VACCINE_IN_USE");
+  }
+
+  await petsRepo.deleteVaccine(vaccineId);
+  logger.info({ vaccineId }, "Vaccine deleted");
+}
+
+// ===================
+// PET VACCINE RECORDS
+// ===================
+
+export async function getPetVaccines(petId: string) {
+  const pet = await petsRepo.findPetById(petId);
+  if (!pet) {
+    throw new NotFoundError("Pet not found", "PET_NOT_FOUND");
+  }
+  return petsRepo.findPetVaccines(petId);
+}
+
+export async function applyVaccineToPet(petId: string, data: ApplyVaccineDTO) {
+  const pet = await petsRepo.findPetById(petId);
+  if (!pet) {
+    throw new NotFoundError("Pet not found", "PET_NOT_FOUND");
+  }
+
+  const vaccine = await petsRepo.findVaccineById(data.vaccineId);
+  if (!vaccine) {
+    throw new NotFoundError("Vaccine not found", "VACCINE_NOT_FOUND");
+  }
+
+  const appliedAt = data.appliedAt || new Date().toISOString().split("T")[0];
+
+  return petsRepo.applyVaccineToPet({ petId, vaccineId: data.vaccineId, appliedAt });
+}
+
+export async function removePetVaccine(petId: string, vaccineId: number, appliedAt: string) {
+  const pet = await petsRepo.findPetById(petId);
+  if (!pet) {
+    throw new NotFoundError("Pet not found", "PET_NOT_FOUND");
+  }
+
+  await petsRepo.removePetVaccine(petId, vaccineId, appliedAt);
+  logger.info({ petId, vaccineId, appliedAt }, "Pet vaccine record removed");
 }
